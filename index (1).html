@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>花立山養鰻 業務管理</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{margin:0;padding:0;background:#F0EDE8;font-family:'Helvetica Neue',Arial,'Hiragino Sans','ヒラギノ角ゴ ProN',sans-serif;}
+select,button,input,textarea{font-family:inherit;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:#C8963E44;border-radius:4px;}
+input:focus,select:focus,textarea:focus{outline:2px solid #C8963E;outline-offset:1px;}
+.tab-bar button:active{opacity:0.7;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useCallback,useRef}=React;
+
+// ══════════════════════════════
+//  ⚙️ 設定（本番化時にここを編集）
+// ══════════════════════════════
+const CONFIG={
+  SUPABASE_URL:"https://YOUR_PROJECT.supabase.co",
+  SUPABASE_ANON_KEY:"YOUR_ANON_KEY",
+  LINE_NOTIFY_TOKEN:"YOUR_LINE_NOTIFY_TOKEN",
+};
+const IS_DEMO=CONFIG.SUPABASE_URL.includes("YOUR_PROJECT");
+
+// ── Supabaseクライアント ──
+class SB{
+  constructor(url,key){this.url=url;this.key=key;}
+  headers(){return{"apikey":this.key,"Authorization":"Bearer "+this.key,"Content-Type":"application/json","Prefer":"return=representation"};}
+  async select(table){const r=await fetch(`${this.url}/rest/v1/${table}?select=*`,{headers:this.headers()});if(!r.ok)throw new Error(await r.text());return r.json();}
+  async upsert(table,data){const r=await fetch(`${this.url}/rest/v1/${table}`,{method:"POST",headers:{...this.headers(),"Prefer":"resolution=merge-duplicates,return=representation"},body:JSON.stringify(Array.isArray(data)?data:[data])});if(!r.ok)throw new Error(await r.text());return r.json();}
+}
+const db=new SB(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
+
+// ── LINE通知 ──
+async function lineNotify(msg){
+  if(IS_DEMO){console.log("[LINE デモ]",msg);return;}
+  try{await fetch("/api/line-notify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:msg})});}
+  catch(e){console.error("LINE通知エラー:",e);}
+}
+function buildAlertMsg(ecA,wsA){
+  const lines=["🐟【花立山養鰻】要対応アラート",`📅 ${new Date().toLocaleString("ja-JP")}`];
+  if(ecA.length){lines.push("\n🛒 EC・ふるさと納税");ecA.forEach(o=>lines.push(`  ${o.id} ${o.customer}`));}
+  if(wsA.length){lines.push("\n📦 卸先管理");wsA.forEach(w=>lines.push(`  ${w.id} ${w.client}`));}
+  return lines.join("\n");
+}
+
+const C={navy:"#1A2744",gold:"#C8963E",goldLight:"#E8B85A",red:"#C0392B",green:"#27AE60",orange:"#E67E22",cyan:"#2980B9",bg:"#F0EDE8",bgCard:"#FAFAF8",text:"#1A1A1A",textSub:"#5A5A5A",border:"#D8D2C8"};
+
+// ── デモ初期データ ──
+const DEMO_ORDERS=[
+  {id:"EC-001",customer:"田中 一郎",type:"EC",product:"うなぎ蒲焼き 2尾セット",qty:1,amount:4800,status:"注文確認",stock:true,payment:true,assigned:null,shipDate:"2026-06-13",created:"2026-06-10 09:12",alert:false},
+  {id:"EC-002",customer:"鈴木 花子",type:"ふるさと納税",product:"特選うなぎ詰め合わせ",qty:2,amount:12000,status:"梱包中",stock:true,payment:true,assigned:null,shipDate:"2026-06-12",created:"2026-06-10 10:45",alert:false},
+  {id:"EC-003",customer:"山田 太郎",type:"EC",product:"うなぎ白焼き 1尾",qty:3,amount:7200,status:"在庫なし",stock:false,payment:true,assigned:null,shipDate:"",created:"2026-06-11 08:30",alert:true},
+  {id:"EC-004",customer:"佐藤 美咲",type:"ふるさと納税",product:"うなぎ蒲焼き 4尾セット",qty:1,amount:8500,status:"発送済み",stock:true,payment:true,assigned:null,shipDate:"2026-06-11",created:"2026-06-09 14:20",alert:false},
+  {id:"EC-005",customer:"高橋 健二",type:"EC",product:"うなぎ蒲焼き 2尾セット",qty:1,amount:4800,status:"未対応",stock:true,payment:false,assigned:null,shipDate:"",created:"2026-06-11 11:05",alert:true},
+];
+const DEMO_WHOLESALE=[
+  {id:"WS-001",client:"博多うなぎ料理店",tel:"092-111-2222",product:"活鰻 5kg",qty:5,unitPrice:8000,amount:40000,orderStatus:"受注入力済",purchaseStatus:"発注済",deliveryStatus:"仕入確定",invoiceIssued:true,salesRecorded:false,shipDate:"2026-06-14",created:"2026-06-08"},
+  {id:"WS-002",client:"福岡市場株式会社",tel:"092-333-4444",product:"蒲焼き業務用 10kg",qty:2,unitPrice:15000,amount:30000,orderStatus:"受注入力済",purchaseStatus:"未発注",deliveryStatus:"未確定",invoiceIssued:false,salesRecorded:false,shipDate:"",created:"2026-06-10"},
+  {id:"WS-003",client:"九州食品卸 LLC",tel:"092-555-6666",product:"活鰻 10kg",qty:10,unitPrice:7500,amount:75000,orderStatus:"受注入力済",purchaseStatus:"発注済",deliveryStatus:"仕入確定",invoiceIssued:true,salesRecorded:true,shipDate:"2026-06-10",created:"2026-06-05"},
+];
+const DEMO_PRODUCTS=[
+  {id:"P-001",name:"うなぎ蒲焼き 2尾セット",price:4800,category:"EC"},
+  {id:"P-002",name:"特選うなぎ詰め合わせ",price:12000,category:"ふるさと納税"},
+  {id:"P-003",name:"うなぎ白焼き 1尾",price:2400,category:"EC"},
+  {id:"P-004",name:"うなぎ蒲焼き 4尾セット",price:8500,category:"ふるさと納税"},
+  {id:"P-005",name:"活鰻 5kg",price:8000,category:"卸売"},
+  {id:"P-006",name:"活鰻 10kg",price:7500,category:"卸売"},
+  {id:"P-007",name:"蒲焼き業務用 10kg",price:15000,category:"卸売"},
+];
+const DEMO_CLIENTS=[
+  {id:"C-001",name:"博多うなぎ料理店",tel:"092-111-2222",address:"福岡市博多区"},
+  {id:"C-002",name:"福岡市場株式会社",tel:"092-333-4444",address:"福岡市東区"},
+  {id:"C-003",name:"九州食品卸 LLC",tel:"092-555-6666",address:"福岡市中央区"},
+];
+const DEMO_REPORTS=[
+  {month:"2026-04",ec:85000,furusato:210000,wholesale:320000},
+  {month:"2026-05",ec:92000,furusato:185000,wholesale:415000},
+  {month:"2026-06",ec:29800,furusato:20500,wholesale:75000},
+];
+const DEMO_DIARY=[
+  {id:"D-001",date:"2026-06-11",author:"昭次郎",content:"第1池・第2池の水温確認。28℃安定。餌やり完了（午前・午後）。出荷4尾確認済み。",tag:"池管理"},
+  {id:"D-002",date:"2026-06-10",author:"琴音",content:"ふるさと納税 2件梱包・発送完了。EC注文3件対応。在庫確認：蒲焼き残12セット。",tag:"出荷"},
+];
+
+const STATUS_EC=["未対応","注文確認","在庫なし","梱包中","発送済み","完了"];
+const STATUS_WS_O=["未入力","受注入力済"];
+const STATUS_WS_P=["未発注","発注済"];
+const STATUS_WS_D=["未確定","仕入確定"];
+const TABS=[{id:"ec",icon:"🛒",label:"EC注文"},{id:"wholesale",icon:"📦",label:"卸先"},{id:"alert",icon:"🔔",label:"アラート"},{id:"finance",icon:"📊",label:"財務"},{id:"diary",icon:"📝",label:"日報"},{id:"setup",icon:"⚙️",label:"設定"}];
+const DIARY_TAGS=["池管理","出荷","仕入","清掃","その他"];
+
+const sc=s=>["発送済み","完了","仕入確定","受注入力済","発注済"].includes(s)?C.green:["未対応","在庫なし","未確定","未発注","未入力"].includes(s)?C.red:C.orange;
+const genId=(prefix)=>prefix+"-"+Date.now().toString().slice(-6);
+const today=()=>new Date().toISOString().slice(0,10);
+const nowStr=()=>new Date().toLocaleString("ja-JP").replace(/\//g,"-");
+
+// ── 共通UI ──
+const Badge=({label,color})=>(<span style={{background:color+"22",color,border:`1px solid ${color}55`,borderRadius:4,padding:"2px 7px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>{label}</span>);
+const Row=({label,value})=>(<div style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:`1px solid ${C.border}`}}><span style={{fontSize:12,color:C.textSub}}>{label}</span><span style={{fontSize:13,fontWeight:600}}>{value}</span></div>);
+const ToggleBtn=({label,checked,onChange})=>(<button onClick={()=>onChange(!checked)} style={{flex:1,padding:"11px 0",borderRadius:8,border:`2px solid ${checked?C.green:C.border}`,background:checked?C.green+"11":"white",color:checked?C.green:C.textSub,fontWeight:700,fontSize:13,cursor:"pointer"}}>{checked?"✓ ":""}{label}</button>);
+const Toast=({msg,type})=>msg?(<div style={{position:"fixed",bottom:76,left:"50%",transform:"translateX(-50%)",background:type==="error"?C.red:C.navy,color:"white",padding:"10px 20px",borderRadius:24,fontSize:13,fontWeight:600,zIndex:300,whiteSpace:"nowrap",boxShadow:"0 4px 20px #0004"}}>{type==="error"?"⚠️":"✅"} {msg}</div>):null;
+const Label=({children})=>(<div style={{fontSize:11,color:C.textSub,marginBottom:5,marginTop:10}}>{children}</div>);
+const Input=({value,onChange,placeholder,type="text"})=>(<input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,fontSize:14,background:"white"}}/>);
+const Select=({value,onChange,children})=>(<select value={value} onChange={e=>onChange(e.target.value)} style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,fontSize:14,background:"white"}}>{children}</select>);
+const SaveBtn=({onClick,disabled,label="💾 保存"})=>(<button onClick={onClick} disabled={disabled} style={{width:"100%",padding:"13px 0",borderRadius:8,background:disabled?C.border:C.navy,color:"white",fontWeight:700,fontSize:14,border:"none",cursor:"pointer",marginTop:14}}>{disabled?"保存中...":label}</button>);
+
+const Modal=({onClose,title,children})=>(
+  <div style={{position:"fixed",inset:0,background:"#0009",zIndex:200,display:"flex",alignItems:"flex-end"}} onClick={onClose}>
+    <div style={{background:"white",width:"100%",maxHeight:"92vh",borderRadius:"18px 18px 0 0",padding:20,overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+        <h3 style={{margin:0,fontSize:16,color:C.navy}}>{title}</h3>
+        <button onClick={onClose} style={{border:"none",background:"none",fontSize:22,cursor:"pointer",color:C.textSub}}>✕</button>
+      </div>
+      {children}
+    </div>
+  </div>
+);
+
+// ══════════════════════════════
+//  EC・ふるさと納税タブ
+// ══════════════════════════════
+function EcTab({orders,setOrders,staff,products,showToast}){
+  const [filter,setFilter]=useState("全て");
+  const [detail,setDetail]=useState(null);
+  const [showNew,setShowNew]=useState(false);
+  const [form,setForm]=useState({customer:"",type:"EC",product:"",qty:1,amount:0,shipDate:"",stock:true,payment:false});
+
+  const filtered=filter==="全て"?orders:orders.filter(o=>o.type===filter||o.status===filter);
+
+  const update=(id,field,value)=>{
+    setOrders(prev=>prev.map(o=>{
+      if(o.id!==id)return o;
+      const u={...o,[field]:value};
+      u.alert=!u.stock||!u.payment||u.status==="未対応";
+      return u;
+    }));
+    setDetail(prev=>prev&&prev.id===id?{...prev,[field]:value}:prev);
+  };
+
+  const addOrder=()=>{
+    if(!form.customer||!form.product){showToast("顧客名と商品を入力してください","error");return;}
+    const newOrder={
+      id:genId("EC"),customer:form.customer,type:form.type,product:form.product,
+      qty:Number(form.qty),amount:Number(form.amount),status:"未対応",
+      stock:form.stock,payment:form.payment,assigned:null,
+      shipDate:form.shipDate,created:nowStr(),alert:true,
+    };
+    setOrders(prev=>[newOrder,...prev]);
+    setShowNew(false);
+    setForm({customer:"",type:"EC",product:"",qty:1,amount:0,shipDate:"",stock:true,payment:false});
+    showToast("注文を追加しました");
+  };
+
+  const selectProduct=(name)=>{
+    const p=products.find(p=>p.name===name);
+    if(p)setForm(f=>({...f,product:p.name,amount:p.price*f.qty}));
+    else setForm(f=>({...f,product:name}));
+  };
+
+  return(
+    <div>
+      {/* サマリー */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:16}}>
+        {[
+          {label:"本日の注文",value:orders.filter(o=>o.created.startsWith("2026-06-11")).length,color:C.cyan},
+          {label:"要対応",value:orders.filter(o=>o.alert).length,color:C.red},
+          {label:"発送待ち",value:orders.filter(o=>o.status==="梱包中").length,color:C.orange},
+        ].map(s=>(
+          <div key={s.label} style={{background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:8,padding:"12px 10px",borderLeft:`4px solid ${s.color}`}}>
+            <div style={{fontSize:22,fontWeight:800,color:s.color}}>{s.value}</div>
+            <div style={{fontSize:10,color:C.textSub,marginTop:2,lineHeight:1.3}}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* 新規注文ボタン */}
+      <button onClick={()=>setShowNew(true)} style={{width:"100%",padding:"12px 0",borderRadius:10,background:C.gold,color:"white",fontWeight:800,fontSize:14,border:"none",cursor:"pointer",marginBottom:14,boxShadow:"0 2px 8px #C8963E44"}}>
+        ＋ 新規注文を追加
+      </button>
+
+      {/* フィルター */}
+      <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
+        {["全て","EC","ふるさと納税","未対応","梱包中","発送済み"].map(f=>(
+          <button key={f} onClick={()=>setFilter(f)} style={{padding:"5px 11px",borderRadius:20,border:`1px solid ${filter===f?C.gold:C.border}`,background:filter===f?C.gold:"white",color:filter===f?"white":C.text,fontSize:12,cursor:"pointer",fontWeight:filter===f?700:400}}>{f}</button>
+        ))}
+      </div>
+
+      {/* リスト */}
+      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+        {filtered.map(o=>(
+          <div key={o.id} onClick={()=>setDetail(o)} style={{background:C.bgCard,border:`1px solid ${o.alert?C.red:C.border}`,borderLeft:`4px solid ${o.alert?C.red:sc(o.status)}`,borderRadius:8,padding:"12px 14px",cursor:"pointer"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
+              <div style={{flex:1}}>
+                <div style={{display:"flex",alignItems:"center",gap:5,flexWrap:"wrap"}}>
+                  {o.alert&&<span>⚠️</span>}
+                  <span style={{fontWeight:700,fontSize:13}}>{o.customer}</span>
+                  <Badge label={o.type} color={o.type==="EC"?C.cyan:C.gold}/>
+                  <Badge label={o.status} color={sc(o.status)}/>
+                </div>
+                <div style={{fontSize:12,color:C.textSub,marginTop:3}}>{o.product} × {o.qty}</div>
+                <div style={{fontSize:11,color:C.textSub,marginTop:2}}>
+                  担当:{o.assigned||"未割当"} {o.shipDate&&`| 発送予定:${o.shipDate}`}
+                </div>
+              </div>
+              <div style={{fontWeight:800,color:C.navy,fontSize:14,whiteSpace:"nowrap"}}>¥{o.amount.toLocaleString()}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 新規注文モーダル */}
+      {showNew&&(
+        <Modal onClose={()=>setShowNew(false)} title="＋ 新規注文">
+          <Label>種別</Label>
+          <Select value={form.type} onChange={v=>setForm(f=>({...f,type:v}))}>
+            <option>EC</option><option>ふるさと納税</option>
+          </Select>
+          <Label>顧客名 *</Label>
+          <Input value={form.customer} onChange={v=>setForm(f=>({...f,customer:v}))} placeholder="例：田中 一郎"/>
+          <Label>商品 *（登録商品から選ぶか直接入力）</Label>
+          <Select value="" onChange={e=>selectProduct(e.target.value)}>
+            <option value="">── 登録商品から選択 ──</option>
+            {products.filter(p=>p.category!=="卸売").map(p=><option key={p.id} value={p.name}>{p.name}（¥{p.price.toLocaleString()}）</option>)}
+          </Select>
+          <div style={{marginTop:6}}>
+            <Input value={form.product} onChange={v=>setForm(f=>({...f,product:v}))} placeholder="または商品名を直接入力"/>
+          </div>
+          <Label>数量</Label>
+          <Input type="number" value={form.qty} onChange={v=>setForm(f=>({...f,qty:v,amount:products.find(p=>p.name===f.product)?.price*v||f.amount}))} placeholder="1"/>
+          <Label>金額（円）</Label>
+          <Input type="number" value={form.amount} onChange={v=>setForm(f=>({...f,amount:v}))} placeholder="0"/>
+          <Label>発送予定日</Label>
+          <Input type="date" value={form.shipDate} onChange={v=>setForm(f=>({...f,shipDate:v}))}/>
+          <div style={{display:"flex",gap:10,marginTop:10}}>
+            <ToggleBtn label="在庫あり" checked={form.stock} onChange={v=>setForm(f=>({...f,stock:v}))}/>
+            <ToggleBtn label="決済OK" checked={form.payment} onChange={v=>setForm(f=>({...f,payment:v}))}/>
+          </div>
+          <SaveBtn onClick={addOrder} label="＋ 注文を追加"/>
+        </Modal>
+      )}
+
+      {/* 詳細モーダル */}
+      {detail&&(
+        <Modal onClose={()=>setDetail(null)} title={`注文詳細 ${detail.id}`}>
+          <Row label="顧客名" value={detail.customer}/>
+          <Row label="商品" value={`${detail.product} × ${detail.qty}`}/>
+          <Row label="金額" value={`¥${detail.amount.toLocaleString()}`}/>
+          <Row label="種別" value={detail.type}/>
+          <Row label="注文日時" value={detail.created}/>
+          <Label>ステータス</Label>
+          <Select value={detail.status} onChange={v=>{update(detail.id,"status",v);setDetail(p=>({...p,status:v}));}}>
+            {STATUS_EC.map(s=><option key={s}>{s}</option>)}
+          </Select>
+          <Label>発送予定日</Label>
+          <Input type="date" value={detail.shipDate||""} onChange={v=>{update(detail.id,"shipDate",v);setDetail(p=>({...p,shipDate:v}));}}/>
+          <Label>担当者</Label>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            {staff.length===0&&<div style={{fontSize:12,color:C.textSub}}>⚙️設定タブで担当者を追加してください</div>}
+            {staff.map(s=>(<button key={s} onClick={()=>{update(detail.id,"assigned",s);setDetail(p=>({...p,assigned:s}));}} style={{padding:"9px 14px",borderRadius:6,border:`1px solid ${detail.assigned===s?C.navy:C.border}`,background:detail.assigned===s?C.navy:"white",color:detail.assigned===s?"white":C.text,fontSize:13,cursor:"pointer",fontWeight:700}}>{s}</button>))}
+          </div>
+          <div style={{display:"flex",gap:10,marginTop:10}}>
+            <ToggleBtn label="在庫あり" checked={detail.stock} onChange={v=>{update(detail.id,"stock",v);setDetail(p=>({...p,stock:v}));}}/>
+            <ToggleBtn label="決済OK" checked={detail.payment} onChange={v=>{update(detail.id,"payment",v);setDetail(p=>({...p,payment:v}));}}/>
+          </div>
+          <SaveBtn onClick={()=>{showToast("保存しました（デモ）");setDetail(null);}} label="💾 保存"/>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════
+//  卸先管理タブ
+// ══════════════════════════════
+function WholesaleTab({wholesale,setWholesale,staff,products,clients,showToast}){
+  const [detail,setDetail]=useState(null);
+  const [showNew,setShowNew]=useState(false);
+  const [form,setForm]=useState({client:"",tel:"",product:"",qty:1,unitPrice:0,shipDate:""});
+
+  const update=(id,field,value)=>{
+    setWholesale(prev=>prev.map(w=>w.id===id?{...w,[field]:value}:w));
+    setDetail(prev=>prev&&prev.id===id?{...prev,[field]:value}:prev);
+  };
+
+  const selectClient=(name)=>{
+    const c=clients.find(c=>c.name===name);
+    if(c)setForm(f=>({...f,client:c.name,tel:c.tel}));
+    else setForm(f=>({...f,client:name}));
+  };
+
+  const selectProduct=(name)=>{
+    const p=products.find(p=>p.name===name);
+    if(p)setForm(f=>({...f,product:p.name,unitPrice:p.price}));
+    else setForm(f=>({...f,product:name}));
+  };
+
+  const addWS=()=>{
+    if(!form.client||!form.product){showToast("得意先と商品を入力してください","error");return;}
+    const w={
+      id:genId("WS"),client:form.client,tel:form.tel,product:form.product,
+      qty:Number(form.qty),unitPrice:Number(form.unitPrice),
+      amount:Number(form.qty)*Number(form.unitPrice),
+      orderStatus:"受注入力済",purchaseStatus:"未発注",deliveryStatus:"未確定",
+      invoiceIssued:false,salesRecorded:false,
+      shipDate:form.shipDate,created:today(),
+    };
+    setWholesale(prev=>[w,...prev]);
+    setShowNew(false);
+    setForm({client:"",tel:"",product:"",qty:1,unitPrice:0,shipDate:""});
+    showToast("卸先注文を追加しました");
+  };
+
+  const totalSales=wholesale.reduce((s,w)=>w.salesRecorded?s+w.amount:s,0);
+  const FlowStep=({label,opts,value,onChange})=>(
+    <div style={{marginTop:10}}>
+      <div style={{fontSize:11,color:C.textSub,marginBottom:5}}>{label}</div>
+      <div style={{display:"flex",gap:6}}>
+        {opts.map(o=><button key={o} onClick={()=>onChange(o)} style={{flex:1,padding:"9px 0",borderRadius:6,border:`1px solid ${value===o?sc(o):C.border}`,background:value===o?sc(o):"white",color:value===o?"white":C.text,fontSize:12,cursor:"pointer",fontWeight:700}}>{o}</button>)}
+      </div>
+    </div>
+  );
+
+  return(
+    <div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,marginBottom:16}}>
+        {[{label:"計上済み売上",value:`¥${totalSales.toLocaleString()}`,color:C.green},{label:"未計上件数",value:wholesale.filter(w=>!w.salesRecorded).length,color:C.orange}].map(s=>(
+          <div key={s.label} style={{background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:8,padding:"14px 12px",borderLeft:`4px solid ${s.color}`}}>
+            <div style={{fontSize:18,fontWeight:800,color:s.color}}>{s.value}</div>
+            <div style={{fontSize:11,color:C.textSub,marginTop:2}}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <button onClick={()=>setShowNew(true)} style={{width:"100%",padding:"12px 0",borderRadius:10,background:C.gold,color:"white",fontWeight:800,fontSize:14,border:"none",cursor:"pointer",marginBottom:14,boxShadow:"0 2px 8px #C8963E44"}}>
+        ＋ 新規卸注文を追加
+      </button>
+
+      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+        {wholesale.map(w=>(
+          <div key={w.id} onClick={()=>setDetail(w)} style={{background:C.bgCard,border:`1px solid ${C.border}`,borderLeft:`4px solid ${w.salesRecorded?C.green:C.orange}`,borderRadius:8,padding:"12px 14px",cursor:"pointer"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+              <div style={{flex:1}}>
+                <div style={{fontWeight:700,fontSize:13}}>{w.client}</div>
+                <div style={{fontSize:12,color:C.textSub,marginTop:3}}>{w.product}</div>
+                <div style={{display:"flex",gap:5,marginTop:6,flexWrap:"wrap"}}>
+                  <Badge label={`受注:${w.orderStatus}`} color={sc(w.orderStatus)}/>
+                  <Badge label={`発注:${w.purchaseStatus}`} color={sc(w.purchaseStatus)}/>
+                  <Badge label={`仕入:${w.deliveryStatus}`} color={sc(w.deliveryStatus)}/>
+                </div>
+                {w.shipDate&&<div style={{fontSize:11,color:C.textSub,marginTop:4}}>納品予定:{w.shipDate}</div>}
+              </div>
+              <div style={{textAlign:"right"}}>
+                <div style={{fontWeight:800,color:C.navy,fontSize:14}}>¥{w.amount.toLocaleString()}</div>
+                <div style={{fontSize:11,color:C.textSub}}>{w.created}</div>
+              </div>
+            </div>
+            <div style={{display:"flex",gap:6,marginTop:8}}>
+              <Badge label={w.invoiceIssued?"✓ 納品書":"納品書未発行"} color={w.invoiceIssued?C.green:C.red}/>
+              <Badge label={w.salesRecorded?"✓ 売上計上":"売上未計上"} color={w.salesRecorded?C.green:C.orange}/>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 新規卸注文モーダル */}
+      {showNew&&(
+        <Modal onClose={()=>setShowNew(false)} title="＋ 新規卸注文">
+          <Label>得意先（登録から選ぶか直接入力）</Label>
+          <Select value="" onChange={e=>selectClient(e.target.value)}>
+            <option value="">── 登録得意先から選択 ──</option>
+            {clients.map(c=><option key={c.id} value={c.name}>{c.name}</option>)}
+          </Select>
+          <div style={{marginTop:6}}><Input value={form.client} onChange={v=>setForm(f=>({...f,client:v}))} placeholder="または直接入力"/></div>
+          <Label>電話番号</Label>
+          <Input value={form.tel} onChange={v=>setForm(f=>({...f,tel:v}))} placeholder="例：092-123-4567"/>
+          <Label>商品（登録から選ぶか直接入力）</Label>
+          <Select value="" onChange={e=>selectProduct(e.target.value)}>
+            <option value="">── 登録商品から選択 ──</option>
+            {products.filter(p=>p.category==="卸売").map(p=><option key={p.id} value={p.name}>{p.name}（¥{p.price.toLocaleString()}）</option>)}
+          </Select>
+          <div style={{marginTop:6}}><Input value={form.product} onChange={v=>setForm(f=>({...f,product:v}))} placeholder="または直接入力"/></div>
+          <Label>数量</Label>
+          <Input type="number" value={form.qty} onChange={v=>setForm(f=>({...f,qty:v}))} placeholder="1"/>
+          <Label>単価（円）</Label>
+          <Input type="number" value={form.unitPrice} onChange={v=>setForm(f=>({...f,unitPrice:v}))} placeholder="0"/>
+          <div style={{padding:"8px 12px",background:C.gold+"11",borderRadius:6,marginTop:6,fontWeight:700,color:C.navy}}>
+            合計：¥{(Number(form.qty)*Number(form.unitPrice)).toLocaleString()}
+          </div>
+          <Label>納品予定日</Label>
+          <Input type="date" value={form.shipDate} onChange={v=>setForm(f=>({...f,shipDate:v}))}/>
+          <SaveBtn onClick={addWS} label="＋ 卸注文を追加"/>
+        </Modal>
+      )}
+
+      {/* 詳細モーダル */}
+      {detail&&(
+        <Modal onClose={()=>setDetail(null)} title={`卸先詳細 ${detail.id}`}>
+          <Row label="得意先" value={detail.client}/>
+          <Row label="電話" value={detail.tel||"—"}/>
+          <Row label="商品" value={detail.product}/>
+          <Row label="数量" value={`${detail.qty}個`}/>
+          <Row label="単価" value={`¥${detail.unitPrice.toLocaleString()}`}/>
+          <Row label="合計" value={`¥${detail.amount.toLocaleString()}`}/>
+          <Label>納品予定日</Label>
+          <Input type="date" value={detail.shipDate||""} onChange={v=>{update(detail.id,"shipDate",v);setDetail(p=>({...p,shipDate:v}));}}/>
+          <FlowStep label="受注管理" opts={STATUS_WS_O} value={detail.orderStatus} onChange={v=>update(detail.id,"orderStatus",v)}/>
+          <FlowStep label="発注管理" opts={STATUS_WS_P} value={detail.purchaseStatus} onChange={v=>update(detail.id,"purchaseStatus",v)}/>
+          <FlowStep label="仕入管理" opts={STATUS_WS_D} value={detail.deliveryStatus} onChange={v=>update(detail.id,"deliveryStatus",v)}/>
+          <div style={{display:"flex",gap:10,marginTop:10}}>
+            <ToggleBtn label="納品書発行" checked={detail.invoiceIssued} onChange={v=>update(detail.id,"invoiceIssued",v)}/>
+            <ToggleBtn label="売上計上" checked={detail.salesRecorded} onChange={v=>update(detail.id,"salesRecorded",v)}/>
+          </div>
+          <SaveBtn onClick={()=>{showToast("保存しました（デモ）");setDetail(null);}} label="💾 保存"/>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════
+//  アラートタブ
+// ══════════════════════════════
+function AlertTab({orders,wholesale,onLine,lineSending}){
+  const ecA=orders.filter(o=>o.alert);
+  const wsA=wholesale.filter(w=>!w.salesRecorded||!w.invoiceIssued||w.purchaseStatus==="未発注");
+  const shipA=[
+    ...orders.filter(o=>o.shipDate===today()&&o.status!=="発送済み"&&o.status!=="完了").map(o=>({label:`EC: ${o.customer}`,sub:`発送予定日が本日です`,color:C.cyan})),
+    ...wholesale.filter(w=>w.shipDate===today()&&w.deliveryStatus!=="仕入確定").map(w=>({label:`卸: ${w.client}`,sub:`納品予定日が本日です`,color:C.gold})),
+  ];
+  const total=ecA.length+wsA.length+shipA.length;
+
+  const AlertCard=({title,sub,issues})=>(
+    <div style={{background:C.bgCard,border:`1px solid ${C.red}44`,borderLeft:`4px solid ${C.red}`,borderRadius:8,padding:"10px 14px",marginBottom:8}}>
+      <div style={{fontWeight:700,fontSize:13}}>{title}</div>
+      <div style={{fontSize:11,color:C.textSub,marginBottom:5}}>{sub}</div>
+      {issues.map((i,idx)=><div key={idx} style={{fontSize:12,color:C.red}}>{i}</div>)}
+    </div>
+  );
+
+  return(
+    <div>
+      <div style={{background:total>0?C.red+"11":C.green+"11",border:`1px solid ${total>0?C.red:C.green}44`,borderRadius:10,padding:"14px 16px",marginBottom:12,display:"flex",alignItems:"center",gap:10}}>
+        <span style={{fontSize:24}}>{total>0?"⚠️":"✅"}</span>
+        <div style={{flex:1}}>
+          <div style={{fontWeight:700,color:total>0?C.red:C.green,fontSize:15}}>{total>0?`要対応 ${total}件`:"全て対応済み"}</div>
+          <div style={{fontSize:12,color:C.textSub}}>複数名で確認してください</div>
+        </div>
+        {total>0&&(
+          <button onClick={onLine} disabled={lineSending} style={{padding:"9px 14px",borderRadius:8,background:lineSending?C.border:"#06C755",color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>
+            {lineSending?"送信中...":"📲 LINE通知"}
+          </button>
+        )}
+      </div>
+
+      {IS_DEMO&&(
+        <div style={{background:C.gold+"22",border:`1px solid ${C.gold}55`,borderRadius:8,padding:"10px 14px",marginBottom:12,fontSize:12}}>
+          🧪 <strong>デモモード</strong>：LINE通知はコンソールに出力されます。⚙️設定タブでトークンを設定すると実際に送信できます。
+        </div>
+      )}
+
+      {shipA.length>0&&(
+        <div style={{marginBottom:16}}>
+          <div style={{fontWeight:700,fontSize:13,color:C.orange,marginBottom:8,paddingBottom:6,borderBottom:`2px solid ${C.orange}33`}}>📅 本日の発送・納品予定</div>
+          {shipA.map((s,i)=>(
+            <div key={i} style={{background:C.bgCard,border:`1px solid ${s.color}44`,borderLeft:`4px solid ${s.color}`,borderRadius:8,padding:"10px 14px",marginBottom:8}}>
+              <div style={{fontWeight:700,fontSize:13}}>{s.label}</div>
+              <div style={{fontSize:12,color:C.orange}}>{s.sub}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div style={{fontWeight:700,fontSize:13,color:C.cyan,marginBottom:8,paddingBottom:6,borderBottom:`2px solid ${C.cyan}33`}}>🛒 EC・ふるさと納税</div>
+      {ecA.length===0?<div style={{fontSize:13,color:C.green,padding:"8px 0 14px"}}>✅ アラートなし</div>:ecA.map(o=>(
+        <AlertCard key={o.id} title={`${o.id} — ${o.customer}`} sub={o.product}
+          issues={[!o.stock&&"⛔ 在庫なし",!o.payment&&"⛔ 決済未確認",o.status==="未対応"&&"⚡ 未対応",!o.assigned&&"👤 担当未割当"].filter(Boolean)}/>
+      ))}
+
+      <div style={{fontWeight:700,fontSize:13,color:C.gold,marginBottom:8,marginTop:4,paddingBottom:6,borderBottom:`2px solid ${C.gold}33`}}>📦 卸先管理</div>
+      {wsA.length===0?<div style={{fontSize:13,color:C.green,padding:"8px 0 14px"}}>✅ アラートなし</div>:wsA.map(w=>(
+        <AlertCard key={w.id} title={`${w.id} — ${w.client}`} sub={w.product}
+          issues={[w.purchaseStatus==="未発注"&&"⚡ 発注未完了",!w.invoiceIssued&&"📄 納品書未発行",!w.salesRecorded&&"💴 売上未計上"].filter(Boolean)}/>
+      ))}
+
+      <div style={{background:C.navy+"0A",border:`1px solid ${C.navy}22`,borderRadius:8,padding:14,marginTop:4}}>
+        <div style={{fontWeight:700,fontSize:13,marginBottom:8,color:C.navy}}>📋 確認ルール</div>
+        {["主担当が対応後、副担当が確認","24時間以上の未対応は全員にLINE通知","在庫なし・決済NGは即時全員に共有"].map((r,i)=>(
+          <div key={i} style={{fontSize:12,color:C.textSub,padding:"5px 0",borderBottom:`1px solid ${C.border}`}}>・{r}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════
+//  財務タブ（月次グラフ付き）
+// ══════════════════════════════
+function FinanceTab({orders,wholesale,reports}){
+  const ecSales=orders.filter(o=>["発送済み","完了"].includes(o.status)).reduce((s,o)=>s+o.amount,0);
+  const wsSales=wholesale.filter(w=>w.salesRecorded).reduce((s,w)=>s+w.amount,0);
+  const total=ecSales+wsSales;
+  const pending=wholesale.filter(w=>!w.salesRecorded).reduce((s,w)=>s+w.amount,0);
+  const breakdown=orders.reduce((acc,o)=>{if(["発送済み","完了"].includes(o.status))acc[o.type]=(acc[o.type]||0)+o.amount;return acc;},{});
+
+  const maxBar=Math.max(...reports.map(r=>r.ec+r.furusato+r.wholesale));
+
+  return(
+    <div>
+      <div style={{background:C.navy,borderRadius:10,padding:"18px 20px",marginBottom:18,color:"white"}}>
+        <div style={{fontSize:11,opacity:0.7,marginBottom:4}}>今月の確定売上</div>
+        <div style={{fontSize:28,fontWeight:800,color:C.goldLight}}>¥{total.toLocaleString()}</div>
+        <div style={{fontSize:11,opacity:0.6,marginTop:4}}>未計上: ¥{pending.toLocaleString()}</div>
+      </div>
+
+      {/* 月次グラフ */}
+      <div style={{background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:10,padding:"16px",marginBottom:18}}>
+        <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:14}}>📈 月次売上推移</div>
+        {reports.map(r=>{
+          const tot=r.ec+r.furusato+r.wholesale;
+          return(
+            <div key={r.month} style={{marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                <span style={{fontSize:12,fontWeight:600}}>{r.month}</span>
+                <span style={{fontSize:12,fontWeight:700,color:C.navy}}>¥{tot.toLocaleString()}</span>
+              </div>
+              <div style={{display:"flex",borderRadius:4,overflow:"hidden",height:18}}>
+                <div style={{width:`${r.ec/maxBar*100}%`,background:C.cyan,minWidth:r.ec>0?4:0}}/>
+                <div style={{width:`${r.furusato/maxBar*100}%`,background:C.gold,minWidth:r.furusato>0?4:0}}/>
+                <div style={{width:`${r.wholesale/maxBar*100}%`,background:C.green,minWidth:r.wholesale>0?4:0}}/>
+              </div>
+            </div>
+          );
+        })}
+        <div style={{display:"flex",gap:14,marginTop:8,flexWrap:"wrap"}}>
+          {[{label:"EC直販",color:C.cyan},{label:"ふるさと納税",color:C.gold},{label:"卸売",color:C.green}].map(l=>(
+            <div key={l.label} style={{display:"flex",alignItems:"center",gap:5,fontSize:11}}>
+              <div style={{width:10,height:10,borderRadius:2,background:l.color}}/>
+              <span style={{color:C.textSub}}>{l.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 内訳 */}
+      <div style={{background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:10,padding:"16px",marginBottom:18}}>
+        <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:10}}>📊 今月の内訳</div>
+        {[{label:"EC直販",value:breakdown["EC"]||0,color:C.cyan},{label:"ふるさと納税",value:breakdown["ふるさと納税"]||0,color:C.gold},{label:"卸売（計上済）",value:wsSales,color:C.green},{label:"卸売（未計上）",value:pending,color:C.orange}].map(item=>(
+          <div key={item.label} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:`1px solid ${C.border}`}}>
+            <div style={{width:10,height:10,borderRadius:"50%",background:item.color}}/>
+            <div style={{flex:1,fontSize:13}}>{item.label}</div>
+            <div style={{fontWeight:700,fontSize:14,color:item.color}}>¥{item.value.toLocaleString()}</div>
+          </div>
+        ))}
+        <div style={{display:"flex",justifyContent:"space-between",padding:"12px 0 0",fontWeight:800,fontSize:15}}>
+          <span>合計（確定）</span><span style={{color:C.navy}}>¥{total.toLocaleString()}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════
+//  日報タブ
+// ══════════════════════════════
+function DiaryTab({diary,setDiary,staff,showToast}){
+  const [showNew,setShowNew]=useState(false);
+  const [form,setForm]=useState({date:today(),author:"",content:"",tag:"池管理"});
+
+  const add=()=>{
+    if(!form.content){showToast("内容を入力してください","error");return;}
+    setDiary(prev=>[{id:genId("D"),date:form.date,author:form.author,content:form.content,tag:form.tag},...prev]);
+    setShowNew(false);
+    setForm({date:today(),author:"",content:"",tag:"池管理"});
+    showToast("日報を追加しました");
+  };
+
+  const tagColor=t=>({池管理:C.cyan,出荷:C.green,仕入:C.gold,清掃:C.orange,その他:C.textSub}[t]||C.textSub);
+
+  return(
+    <div>
+      <button onClick={()=>setShowNew(true)} style={{width:"100%",padding:"12px 0",borderRadius:10,background:C.gold,color:"white",fontWeight:800,fontSize:14,border:"none",cursor:"pointer",marginBottom:16,boxShadow:"0 2px 8px #C8963E44"}}>
+        ＋ 日報・作業メモを追加
+      </button>
+
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+        {diary.map(d=>(
+          <div key={d.id} style={{background:C.bgCard,border:`1px solid ${C.border}`,borderLeft:`4px solid ${tagColor(d.tag)}`,borderRadius:8,padding:"12px 14px"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+              <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                <span style={{fontWeight:700,fontSize:13}}>{d.date}</span>
+                <Badge label={d.tag} color={tagColor(d.tag)}/>
+              </div>
+              <span style={{fontSize:12,color:C.textSub}}>{d.author||"記録者不明"}</span>
+            </div>
+            <div style={{fontSize:13,color:C.text,lineHeight:1.6,whiteSpace:"pre-wrap"}}>{d.content}</div>
+          </div>
+        ))}
+      </div>
+
+      {showNew&&(
+        <Modal onClose={()=>setShowNew(false)} title="＋ 日報・作業メモ">
+          <Label>日付</Label>
+          <Input type="date" value={form.date} onChange={v=>setForm(f=>({...f,date:v}))}/>
+          <Label>記録者</Label>
+          <Select value={form.author} onChange={v=>setForm(f=>({...f,author:v}))}>
+            <option value="">── 選択 ──</option>
+            {staff.map(s=><option key={s}>{s}</option>)}
+          </Select>
+          <Label>カテゴリ</Label>
+          <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+            {DIARY_TAGS.map(t=>(
+              <button key={t} onClick={()=>setForm(f=>({...f,tag:t}))} style={{padding:"6px 12px",borderRadius:20,border:`1px solid ${form.tag===t?tagColor(t):C.border}`,background:form.tag===t?tagColor(t)+"22":"white",color:form.tag===t?tagColor(t):C.text,fontSize:12,cursor:"pointer",fontWeight:700}}>{t}</button>
+            ))}
+          </div>
+          <Label>作業内容</Label>
+          <textarea value={form.content} onChange={e=>setForm(f=>({...f,content:e.target.value}))} placeholder="今日の作業内容を入力...&#10;例：第1池の水温28℃確認、餌やり完了、出荷3尾"
+            style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,fontSize:14,minHeight:100,resize:"vertical",background:"white"}}/>
+          <SaveBtn onClick={add} label="＋ 日報を追加"/>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════
+//  設定タブ
+// ══════════════════════════════
+function SetupTab({staff,setStaff,products,setProducts,clients,setClients,showToast}){
+  const [section,setSection]=useState("staff");
+  const [newStaff,setNewStaff]=useState("");
+  const [newProd,setNewProd]=useState({name:"",price:"",category:"EC"});
+  const [newClient,setNewClient]=useState({name:"",tel:"",address:""});
+
+  const addStaff=()=>{const n=newStaff.trim();if(!n)return;if(staff.includes(n)){showToast("すでに登録されています","error");return;}setStaff(p=>[...p,n]);setNewStaff("");showToast("担当者を追加しました");};
+  const removeStaff=n=>setStaff(p=>p.filter(s=>s!==n));
+  const addProduct=()=>{if(!newProd.name){showToast("商品名を入力してください","error");return;}setProducts(p=>[...p,{id:genId("P"),name:newProd.name,price:Number(newProd.price)||0,category:newProd.category}]);setNewProd({name:"",price:"",category:"EC"});showToast("商品を追加しました");};
+  const removeProduct=id=>setProducts(p=>p.filter(x=>x.id!==id));
+  const addClient=()=>{if(!newClient.name){showToast("会社名を入力してください","error");return;}setClients(p=>[...p,{id:genId("C"),name:newClient.name,tel:newClient.tel,address:newClient.address}]);setNewClient({name:"",tel:"",address:""});showToast("得意先を追加しました");};
+  const removeClient=id=>setClients(p=>p.filter(x=>x.id!==id));
+
+  const sections=[{id:"staff",label:"👤 担当者"},{id:"products",label:"🐟 商品マスタ"},{id:"clients",label:"🏢 得意先マスタ"},{id:"system",label:"🔧 本番設定"}];
+
+  return(
+    <div>
+      <div style={{display:"flex",gap:6,marginBottom:16}}>
+        {sections.map(s=>(
+          <button key={s.id} onClick={()=>setSection(s.id)} style={{flex:1,padding:"9px 4px",borderRadius:8,border:`1px solid ${section===s.id?C.navy:C.border}`,background:section===s.id?C.navy:"white",color:section===s.id?"white":C.text,fontSize:12,cursor:"pointer",fontWeight:700}}>{s.label}</button>
+        ))}
+      </div>
+
+      {/* 担当者 */}
+      {section==="staff"&&(
+        <div>
+          <div style={{background:C.bgCard,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.gold}`,borderRadius:8,padding:"14px 16px",marginBottom:14}}>
+            <div style={{fontWeight:800,fontSize:14,color:C.gold,marginBottom:12}}>登録済み担当者</div>
+            {staff.length===0&&<div style={{fontSize:13,color:C.textSub,marginBottom:10}}>担当者が登録されていません</div>}
+            <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:12}}>
+              {staff.map(s=>(
+                <div key={s} style={{display:"flex",alignItems:"center",gap:5,background:C.navy+"11",border:`1px solid ${C.navy}33`,borderRadius:20,padding:"6px 12px"}}>
+                  <span style={{fontSize:13,fontWeight:700,color:C.navy}}>{s}</span>
+                  <button onClick={()=>removeStaff(s)} style={{border:"none",background:"none",color:C.red,fontSize:16,cursor:"pointer",lineHeight:1,padding:"0 2px"}}>×</button>
+                </div>
+              ))}
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <input value={newStaff} onChange={e=>setNewStaff(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addStaff()} placeholder="名前を入力..." style={{flex:1,padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,fontSize:14}}/>
+              <button onClick={addStaff} style={{padding:"10px 18px",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer"}}>＋追加</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 商品マスタ */}
+      {section==="products"&&(
+        <div>
+          <div style={{background:C.bgCard,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.cyan}`,borderRadius:8,padding:"14px 16px",marginBottom:14}}>
+            <div style={{fontWeight:800,fontSize:14,color:C.cyan,marginBottom:12}}>商品を追加</div>
+            <Label>商品名</Label>
+            <Input value={newProd.name} onChange={v=>setNewProd(f=>({...f,name:v}))} placeholder="例：うなぎ蒲焼き 2尾セット"/>
+            <Label>価格（円）</Label>
+            <Input type="number" value={newProd.price} onChange={v=>setNewProd(f=>({...f,price:v}))} placeholder="0"/>
+            <Label>カテゴリ</Label>
+            <Select value={newProd.category} onChange={v=>setNewProd(f=>({...f,category:v}))}>
+              <option>EC</option><option>ふるさと納税</option><option>卸売</option>
+            </Select>
+            <button onClick={addProduct} style={{width:"100%",padding:"11px 0",borderRadius:8,background:C.cyan,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer",marginTop:12}}>＋ 商品を追加</button>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {products.map(p=>(
+              <div key={p.id} style={{background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <div style={{fontWeight:700,fontSize:13}}>{p.name}</div>
+                  <div style={{fontSize:12,color:C.textSub}}>¥{p.price.toLocaleString()} | <Badge label={p.category} color={p.category==="EC"?C.cyan:p.category==="卸売"?C.green:C.gold}/></div>
+                </div>
+                <button onClick={()=>removeProduct(p.id)} style={{border:"none",background:C.red+"11",color:C.red,borderRadius:6,padding:"6px 10px",cursor:"pointer",fontSize:12,fontWeight:700}}>削除</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 得意先マスタ */}
+      {section==="clients"&&(
+        <div>
+          <div style={{background:C.bgCard,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.green}`,borderRadius:8,padding:"14px 16px",marginBottom:14}}>
+            <div style={{fontWeight:800,fontSize:14,color:C.green,marginBottom:12}}>得意先を追加</div>
+            <Label>会社名 / 店舗名</Label>
+            <Input value={newClient.name} onChange={v=>setNewClient(f=>({...f,name:v}))} placeholder="例：博多うなぎ料理店"/>
+            <Label>電話番号</Label>
+            <Input value={newClient.tel} onChange={v=>setNewClient(f=>({...f,tel:v}))} placeholder="例：092-123-4567"/>
+            <Label>住所</Label>
+            <Input value={newClient.address} onChange={v=>setNewClient(f=>({...f,address:v}))} placeholder="例：福岡市博多区"/>
+            <button onClick={addClient} style={{width:"100%",padding:"11px 0",borderRadius:8,background:C.green,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer",marginTop:12}}>＋ 得意先を追加</button>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {clients.map(c=>(
+              <div key={c.id} style={{background:C.bgCard,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <div style={{fontWeight:700,fontSize:13}}>{c.name}</div>
+                  <div style={{fontSize:12,color:C.textSub}}>{c.tel} {c.address&&`| ${c.address}`}</div>
+                </div>
+                <button onClick={()=>removeClient(c.id)} style={{border:"none",background:C.red+"11",color:C.red,borderRadius:6,padding:"6px 10px",cursor:"pointer",fontSize:12,fontWeight:700}}>削除</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 本番設定ガイド */}
+      {section==="system"&&(
+        <div>
+          <div style={{background:IS_DEMO?C.gold+"11":"#E8F5E9",border:`1px solid ${IS_DEMO?C.gold:C.green}44`,borderRadius:8,padding:"12px 14px",marginBottom:16,fontSize:13}}>
+            {IS_DEMO?"🧪 現在デモモードで動作中。下記を設定すると本番稼働できます。":"✅ 本番モードで稼働中"}
+          </div>
+
+          {[{
+            title:"① Supabase（データ永続化）",color:C.cyan,
+            steps:["app.supabase.com でプロジェクト作成","Settings → API から URL と anon key をコピー","このファイルの CONFIG.SUPABASE_URL と CONFIG.SUPABASE_ANON_KEY に貼り付け"],
+            sql:`CREATE TABLE ec_orders (id TEXT PRIMARY KEY, customer TEXT, type TEXT, product TEXT, qty INT, amount INT, status TEXT, stock BOOL, payment BOOL, assigned TEXT, ship_date TEXT, created TEXT, alert BOOL);
+CREATE TABLE ws_orders (id TEXT PRIMARY KEY, client TEXT, tel TEXT, product TEXT, qty INT, unit_price INT, amount INT, order_status TEXT, purchase_status TEXT, delivery_status TEXT, invoice_issued BOOL, sales_recorded BOOL, ship_date TEXT, created TEXT);
+CREATE TABLE products (id TEXT PRIMARY KEY, name TEXT, price INT, category TEXT);
+CREATE TABLE clients (id TEXT PRIMARY KEY, name TEXT, tel TEXT, address TEXT);
+CREATE TABLE staff (id TEXT PRIMARY KEY, name TEXT);
+CREATE TABLE diary (id TEXT PRIMARY KEY, date TEXT, author TEXT, content TEXT, tag TEXT);`
+          },{
+            title:"② LINE Notify（アラート通知）",color:"#06C755",
+            steps:["notify-bot.line.me でトークン発行","通知先のLINEグループを選択","CONFIG.LINE_NOTIFY_TOKEN にトークンを貼り付け","Vercelの場合は環境変数 LINE_TOKEN に設定"],
+            sql:`// api/line-notify.js (Vercel API Route)
+export default async function handler(req, res) {
+  const { message } = req.body;
+  const params = new URLSearchParams({ message });
+  await fetch("https://notify-api.line.me/api/notify", {
+    method: "POST",
+    headers: { "Authorization": "Bearer " + process.env.LINE_TOKEN,
+      "Content-Type": "application/x-www-form-urlencoded" },
+    body: params,
+  });
+  res.json({ ok: true });
+}`
+          },{
+            title:"③ Vercel（スマホ公開）",color:C.navy,
+            steps:["github.com でリポジトリ作成","index.html をアップロード","vercel.com でインポート → Deploy","発行されたURLをスタッフに共有"],
+          }].map((s,si)=>(
+            <div key={si} style={{background:C.bgCard,border:`1px solid ${C.border}`,borderLeft:`4px solid ${s.color}`,borderRadius:8,padding:"14px 16px",marginBottom:14}}>
+              <div style={{fontWeight:800,fontSize:14,color:s.color,marginBottom:10}}>{s.title}</div>
+              {s.steps.map((step,i)=>(
+                <div key={i} style={{display:"flex",gap:8,padding:"4px 0",fontSize:13}}>
+                  <span style={{color:s.color,fontWeight:700,minWidth:20}}>{i+1}.</span>
+                  <span style={{color:C.text,lineHeight:1.5}}>{step}</span>
+                </div>
+              ))}
+              {s.sql&&(
+                <div style={{marginTop:10,background:"#0F1923",borderRadius:6,padding:"10px 12px",overflowX:"auto"}}>
+                  <pre style={{margin:0,fontSize:10,color:"#A8E6CF",fontFamily:"monospace",whiteSpace:"pre",lineHeight:1.6}}>{s.sql}</pre>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════
+//  メインアプリ
+// ══════════════════════════════
+function App(){
+  const [activeTab,setActiveTab]=useState("ec");
+  const [orders,setOrders]=useState(DEMO_ORDERS);
+  const [wholesale,setWholesale]=useState(DEMO_WHOLESALE);
+  const [products,setProducts]=useState(DEMO_PRODUCTS);
+  const [clients,setClients]=useState(DEMO_CLIENTS);
+  const [staff,setStaff]=useState([]);
+  const [diary,setDiary]=useState(DEMO_DIARY);
+  const [toast,setToast]=useState(null);
+  const [lineSending,setLineSending]=useState(false);
+
+  const showToast=useCallback((msg,type="success")=>{setToast({msg,type});setTimeout(()=>setToast(null),3000);},[]);
+
+  // Supabase初期ロード
+  useEffect(()=>{
+    if(IS_DEMO)return;
+    (async()=>{
+      try{
+        const [ec,ws,pr,cl,st,di]=await Promise.all([
+          db.select("ec_orders"),db.select("ws_orders"),
+          db.select("products"),db.select("clients"),
+          db.select("staff"),db.select("diary"),
+        ]);
+        if(ec?.length)setOrders(ec);
+        if(ws?.length)setWholesale(ws);
+        if(pr?.length)setProducts(pr);
+        if(cl?.length)setClients(cl);
+        if(st?.length)setStaff(st.map(s=>s.name));
+        if(di?.length)setDiary(di);
+        showToast("データを読み込みました");
+      }catch(e){showToast("データ取得エラー: "+e.message,"error");}
+    })();
+  },[]);
+
+  // LINE通知ハンドラ
+  const handleLine=useCallback(async()=>{
+    setLineSending(true);
+    const ecA=orders.filter(o=>o.alert);
+    const wsA=wholesale.filter(w=>!w.salesRecorded||!w.invoiceIssued||w.purchaseStatus==="未発注");
+    await lineNotify(buildAlertMsg(ecA,wsA));
+    showToast(IS_DEMO?"LINE通知（デモ）コンソールを確認":"LINE通知を送信しました");
+    setLineSending(false);
+  },[orders,wholesale,showToast]);
+
+  const alertCount=orders.filter(o=>o.alert).length+wholesale.filter(w=>!w.salesRecorded||!w.invoiceIssued||w.purchaseStatus==="未発注").length;
+
+  return(
+    <div style={{fontFamily:"'Helvetica Neue',Arial,'Hiragino Sans',sans-serif",background:C.bg,minHeight:"100vh",maxWidth:600,margin:"0 auto"}}>
+      <div style={{background:C.navy,padding:"14px 18px 0",position:"sticky",top:0,zIndex:50}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+          <div>
+            <div style={{color:"white",fontWeight:800,fontSize:15}}>花立山養鰻</div>
+            <div style={{color:C.goldLight,fontSize:10,opacity:0.85}}>業務管理システム 🧪 デモ</div>
+          </div>
+          {alertCount>0&&<div style={{marginLeft:"auto",background:C.red,color:"white",borderRadius:20,padding:"4px 10px",fontSize:12,fontWeight:800}}>⚠️ {alertCount}件</div>}
+        </div>
+        <div className="tab-bar" style={{display:"flex"}}>
+          {TABS.map(t=>(
+            <button key={t.id} onClick={()=>setActiveTab(t.id)} style={{flex:1,padding:"8px 2px 9px",border:"none",background:"none",color:activeTab===t.id?C.goldLight:"rgba(255,255,255,0.4)",borderBottom:`2px solid ${activeTab===t.id?C.goldLight:"transparent"}`,fontSize:9,cursor:"pointer",fontWeight:activeTab===t.id?700:400,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+              <span style={{fontSize:15}}>{t.icon}</span>
+              <span style={{whiteSpace:"nowrap"}}>{t.label}{t.id==="alert"&&alertCount>0?` (${alertCount})`:""}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{padding:"16px 16px 80px"}}>
+        {activeTab==="ec"&&<EcTab orders={orders} setOrders={setOrders} staff={staff} products={products} showToast={showToast}/>}
+        {activeTab==="wholesale"&&<WholesaleTab wholesale={wholesale} setWholesale={setWholesale} staff={staff} products={products} clients={clients} showToast={showToast}/>}
+        {activeTab==="alert"&&<AlertTab orders={orders} wholesale={wholesale} onLine={handleLine} lineSending={lineSending}/>}
+        {activeTab==="finance"&&<FinanceTab orders={orders} wholesale={wholesale} reports={DEMO_REPORTS}/>}
+        {activeTab==="diary"&&<DiaryTab diary={diary} setDiary={setDiary} staff={staff} showToast={showToast}/>}
+        {activeTab==="setup"&&<SetupTab staff={staff} setStaff={setStaff} products={products} setProducts={setProducts} clients={clients} setClients={setClients} showToast={showToast}/>}
+      </div>
+      <Toast msg={toast?.msg} type={toast?.type}/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
