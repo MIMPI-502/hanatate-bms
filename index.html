@@ -593,10 +593,10 @@ function ImportTab({orders,setOrders,wholesale,setWholesale,showToast}){
       const rows=parseCSV(csvText);
       if(csvType==="ec"||csvType==="furusato"){
         const newOrders=rows.map((r,i)=>({id:genId("EC"),customer:r["氏名"]||r["顧客名"]||r["寄付者名"]||r["注文者名"]||`顧客${i+1}`,type:csvType==="furusato"?"ふるさと納税":"EC",product:r["商品名"]||r["返礼品名"]||"",qty:Number(r["数量"]||1),amount:Number(String(r["金額"]||r["寄付金額"]||0).replace(/[,¥￥]/g,"")),status:"未対応",stock:true,payment:true,assigned:null,shipDate:r["発送予定日"]||"",created:nowStr(),alert:true,memo:r["備考"]||""}));
-        setOrders(p=>[...newOrders,...p]);showToast(`${newOrders.length}件のEC注文を取り込みました`);
+        setOrders(p=>[...newOrders,...p]);showToast(`${newOrders.length}件のEC注文を取り込みました`);await lineMessage(`📥【花立山養鰻】CSV取込完了\n📅 ${new Date().toLocaleString("ja-JP")}\n\n${csvType==="furusato"?"🏠 ふるさと納税":"🛒 EC注文"}：${newOrders.length}件を取り込みました`);
       }else{
         const newWS=rows.map((r,i)=>({id:genId("WS"),client:r["得意先名"]||r["会社名"]||`得意先${i+1}`,tel:r["電話番号"]||"",product:r["商品名"]||"",qty:Number(r["数量"]||1),unitPrice:Number(String(r["単価"]||0).replace(/[,¥￥]/g,"")),amount:Number(String(r["金額"]||r["合計"]||0).replace(/[,¥￥]/g,"")),orderStatus:"受注入力済",purchaseStatus:"未発注",deliveryStatus:"未確定",invoiceIssued:false,salesRecorded:false,shipDate:r["納品予定日"]||"",created:today(),memo:r["備考"]||""}));
-        setWholesale(p=>[...newWS,...p]);showToast(`${newWS.length}件の卸注文を取り込みました`);
+        setWholesale(p=>[...newWS,...p]);showToast(`${newWS.length}件の卸注文を取り込みました`);await lineMessage(`📥【花立山養鰻】CSV取込完了\n📅 ${new Date().toLocaleString("ja-JP")}\n\n📦 卸売注文：${newWS.length}件を取り込みました`);
       }
       setCsvText("");setPreview([]);if(fileRef.current)fileRef.current.value="";
     }catch(e){showToast("取込エラー: "+e.message,"error");}
