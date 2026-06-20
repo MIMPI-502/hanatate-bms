@@ -678,8 +678,8 @@ export default async function handler(req, res) {
           <div style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.green}`,borderRadius:8,padding:"14px 16px"}}>
             <div style={{fontWeight:800,fontSize:14,color:C.green,marginBottom:12}}>📋 自動化ロードマップ</div>
             {[{phase:"STEP 1",title:"現在（デモ）",desc:"CSV取込で手入力を削減",status:"🟢 完了",color:C.green},
-              {phase:"STEP 2",title:"Supabase設定",desc:"データ永続化・複数人共有",status:"⬜ 未設定",color:C.border},
-              {phase:"STEP 3",title:"LINE Messaging API",desc:"アラート自動通知を有効化",status:"⬜ 未設定",color:C.border},
+              {phase:"STEP 2",title:"Supabase設定",desc:"データ永続化・複数人共有",status:"⬜完了 ",color:C.border},
+              {phase:"STEP 3",title:"LINE Messaging API",desc:"アラート自動通知を有効化",status:"⬜ 完了",color:C.border},
               {phase:"STEP 4",title:"Shopify Webhook",desc:"EC注文が完全自動取込",status:"⬜ STEP2後",color:C.border},
               {phase:"STEP 5",title:"完全自動化",desc:"全工程の自動化完了",status:"🎯 最終目標",color:C.gold},
             ].map(s=>(<div key={s.phase} style={{display:"flex",gap:10,padding:"10px 0",borderBottom:`1px solid ${C.border}`}}><div style={{width:60,fontSize:9,fontWeight:700,color:s.color,padding:"4px 0"}}>{s.phase}</div><div style={{flex:1}}><div style={{fontWeight:700,fontSize:13}}>{s.title}</div><div style={{fontSize:12,color:C.sub}}>{s.desc}</div></div><div style={{fontSize:11,color:s.color,fontWeight:700,whiteSpace:"nowrap"}}>{s.status}</div></div>))}
