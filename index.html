@@ -43,12 +43,16 @@ const CONFIG={
 const IS_DEMO=CONFIG.SUPABASE_URL.includes("YOUR_PROJECT");
 
 // ── Supabaseクライアント ──
+const toSnake=s=>s.replace(/[A-Z]/g,m=>"_"+m.toLowerCase());
+const toCamel=s=>s.replace(/_([a-z])/g,(_,c)=>c.toUpperCase());
+const keysToSnake=o=>{if(Array.isArray(o))return o.map(keysToSnake);if(o&&typeof o==="object"){const r={};for(const k in o)r[toSnake(k)]=o[k];return r;}return o;};
+const keysToCamel=o=>{if(Array.isArray(o))return o.map(keysToCamel);if(o&&typeof o==="object"){const r={};for(const k in o)r[toCamel(k)]=o[k];return r;}return o;};
 class SB{
   constructor(u,k){this.u=u;this.k=k;}
   h(){return{"apikey":this.k,"Authorization":"Bearer "+this.k,"Content-Type":"application/json","Prefer":"return=representation"};}
-  async select(t){const r=await fetch(`${this.u}/rest/v1/${t}?select=*`,{headers:this.h()});if(!r.ok)throw new Error(await r.text());return r.json();}
-  async upsert(t,d){const r=await fetch(`${this.u}/rest/v1/${t}`,{method:"POST",headers:{...this.h(),"Prefer":"resolution=merge-duplicates,return=representation"},body:JSON.stringify(Array.isArray(d)?d:[d])});if(!r.ok)throw new Error(await r.text());return r.json();}
-  async del(t,col,val){const r=await fetch(`${this.u}/rest/v1/${t}?${col}=eq.${encodeURIComponent(val)}`,{method:"DELETE",headers:this.h()});if(!r.ok)throw new Error(await r.text());}
+  async select(t){const r=await fetch(`${this.u}/rest/v1/${t}?select=*`,{headers:this.h()});if(!r.ok)throw new Error(await r.text());return keysToCamel(await r.json());}
+  async upsert(t,d){const r=await fetch(`${this.u}/rest/v1/${t}`,{method:"POST",headers:{...this.h(),"Prefer":"resolution=merge-duplicates,return=representation"},body:JSON.stringify(keysToSnake(Array.isArray(d)?d:[d]))});if(!r.ok)throw new Error(await r.text());return keysToCamel(await r.json());}
+  async del(t,col,val){const r=await fetch(`${this.u}/rest/v1/${t}?${toSnake(col)}=eq.${encodeURIComponent(val)}`,{method:"DELETE",headers:this.h()});if(!r.ok)throw new Error(await r.text());}
 }
 const db=new SB(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
 
