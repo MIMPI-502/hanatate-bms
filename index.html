@@ -90,43 +90,18 @@ const C={
 
 // ── デモデータ ──
 const D_ORDERS=[
-  {id:"EC-001",customer:"田中 一郎",type:"EC",product:"うなぎ蒲焼き 2尾セット",qty:1,amount:4800,status:"注文確認",stock:true,payment:true,assigned:null,shipDate:"2026-06-20",created:"2026-06-15 09:12",alert:false,memo:""},
-  {id:"EC-002",customer:"鈴木 花子",type:"ふるさと納税",product:"特選うなぎ詰め合わせ",qty:2,amount:12000,status:"梱包中",stock:true,payment:true,assigned:null,shipDate:"2026-06-18",created:"2026-06-15 10:45",alert:false,memo:""},
-  {id:"EC-003",customer:"山田 太郎",type:"EC",product:"うなぎ白焼き 1尾",qty:3,amount:7200,status:"在庫なし",stock:false,payment:true,assigned:null,shipDate:"",created:"2026-06-15 08:30",alert:true,memo:"在庫補充待ち"},
-  {id:"EC-004",customer:"佐藤 美咲",type:"ふるさと納税",product:"うなぎ蒲焼き 4尾セット",qty:1,amount:8500,status:"発送済み",stock:true,payment:true,assigned:null,shipDate:"2026-06-16",created:"2026-06-14 14:20",alert:false,memo:""},
-  {id:"EC-005",customer:"高橋 健二",type:"EC",product:"うなぎ蒲焼き 2尾セット",qty:1,amount:4800,status:"未対応",stock:true,payment:false,assigned:null,shipDate:"",created:"2026-06-15 11:05",alert:true,memo:""},
 ];
 const D_WS=[
-  {id:"WS-001",client:"博多うなぎ料理店",tel:"092-111-2222",product:"活鰻 5kg",qty:5,unitPrice:8000,amount:40000,orderStatus:"受注入力済",purchaseStatus:"発注済",deliveryStatus:"仕入確定",invoiceIssued:true,salesRecorded:false,shipDate:"2026-06-20",created:"2026-06-10",memo:""},
-  {id:"WS-002",client:"福岡市場株式会社",tel:"092-333-4444",product:"蒲焼き業務用 10kg",qty:2,unitPrice:15000,amount:30000,orderStatus:"受注入力済",purchaseStatus:"未発注",deliveryStatus:"未確定",invoiceIssued:false,salesRecorded:false,shipDate:"",created:"2026-06-12",memo:"急ぎ対応"},
-  {id:"WS-003",client:"九州食品卸 LLC",tel:"092-555-6666",product:"活鰻 10kg",qty:10,unitPrice:7500,amount:75000,orderStatus:"受注入力済",purchaseStatus:"発注済",deliveryStatus:"仕入確定",invoiceIssued:true,salesRecorded:true,shipDate:"2026-06-13",created:"2026-06-08",memo:""},
 ];
 const D_PRODUCTS=[
-  {id:"P-001",name:"うなぎ蒲焼き 2尾セット",price:4800,category:"EC",stock:15},
-  {id:"P-002",name:"特選うなぎ詰め合わせ",price:12000,category:"ふるさと納税",stock:8},
-  {id:"P-003",name:"うなぎ白焼き 1尾",price:2400,category:"EC",stock:0},
-  {id:"P-004",name:"うなぎ蒲焼き 4尾セット",price:8500,category:"ふるさと納税",stock:12},
-  {id:"P-005",name:"活鰻 5kg",price:8000,category:"卸売",stock:20},
-  {id:"P-006",name:"活鰻 10kg",price:7500,category:"卸売",stock:18},
-  {id:"P-007",name:"蒲焼き業務用 10kg",price:15000,category:"卸売",stock:5},
 ];
 const D_CLIENTS=[
-  {id:"C-001",name:"博多うなぎ料理店",tel:"092-111-2222",address:"福岡市博多区",memo:"月2回定期発注"},
-  {id:"C-002",name:"福岡市場株式会社",tel:"092-333-4444",address:"福岡市東区",memo:""},
-  {id:"C-003",name:"九州食品卸 LLC",tel:"092-555-6666",address:"福岡市中央区",memo:"大口得意先"},
 ];
 const D_REPORTS=[
-  {month:"2026-04",ec:85000,furusato:210000,wholesale:320000},
-  {month:"2026-05",ec:92000,furusato:185000,wholesale:415000},
-  {month:"2026-06",ec:29800,furusato:20500,wholesale:75000},
 ];
 const D_DIARY=[
-  {id:"D-001",date:"2026-06-15",author:"",content:"第1池・第2池の水温確認。28℃安定。餌やり完了（午前・午後）。出荷4尾確認済み。",tag:"池管理"},
-  {id:"D-002",date:"2026-06-14",author:"",content:"ふるさと納税 2件梱包・発送完了。EC注文3件対応。在庫確認：蒲焼き残12セット。",tag:"出荷"},
 ];
 const D_INVENTORY=[
-  {id:"I-001",product:"うなぎ蒲焼き 2尾セット",qty:15,type:"在庫",date:"2026-06-15",memo:""},
-  {id:"I-002",product:"うなぎ白焼き 1尾",qty:0,type:"在庫",date:"2026-06-15",memo:"欠品中"},
 ];
 
 const ST_EC=["未対応","注文確認","在庫なし","梱包中","発送済み","完了"];
