@@ -146,7 +146,8 @@ const TABS=[
 ];
 
 const sc=s=>["発送済み","完了","仕入確定","受注入力済","発注済"].includes(s)?C.green:["未対応","在庫なし","未確定","未発注","未入力"].includes(s)?C.red:C.orange;
-const genId=p=>p+"-"+Date.now().toString().slice(-6);
+let genIdCounter=0;
+const genId=p=>p+"-"+Date.now().toString().slice(-6)+"-"+(genIdCounter++%1000).toString().padStart(3,"0")+Math.random().toString(36).slice(2,5);
 const today=()=>new Date().toISOString().slice(0,10);
 const nowStr=()=>new Date().toLocaleString("ja-JP").replace(/\//g,"-");
 const fmt=n=>Number(n||0).toLocaleString();
