@@ -665,7 +665,7 @@ export default async function handler(req, res) {
         <div>
           <div style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.green}`,borderRadius:8,padding:"14px 16px"}}>
             <div style={{fontWeight:800,fontSize:14,color:C.green,marginBottom:12}}>📋 自動化ロードマップ</div>
-            {[{phase:"STEP 1",title:"現在（デモ）",desc:"CSV取込で手入力を削減",status:"🟢 完了",color:C.green},
+            {[{phase:"STEP 1",title:"CSV取込（本番稼働中）",desc:"CSV取込で手入力を削減",status:"🟢 完了",color:C.green},
               {phase:"STEP 2",title:"Supabase設定",desc:"データ永続化・複数人共有",status:"🟢 完了",color:C.green},
               {phase:"STEP 3",title:"LINE Messaging API",desc:"アラート自動通知を有効化",status:"🟢 完了",color:C.green},
               {phase:"STEP 4",title:"Shopify Webhook",desc:"コード準備済み・Shopify側の登録待ち",status:"🟡 準備済み",color:C.gold},
