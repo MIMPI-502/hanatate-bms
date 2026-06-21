@@ -597,14 +597,14 @@ function ImportTab({orders,setOrders,wholesale,setWholesale,showToast}){
         let saveErr1=null;
         if(!IS_DEMO){try{await db.upsert("ec_orders",newOrders);}catch(e){saveErr1=e.message;}}
         if(saveErr1){showToast("Supabase保存エラー: "+saveErr1,"error");}else{showToast(`${newOrders.length}件のEC注文を取り込みました`);}
-        await lineMessage(`📥【花立山養鰻】CSV取込完了\n📅 ${new Date().toLocaleString("ja-JP")}\n\n${csvType==="furusato"?"🏠 ふるさと納税":"🛒 EC注文"}：${newOrders.length}件を取り込みました${saveErr1?"\n⚠️Supabase保存失敗":""}`);
+        await lineMessage(`📥【花立山養鰻】CSV取込完了\n📅 ${new Date().toLocaleString("ja-JP")}\n\n${csvType==="furusato"?"🏠 ふるさと納税":"🛒 EC注文"}：${newOrders.length}件を取り込みました${saveErr1?"\n⚠️Supabase保存失敗: "+saveErr1:""}`);
       }else{
         const newWS=rows.map((r,i)=>({id:genId("WS"),client:r["得意先名"]||r["会社名"]||`得意先${i+1}`,tel:r["電話番号"]||"",product:r["商品名"]||"",qty:Number(r["数量"]||1),unitPrice:Number(String(r["単価"]||0).replace(/[,¥￥]/g,"")),amount:Number(String(r["金額"]||r["合計"]||0).replace(/[,¥￥]/g,"")),orderStatus:"受注入力済",purchaseStatus:"未発注",deliveryStatus:"未確定",invoiceIssued:false,salesRecorded:false,shipDate:r["納品予定日"]||"",created:today(),memo:r["備考"]||""}));
         setWholesale(p=>[...newWS,...p]);
         let saveErr2=null;
         if(!IS_DEMO){try{await db.upsert("ws_orders",newWS);}catch(e){saveErr2=e.message;}}
         if(saveErr2){showToast("Supabase保存エラー: "+saveErr2,"error");}else{showToast(`${newWS.length}件の卸注文を取り込みました`);}
-        await lineMessage(`📥【花立山養鰻】CSV取込完了\n📅 ${new Date().toLocaleString("ja-JP")}\n\n📦 卸売注文：${newWS.length}件を取り込みました${saveErr2?"\n⚠️Supabase保存失敗":""}`);
+        await lineMessage(`📥【花立山養鰻】CSV取込完了\n📅 ${new Date().toLocaleString("ja-JP")}\n\n📦 卸売注文：${newWS.length}件を取り込みました${saveErr2?"\n⚠️Supabase保存失敗: "+saveErr2:""}`);
       }
       setCsvText("");setPreview([]);if(fileRef.current)fileRef.current.value="";
     }catch(e){showToast("取込エラー: "+e.message,"error");}
