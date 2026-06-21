@@ -406,7 +406,7 @@ function AlertTab({orders,wholesale,onLine,lineSending,autoNotifyEnabled,setAuto
           {icon:"🔴",label:"在庫3個以下",desc:"欠品・残りわずかをリアルタイム通知"},
           {icon:"📥",label:"CSV取込完了時",desc:"一括取込完了後に件数を通知"},
         ].map((n,i)=>(<div key={i} style={{display:"flex",gap:10,padding:"7px 0",borderBottom:`1px solid ${C.border}`}}><span style={{fontSize:16}}>{n.icon}</span><div><div style={{fontWeight:700,fontSize:12,color:C.navy}}>{n.label}</div><div style={{fontSize:11,color:C.sub}}>{n.desc}</div></div></div>))}
-        <button onClick={onMorning} style={{width:"100%",padding:"10px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:12,border:"none",cursor:"pointer",marginTop:10}}>📲 今すぐ日次レポートを送信（テスト）</button>
+        <button onClick={onMorning} style={{width:"100%",padding:"10px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:12,border:"none",cursor:"pointer",marginTop:10}}>📲 今すぐ日次レポートを送信</button>
         {IS_DEMO&&<div style={{fontSize:11,color:C.sub,textAlign:"center",marginTop:6}}>デモ時はコンソールに出力されます</div>}
       </div>
       {notifyLog.length>0&&(
