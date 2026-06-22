@@ -613,7 +613,7 @@ function ImportTab({orders,setOrders,wholesale,setWholesale,showToast}){
           <div style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.gold}`,borderRadius:8,padding:"14px 16px",marginBottom:14}}>
             <div style={{fontWeight:800,fontSize:14,color:C.gold,marginBottom:12}}>📂 CSVファイルから一括取込</div>
             <Lbl t="取込種別"/>
-            <Sel value={csvType} onChange={v=>setCsvType(v)}><option value="ec">🛒 EC注文（Shopify等）</option><option value="furusato">🏠 ふるさと納税（さとふる・楽天等）</option><option value="wholesale">📦 卸売注文</option></Sel>
+            <Sel value={csvType} onChange={v=>setCsvType(v)}><option value="ec">🛒 EC注文（Shopify等）</option><option value="furusato">🏠 ふるさと納税</option><option value="wholesale">📦 卸売注文</option></Sel>
             <div style={{marginTop:10,marginBottom:6}}>
               <div style={{fontSize:11,color:C.sub,marginBottom:6}}>サンプルCSVをダウンロードして形式を確認できます</div>
               <div style={{display:"flex",gap:6}}>
