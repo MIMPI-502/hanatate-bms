@@ -596,7 +596,7 @@ function ImportTab({orders,setOrders,wholesale,setWholesale,showToast}){
     const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`サンプル_${type}.csv`;a.click();
     showToast("サンプルCSVをダウンロードしました");
   };
-  const SECS=[{id:"csv",l:"📂 CSV取込"},{id:"webhook",l:"🔗 Webhook設定"},{id:"roadmap",l:"📋 ロードマップ"}];
+  const SECS=[{id:"csv",l:"📂 CSV取込"},{id:"roadmap",l:"📋 ロードマップ"}];
   return(
     <div>
       <div style={{display:"flex",gap:6,marginBottom:14}}>{SECS.map(s=>(<button key={s.id} onClick={()=>setSec(s.id)} style={{flex:1,padding:"9px 4px",borderRadius:8,border:`1px solid ${sec===s.id?C.navy:C.border}`,background:sec===s.id?C.navy:"white",color:sec===s.id?"white":C.text,fontSize:11,cursor:"pointer",fontWeight:700}}>{s.l}</button>))}</div>
