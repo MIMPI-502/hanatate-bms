@@ -571,13 +571,29 @@ function ImportTab({orders,setOrders,wholesale,setWholesale,showToast}){
     setImporting(true);
     try{
       const rows=parseCSV(csvText);
-      if(csvType==="ec"||csvType==="furusato"){
-        const newOrders=rows.map((r,i)=>({id:genId("EC"),customer:r["氏名"]||r["顧客名"]||r["寄付者名"]||r["注文者名"]||`顧客${i+1}`,type:csvType==="furusato"?"ふるさと納税":"EC",product:r["商品名"]||r["返礼品名"]||"",qty:Number(r["数量"]||1),amount:Number(String(r["金額"]||r["寄付金額"]||0).replace(/[,¥￥]/g,"")),status:"未対応",stock:true,payment:true,assigned:null,shipDate:r["発送予定日"]||"",created:nowStr(),alert:true,memo:r["備考"]||""}));
+      if(csvType==="furusato"){
+        // 筑前町ふるさと納税CSV形式に対応
+        const parseDate=s=>{if(!s)return null;const m=String(s).match(/(\d{4})年(\d{2})月(\d{2})日/);return m?`${m[1]}-${m[2]}-${m[3]}`:String(s).slice(0,10)||null;};
+        const newFurusato=rows.map(r=>({id:genId("FN"),delivery_no:r["配送No."]||"",donation_receipt_no:r["寄附受付No"]||"",product_name:r["謝礼品"]||"",operator_name:r["事業者"]||"",donor_no:r["寄附者No"]||"",last_name:r["配送　姓"]||"",first_name:r["配送　名"]||"",last_name_kana:r["配送　せい"]||"",first_name_kana:r["配送　めい"]||"",prefecture:r["配送　都道府県"]||"",postal_code:r["配送　郵便番号"]||"",address1:r["配送　住所１"]||"",address2:r["配送　住所２"]||"",phone:r["配送　電話番号"]||"",delivery_status:r["配送ステータス"]||"",tracking_number:r["伝票番号"]||"",carrier:r["配達業者"]||"",memo:r["メモ"]||r["備考"]||"",donation_status:r["寄附ステータス"]||"",donation_year:r["寄附年度"]||"",product_price:Number(String(r["謝礼品価格"]||0).replace(/[,¥￥]/g,"")),product_code:r["謝礼品番号"]||"",gift_type:r["贈答"]||"",donation_amount:Number(String(r["寄附金額"]||0).replace(/[,¥￥]/g,"")),donation_set_amount:Number(String(r["寄附設定金額"]||0).replace(/[,¥￥]/g,"")),shipment_request_date:parseDate(r["出荷依頼日"]),scheduled_shipment_date:parseDate(r["出荷予定日"]),created:nowStr()}));
+        let saveErr1=null;
+        if(!IS_DEMO){try{await db.upsert("furusato_orders",newFurusato);}catch(e){saveErr1=e.message;}}
+        if(saveErr1){showToast("Supabase保存エラー: "+saveErr1,"error");}else{showToast(`${newFurusato.length}件のふるさと納税データを取り込みました`);}
+        await lineMessage(`📥【花立山養鰻】CSV取込完了
+📅 ${new Date().toLocaleString("ja-JP")}
+
+🏠 ふるさと納税：${newFurusato.length}件を取り込みました${saveErr1?"
+⚠️Supabase保存失敗: "+saveErr1:""}`);
+      }else if(csvType==="ec"){
+        const newOrders=rows.map((r,i)=>({id:genId("EC"),customer:r["氏名"]||r["顧客名"]||r["注文者名"]||`顧客${i+1}`,type:"EC",product:r["商品名"]||"",qty:Number(r["数量"]||1),amount:Number(String(r["金額"]||0).replace(/[,¥￥]/g,"")),status:"未対応",stock:true,payment:true,assigned:null,shipDate:r["発送予定日"]||"",created:nowStr(),alert:true,memo:r["備考"]||""}));
         setOrders(p=>[...newOrders,...p]);
         let saveErr1=null;
         if(!IS_DEMO){try{await db.upsert("ec_orders",newOrders);}catch(e){saveErr1=e.message;}}
         if(saveErr1){showToast("Supabase保存エラー: "+saveErr1,"error");}else{showToast(`${newOrders.length}件のEC注文を取り込みました`);}
-        await lineMessage(`📥【花立山養鰻】CSV取込完了\n📅 ${new Date().toLocaleString("ja-JP")}\n\n${csvType==="furusato"?"🏠 ふるさと納税":"🛒 EC注文"}：${newOrders.length}件を取り込みました${saveErr1?"\n⚠️Supabase保存失敗: "+saveErr1:""}`);
+        await lineMessage(`📥【花立山養鰻】CSV取込完了
+📅 ${new Date().toLocaleString("ja-JP")}
+
+🛒 EC注文：${newOrders.length}件を取り込みました${saveErr1?"
+⚠️Supabase保存失敗: "+saveErr1:""}`);
       }else{
         const newWS=rows.map((r,i)=>({id:genId("WS"),client:r["得意先名"]||r["会社名"]||`得意先${i+1}`,tel:r["電話番号"]||"",product:r["商品名"]||"",qty:Number(r["数量"]||1),unitPrice:Number(String(r["単価"]||0).replace(/[,¥￥]/g,"")),amount:Number(String(r["金額"]||r["合計"]||0).replace(/[,¥￥]/g,"")),orderStatus:"受注入力済",purchaseStatus:"未発注",deliveryStatus:"未確定",invoiceIssued:false,salesRecorded:false,shipDate:r["納品予定日"]||"",created:today(),memo:r["備考"]||""}));
         setWholesale(p=>[...newWS,...p]);
@@ -750,7 +766,8 @@ CREATE TABLE products (id TEXT PRIMARY KEY, name TEXT, price INT, category TEXT,
 CREATE TABLE clients (id TEXT PRIMARY KEY, name TEXT, tel TEXT, address TEXT, memo TEXT);
 CREATE TABLE staff (id TEXT PRIMARY KEY, name TEXT);
 CREATE TABLE diary (id TEXT PRIMARY KEY, date TEXT, author TEXT, content TEXT, tag TEXT);
-CREATE TABLE inventory (id TEXT PRIMARY KEY, product TEXT, qty INT, type TEXT, date TEXT, memo TEXT);`},
+CREATE TABLE inventory (id TEXT PRIMARY KEY, product TEXT, qty INT, type TEXT, date TEXT, memo TEXT);
+CREATE TABLE furusato_orders (id TEXT PRIMARY KEY, delivery_no TEXT, donation_receipt_no TEXT, product_name TEXT, operator_name TEXT, donor_no TEXT, last_name TEXT, first_name TEXT, last_name_kana TEXT, first_name_kana TEXT, prefecture TEXT, postal_code TEXT, address1 TEXT, address2 TEXT, phone TEXT, delivery_status TEXT, tracking_number TEXT, carrier TEXT, memo TEXT, donation_status TEXT, donation_year TEXT, product_price INT, product_code TEXT, gift_type TEXT, donation_amount INT, donation_set_amount INT, shipment_request_date TEXT, scheduled_shipment_date TEXT, created TEXT);`},
             {title:"② LINE Messaging API（自動通知）",color:C.lineGreen,steps:["developers.line.me でプロバイダー・チャンネル作成","Messaging API チャンネルアクセストークンを発行","スタッフグループにBotを追加してグループIDを取得","CONFIG.LINE_CHANNEL_ACCESS_TOKEN にトークンを設定","CONFIG.LINE_GROUP_ID にグループIDを設定","Vercel環境変数に LINE_TOKEN と LINE_GROUP_ID を追加"],
              sql:`// api/line-message.js (Vercel API Route)
 export default async function handler(req, res) {
