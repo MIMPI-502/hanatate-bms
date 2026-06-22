@@ -1,7 +1,21 @@
+import crypto from 'crypto';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   try {
+    // 署名シークレットによるセキュリティ検証
+    const secret = process.env.SHOPIFY_WEBHOOK_SECRET;
+    if (secret) {
+      const hmac = req.headers['x-shopify-hmac-sha256'];
+      const body = JSON.stringify(req.body);
+      const hash = crypto.createHmac('sha256', secret).update(body).digest('base64');
+      if (hmac !== hash) {
+        console.log('署名検証失敗');
+        return res.status(401).json({ ok: false, error: '署名が一致しません' });
+      }
+    }
+
     const order = req.body;
 
     const uniqueId =
@@ -11,9 +25,9 @@ export default async function handler(req, res) {
 
     const newOrder = {
       id: uniqueId,
-      customer: order.billing_address?.name || order.customer?.first_name
-        ? `${order.customer?.last_name || ''} ${order.customer?.first_name || ''}`.trim()
-        : (order.billing_address?.name || '不明'),
+      customer: order.billing_address?.name ||
+        (`${order.customer?.last_name || ''} ${order.customer?.first_name || ''}`.trim()) ||
+        '不明',
       type: 'EC',
       product: order.line_items?.[0]?.name || '',
       qty: order.line_items?.[0]?.quantity || 1,
