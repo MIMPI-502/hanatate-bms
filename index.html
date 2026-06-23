@@ -883,7 +883,7 @@ function FurusatoTab({furusatoOrders,setFurusatoOrders,showToast,onDel}){
         filtered.map(o=>(
           <div key={o.id} onClick={()=>setDetail(o)} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:"12px 14px",marginBottom:8,cursor:"pointer"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:4}}>
-              <div style={{fontWeight:700,fontSize:14,color:C.text}}>{o.last_name?`${o.last_name} ${o.first_name||""}`.trim():o.donorName||"（氏名なし）"}</div>
+              <div style={{fontWeight:700,fontSize:14,color:C.text}}>{(o.lastName||o.last_name)?`${o.lastName||o.last_name} ${o.firstName||o.first_name||""}`.trim():o.donorName||"（氏名なし）"}</div>
               <Badge label={o.delivery_status||o.status||"未対応"} color={sc(o.delivery_status||o.status||"未対応")}/>
             </div>
             <div style={{fontSize:12,color:C.sub,marginBottom:4}}>{o.product_name||o.productName||"商品未設定"}</div>
@@ -899,7 +899,7 @@ function FurusatoTab({furusatoOrders,setFurusatoOrders,showToast,onDel}){
       )}
       {detail&&(
         <Modal onClose={()=>setDetail(null)} title="ふるさと納税 詳細">
-          <Row label="寄附者名" value={detail.last_name?`${detail.last_name} ${detail.first_name||""}`:detail.donorName||"-"}/>
+          <Row label="寄附者名" value={(detail.lastName||detail.last_name)?`${detail.lastName||detail.last_name} ${detail.firstName||detail.first_name||""}`:detail.donorName||"-"}/>
           <Row label="返礼品" value={detail.product_name||detail.productName||"-"}/>
           <Row label="商品コード" value={detail.product_code||"-"}/>
           <Row label="出荷依頼日" value={detail.shipment_request_date||detail.donationDate||"-"}/>
