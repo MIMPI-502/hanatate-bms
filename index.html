@@ -116,6 +116,7 @@ const TABS=[
   {id:"inventory",icon:"📋",label:"在庫"},
   {id:"finance",icon:"📊",label:"財務"},
   {id:"diary",icon:"📝",label:"日報"},
+  {id:"calendar",icon:"📅",label:"カレンダー"},
   {id:"furusato",icon:"🏠",label:"ふるさと納税"},
   {id:"import",icon:"📥",label:"自動取込"},
   {id:"setup",icon:"⚙️",label:"設定"},
@@ -688,6 +689,162 @@ export default async function handler(req, res) {
 }
 
 
+
+// ── カレンダータブ ──
+function CalendarTab({orders,wholesale,furusatoOrders}){
+  const [currentDate,setCurrentDate]=useState(new Date());
+  const [selectedDay,setSelectedDay]=useState(null);
+  const [selectedEvents,setSelectedEvents]=useState([]);
+
+  const year=currentDate.getFullYear();
+  const month=currentDate.getMonth();
+
+  const monthName=new Date(year,month,1).toLocaleDateString("ja-JP",{year:"numeric",month:"long"});
+
+  // 月の最初の日の曜日と日数
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+
+  // イベントをまとめる
+  const getEvents=(dateStr)=>{
+    const evts=[];
+    orders.forEach(o=>{
+      if(o.shipDate===dateStr){
+        evts.push({type:"ec",label:o.customer,sub:o.product,status:o.status,color:C.cyan});
+      }
+    });
+    wholesale.forEach(w=>{
+      if(w.shipDate===dateStr){
+        evts.push({type:"ws",label:w.client,sub:w.product,status:w.deliveryStatus,color:C.gold});
+      }
+    });
+    furusatoOrders.forEach(o=>{
+      if(o.scheduledShipDate===dateStr||o.donationDate===dateStr){
+        evts.push({type:"fn",label:o.donorName||"寄附者",sub:o.productName,status:o.status,color:"#9C6FD6"});
+      }
+    });
+    return evts;
+  };
+
+  const todayStr=today();
+
+  const handleDayClick=(d)=>{
+    const dateStr=`${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const evts=getEvents(dateStr);
+    setSelectedDay(dateStr);
+    setSelectedEvents(evts);
+  };
+
+  const prevMonth=()=>setCurrentDate(new Date(year,month-1,1));
+  const nextMonth=()=>setCurrentDate(new Date(year,month+1,1));
+
+  const weeks=[];
+  let days=[];
+  for(let i=0;i<firstDay;i++)days.push(null);
+  for(let d=1;d<=daysInMonth;d++){
+    days.push(d);
+    if(days.length===7){weeks.push(days);days=[];}
+  }
+  if(days.length>0){while(days.length<7)days.push(null);weeks.push(days);}
+
+  // 今月の集計
+  const monthStr=`${year}-${String(month+1).padStart(2,"0")}`;
+  const monthEC=orders.filter(o=>o.shipDate?.startsWith(monthStr)).length;
+  const monthWS=wholesale.filter(w=>w.shipDate?.startsWith(monthStr)).length;
+  const monthFN=furusatoOrders.filter(o=>o.scheduledShipDate?.startsWith(monthStr)||o.donationDate?.startsWith(monthStr)).length;
+
+  return(
+    <div>
+      {/* 月次サマリー */}
+      <div style={{display:"flex",gap:6,marginBottom:12}}>
+        <div style={{background:C.card,border:`1px solid ${C.cyan}44`,borderRadius:8,padding:"8px 10px",flex:1,textAlign:"center"}}>
+          <div style={{fontSize:10,color:C.sub}}>🛒 EC</div>
+          <div style={{fontSize:20,fontWeight:800,color:C.cyan}}>{monthEC}</div>
+        </div>
+        <div style={{background:C.card,border:`1px solid ${C.gold}44`,borderRadius:8,padding:"8px 10px",flex:1,textAlign:"center"}}>
+          <div style={{fontSize:10,color:C.sub}}>📦 卸先</div>
+          <div style={{fontSize:20,fontWeight:800,color:C.gold}}>{monthWS}</div>
+        </div>
+        <div style={{background:C.card,border:`1px solid #9C6FD644`,borderRadius:8,padding:"8px 10px",flex:1,textAlign:"center"}}>
+          <div style={{fontSize:10,color:C.sub}}>🏠 ふるさと</div>
+          <div style={{fontSize:20,fontWeight:800,color:"#9C6FD6"}}>{monthFN}</div>
+        </div>
+      </div>
+
+      {/* カレンダーヘッダー */}
+      <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,overflow:"hidden"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:C.navy}}>
+          <button onClick={prevMonth} style={{background:"none",border:"none",color:"white",fontSize:20,cursor:"pointer",padding:"0 8px"}}>‹</button>
+          <div style={{color:"white",fontWeight:700,fontSize:15}}>{monthName}</div>
+          <button onClick={nextMonth} style={{background:"none",border:"none",color:"white",fontSize:20,cursor:"pointer",padding:"0 8px"}}>›</button>
+        </div>
+
+        {/* 曜日ヘッダー */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",background:C.navy+"22"}}>
+          {["日","月","火","水","木","金","土"].map((d,i)=>(
+            <div key={d} style={{textAlign:"center",padding:"6px 0",fontSize:11,fontWeight:700,color:i===0?C.red:i===6?"#4488FF":C.sub}}>{d}</div>
+          ))}
+        </div>
+
+        {/* 日付グリッド */}
+        {weeks.map((week,wi)=>(
+          <div key={wi} style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",borderTop:`1px solid ${C.border}`}}>
+            {week.map((d,di)=>{
+              if(!d)return <div key={di} style={{minHeight:56,background:C.bg+"88"}}/>;
+              const dateStr=`${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+              const evts=getEvents(dateStr);
+              const isToday=dateStr===todayStr;
+              const isSelected=dateStr===selectedDay;
+              return(
+                <div key={di} onClick={()=>handleDayClick(d)} style={{minHeight:56,padding:"3px",borderLeft:di>0?`1px solid ${C.border}`:"none",background:isSelected?C.gold+"22":isToday?C.cyan+"11":"white",cursor:"pointer",position:"relative"}}>
+                  <div style={{fontSize:12,fontWeight:isToday?800:400,color:isToday?C.cyan:di===0?C.red:di===6?"#4488FF":C.text,marginBottom:2,width:20,height:20,borderRadius:"50%",background:isToday?C.cyan:"none",color:isToday?"white":di===0?C.red:di===6?"#4488FF":C.text,display:"flex",alignItems:"center",justifyContent:"center"}}>{d}</div>
+                  {evts.slice(0,2).map((e,ei)=>(
+                    <div key={ei} style={{fontSize:9,background:e.color+"22",color:e.color,borderRadius:2,padding:"1px 3px",marginBottom:1,overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",fontWeight:600}}>{e.label}</div>
+                  ))}
+                  {evts.length>2&&<div style={{fontSize:9,color:C.sub}}>+{evts.length-2}</div>}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      {/* 凡例 */}
+      <div style={{display:"flex",gap:12,marginTop:10,flexWrap:"wrap"}}>
+        {[{color:C.cyan,label:"🛒 EC注文"},{color:C.gold,label:"📦 卸先"},{color:"#9C6FD6",label:"🏠 ふるさと納税"}].map((l,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:4,fontSize:11,color:C.sub}}>
+            <div style={{width:10,height:10,borderRadius:2,background:l.color}}/>
+            {l.label}
+          </div>
+        ))}
+      </div>
+
+      {/* 選択日の詳細 */}
+      {selectedDay&&(
+        <div style={{marginTop:12,background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:14}}>
+          <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:10}}>
+            📅 {new Date(selectedDay+"T00:00:00").toLocaleDateString("ja-JP",{month:"long",day:"numeric",weekday:"short"})}の予定
+          </div>
+          {selectedEvents.length===0?(
+            <div style={{fontSize:13,color:C.sub,textAlign:"center",padding:"12px 0"}}>予定なし</div>
+          ):(
+            selectedEvents.map((e,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:`1px solid ${C.border}`}}>
+                <div style={{width:4,height:36,borderRadius:2,background:e.color,flexShrink:0}}/>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:700,fontSize:13,color:C.text}}>{e.label}</div>
+                  <div style={{fontSize:11,color:C.sub}}>{e.sub}</div>
+                </div>
+                <div style={{fontSize:11,background:e.color+"22",color:e.color,padding:"3px 8px",borderRadius:10,fontWeight:600}}>{e.status||"未対応"}</div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── ふるさと納税タブ ──
 function FurusatoTab({furusatoOrders,setFurusatoOrders,showToast,onDel}){
   const [filter,setFilter]=useState("全て");
@@ -1036,6 +1193,7 @@ function App(){
         {activeTab==="inventory"&&<InventoryTab products={products} setProducts={setProducts} inventory={inventory} setInventory={setInventory} showToast={showToast}/>}
         {activeTab==="finance"&&<FinanceTab orders={orders} wholesale={wholesale} reports={D_REPORTS} onExport={handleExport}/>}
         {activeTab==="diary"&&<DiaryTab diary={diary} setDiary={setDiary} staff={staff} showToast={showToast} onDel={handleDel}/>}
+        {activeTab==="calendar"&&<CalendarTab orders={orders} wholesale={wholesale} furusatoOrders={furusatoOrders}/>}
         {activeTab==="furusato"&&<FurusatoTab furusatoOrders={furusatoOrders} setFurusatoOrders={setFurusatoOrders} showToast={showToast} onDel={handleDel}/>}
         {activeTab==="import"&&<ImportTab orders={orders} setOrders={setOrders} wholesale={wholesale} setWholesale={setWholesale} showToast={showToast}/>}
         {activeTab==="setup"&&<SetupTab staff={staff} setStaff={setStaff} products={products} setProducts={setProducts} clients={clients} setClients={setClients} showToast={showToast} onExportAll={handleExport}/>}
