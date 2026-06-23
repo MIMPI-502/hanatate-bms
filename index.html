@@ -883,29 +883,38 @@ function FurusatoTab({furusatoOrders,setFurusatoOrders,showToast,onDel}){
         filtered.map(o=>(
           <div key={o.id} onClick={()=>setDetail(o)} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:"12px 14px",marginBottom:8,cursor:"pointer"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:4}}>
-              <div style={{fontWeight:700,fontSize:14,color:C.text}}>{o.donorName||"（氏名なし）"}</div>
-              <Badge label={o.status||"未対応"} color={sc(o.status||"未対応")}/>
+              <div style={{fontWeight:700,fontSize:14,color:C.text}}>{o.last_name?`${o.last_name} ${o.first_name||""}`.trim():o.donorName||"（氏名なし）"}</div>
+              <Badge label={o.delivery_status||o.status||"未対応"} color={sc(o.delivery_status||o.status||"未対応")}/>
             </div>
-            <div style={{fontSize:12,color:C.sub,marginBottom:4}}>{o.productName||"商品未設定"}</div>
+            <div style={{fontSize:12,color:C.sub,marginBottom:4}}>{o.product_name||o.productName||"商品未設定"}</div>
             <div style={{display:"flex",gap:12,fontSize:11,color:C.sub,flexWrap:"wrap"}}>
-              {o.donationDate&&<span>📅 {o.donationDate}</span>}
-              {o.deliveryNo&&<span>📦 {o.deliveryNo}</span>}
-              {o.municipality&&<span>🏛 {o.municipality}</span>}
+              {(o.shipment_request_date||o.donationDate)&&<span>📅 {o.shipment_request_date||o.donationDate}</span>}
+              {(o.delivery_no||o.deliveryNo)&&<span>📦 {o.delivery_no||o.deliveryNo}</span>}
+              {o.scheduled_shipment_date&&<span>🚚 {o.scheduled_shipment_date}</span>}
+              {o.donation_amount&&<span>💴 ¥{Number(o.donation_amount).toLocaleString()}</span>}
+              {o.prefecture&&<span>📍 {o.prefecture}</span>}
             </div>
           </div>
         ))
       )}
       {detail&&(
         <Modal onClose={()=>setDetail(null)} title="ふるさと納税 詳細">
-          <Row label="寄附者名" value={detail.donorName||"-"}/>
-          <Row label="返礼品" value={detail.productName||"-"}/>
-          <Row label="数量" value={detail.qty||"-"}/>
-          <Row label="寄附日" value={detail.donationDate||"-"}/>
-          <Row label="発送予定日" value={detail.scheduledShipDate||"-"}/>
-          <Row label="配送No." value={detail.deliveryNo||"-"}/>
-          <Row label="寄附受付No." value={detail.donationReceiptNo||"-"}/>
-          <Row label="自治体" value={detail.municipality||"-"}/>
-          <Row label="ステータス" value={detail.status||"未対応"}/>
+          <Row label="寄附者名" value={detail.last_name?`${detail.last_name} ${detail.first_name||""}`:detail.donorName||"-"}/>
+          <Row label="返礼品" value={detail.product_name||detail.productName||"-"}/>
+          <Row label="商品コード" value={detail.product_code||"-"}/>
+          <Row label="出荷依頼日" value={detail.shipment_request_date||detail.donationDate||"-"}/>
+          <Row label="発送予定日" value={detail.scheduled_shipment_date||detail.scheduledShipDate||"-"}/>
+          <Row label="配送No." value={detail.delivery_no||detail.deliveryNo||"-"}/>
+          <Row label="寄附受付No." value={detail.donation_receipt_no||detail.donationReceiptNo||"-"}/>
+          <Row label="配送ステータス" value={detail.delivery_status||detail.status||"未対応"}/>
+          <Row label="伝票番号" value={detail.tracking_number||"-"}/>
+          <Row label="配送業者" value={detail.carrier||"-"}/>
+          <Row label="都道府県" value={detail.prefecture||"-"}/>
+          <Row label="住所" value={detail.address1?`${detail.address1} ${detail.address2||""}`:"-"}/>
+          <Row label="電話番号" value={detail.phone||"-"}/>
+          <Row label="寄附金額" value={detail.donation_amount?`¥${Number(detail.donation_amount).toLocaleString()}`:"-"}/>
+          <Row label="謝礼品価格" value={detail.product_price?`¥${Number(detail.product_price).toLocaleString()}`:"-"}/>
+          <Row label="寄附年度" value={detail.donation_year||"-"}/>
           <Row label="備考" value={detail.memo||"-"}/>
           <div style={{marginTop:16}}>
             <Lbl t="ステータス変更"/>
