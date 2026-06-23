@@ -979,7 +979,7 @@ function App(){
     if(IS_DEMO||!loggedIn)return;
     (async()=>{
       try{
-        const [ec,ws,pr,cl,st,di,inv,fn]=await Promise.all([db.select("ec_orders"),db.select("ws_orders"),db.select("products"),db.select("clients"),db.select("staff"),db.select("diary"),db.select("inventory")]);
+        const [ec,ws,pr,cl,st,di,inv,fn]=await Promise.all([db.select("ec_orders"),db.select("ws_orders"),db.select("products"),db.select("clients"),db.select("staff"),db.select("diary"),db.select("inventory"),db.select("furusato_orders")]);
         if(ec?.length)setOrders(ec);if(ws?.length)setWholesale(ws);if(pr?.length)setProducts(pr);
         if(cl?.length)setClients(cl);if(st?.length)setStaff(st.map(s=>s.name));if(di?.length)setDiary(di);if(inv?.length)setInventory(inv);
         if(fn?.length)setFurusatoOrders(fn);
