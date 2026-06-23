@@ -116,6 +116,7 @@ const TABS=[
   {id:"inventory",icon:"📋",label:"在庫"},
   {id:"finance",icon:"📊",label:"財務"},
   {id:"diary",icon:"📝",label:"日報"},
+  {id:"furusato",icon:"🏠",label:"ふるさと納税"},
   {id:"import",icon:"📥",label:"自動取込"},
   {id:"setup",icon:"⚙️",label:"設定"},
 ];
@@ -686,6 +687,90 @@ export default async function handler(req, res) {
   );
 }
 
+
+// ── ふるさと納税タブ ──
+function FurusatoTab({furusatoOrders,setFurusatoOrders,showToast,onDel}){
+  const [filter,setFilter]=useState("全て");
+  const [detail,setDetail]=useState(null);
+  const filtered=filter==="全て"?furusatoOrders:furusatoOrders.filter(o=>(o.status||"未対応")===filter);
+  const statuses=["全て","未対応","梱包中","発送済み","完了"];
+  const total=furusatoOrders.length;
+  const done=furusatoOrders.filter(o=>o.status==="完了"||o.status==="発送済み").length;
+  const unhandled=furusatoOrders.filter(o=>!o.status||o.status==="未対応").length;
+  return(
+    <div>
+      <div style={{display:"flex",gap:8,marginBottom:12}}>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 16px",flex:1,textAlign:"center"}}>
+          <div style={{fontSize:11,color:C.sub}}>総件数</div>
+          <div style={{fontSize:22,fontWeight:800,color:C.gold}}>{total}</div>
+        </div>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 16px",flex:1,textAlign:"center"}}>
+          <div style={{fontSize:11,color:C.sub}}>発送済/完了</div>
+          <div style={{fontSize:22,fontWeight:800,color:C.green}}>{done}</div>
+        </div>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 16px",flex:1,textAlign:"center"}}>
+          <div style={{fontSize:11,color:C.sub}}>未対応</div>
+          <div style={{fontSize:22,fontWeight:800,color:C.red}}>{unhandled}</div>
+        </div>
+      </div>
+      <div style={{display:"flex",gap:6,marginBottom:12,overflowX:"auto",paddingBottom:4}}>
+        {statuses.map(s=>(<button key={s} onClick={()=>setFilter(s)} style={{flex:"0 0 auto",padding:"6px 12px",borderRadius:20,border:"none",background:filter===s?C.gold:C.card,color:filter===s?"white":C.text,fontSize:12,fontWeight:filter===s?700:400,cursor:"pointer"}}>{s}</button>))}
+      </div>
+      {filtered.length===0?(
+        <div style={{textAlign:"center",color:C.sub,padding:40,fontSize:14}}>
+          データがありません<br/>
+          <span style={{fontSize:12}}>「自動取込」タブからCSVを読み込んでください</span>
+        </div>
+      ):(
+        filtered.map(o=>(
+          <div key={o.id} onClick={()=>setDetail(o)} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:"12px 14px",marginBottom:8,cursor:"pointer"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:4}}>
+              <div style={{fontWeight:700,fontSize:14,color:C.text}}>{o.donorName||"（氏名なし）"}</div>
+              <Badge label={o.status||"未対応"} color={sc(o.status||"未対応")}/>
+            </div>
+            <div style={{fontSize:12,color:C.sub,marginBottom:4}}>{o.productName||"商品未設定"}</div>
+            <div style={{display:"flex",gap:12,fontSize:11,color:C.sub,flexWrap:"wrap"}}>
+              {o.donationDate&&<span>📅 {o.donationDate}</span>}
+              {o.deliveryNo&&<span>📦 {o.deliveryNo}</span>}
+              {o.municipality&&<span>🏛 {o.municipality}</span>}
+            </div>
+          </div>
+        ))
+      )}
+      {detail&&(
+        <Modal onClose={()=>setDetail(null)} title="ふるさと納税 詳細">
+          <Row label="寄附者名" value={detail.donorName||"-"}/>
+          <Row label="返礼品" value={detail.productName||"-"}/>
+          <Row label="数量" value={detail.qty||"-"}/>
+          <Row label="寄附日" value={detail.donationDate||"-"}/>
+          <Row label="発送予定日" value={detail.scheduledShipDate||"-"}/>
+          <Row label="配送No." value={detail.deliveryNo||"-"}/>
+          <Row label="寄附受付No." value={detail.donationReceiptNo||"-"}/>
+          <Row label="自治体" value={detail.municipality||"-"}/>
+          <Row label="ステータス" value={detail.status||"未対応"}/>
+          <Row label="備考" value={detail.memo||"-"}/>
+          <div style={{marginTop:16}}>
+            <Lbl t="ステータス変更"/>
+            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+              {["未対応","梱包中","発送済み","完了"].map(s=>(
+                <button key={s} onClick={async()=>{
+                  const updated={...detail,status:s};
+                  setFurusatoOrders(p=>p.map(o=>o.id===detail.id?updated:o));
+                  setDetail(updated);
+                  try{await db.upsert("furusato_orders",[updated]);showToast("ステータスを更新しました");}catch(e){showToast("更新エラー","error");}
+                }} style={{padding:"8px 14px",borderRadius:6,border:"none",background:detail.status===s?C.gold:C.bg,color:detail.status===s?"white":C.text,fontSize:13,cursor:"pointer",fontWeight:detail.status===s?700:400}}>{s}</button>
+              ))}
+            </div>
+          </div>
+          <div style={{marginTop:12}}>
+            <button onClick={async()=>{if(window.confirm("削除しますか？")){await onDel("furusato_orders","id",detail.id);setFurusatoOrders(p=>p.filter(o=>o.id!==detail.id));setDetail(null);showToast("削除しました");}}} style={{width:"100%",padding:"10px 0",borderRadius:8,border:"none",background:C.red+"22",color:C.red,fontSize:13,cursor:"pointer",fontWeight:700}}>🗑 削除</button>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
 // ── 設定タブ ──
 function SetupTab({staff,setStaff,products,setProducts,clients,setClients,showToast,onExportAll}){
   const [sec,setSec]=useState("staff");
@@ -810,6 +895,7 @@ function App(){
   const [staff,setStaff]=useState([]);
   const [diary,setDiary]=useState(D_DIARY);
   const [inventory,setInventory]=useState(D_INVENTORY);
+  const [furusatoOrders,setFurusatoOrders]=useState([]);
   const [toast,setToast]=useState(null);
   const [lineSending,setLineSending]=useState(false);
   const [notifyLog,setNotifyLog]=useState([]);
@@ -893,9 +979,10 @@ function App(){
     if(IS_DEMO||!loggedIn)return;
     (async()=>{
       try{
-        const [ec,ws,pr,cl,st,di,inv]=await Promise.all([db.select("ec_orders"),db.select("ws_orders"),db.select("products"),db.select("clients"),db.select("staff"),db.select("diary"),db.select("inventory")]);
+        const [ec,ws,pr,cl,st,di,inv,fn]=await Promise.all([db.select("ec_orders"),db.select("ws_orders"),db.select("products"),db.select("clients"),db.select("staff"),db.select("diary"),db.select("inventory")]);
         if(ec?.length)setOrders(ec);if(ws?.length)setWholesale(ws);if(pr?.length)setProducts(pr);
         if(cl?.length)setClients(cl);if(st?.length)setStaff(st.map(s=>s.name));if(di?.length)setDiary(di);if(inv?.length)setInventory(inv);
+        if(fn?.length)setFurusatoOrders(fn);
         showToast("データを読み込みました");
       }catch(e){showToast("データ取得エラー","error");}
     })();
@@ -949,6 +1036,7 @@ function App(){
         {activeTab==="inventory"&&<InventoryTab products={products} setProducts={setProducts} inventory={inventory} setInventory={setInventory} showToast={showToast}/>}
         {activeTab==="finance"&&<FinanceTab orders={orders} wholesale={wholesale} reports={D_REPORTS} onExport={handleExport}/>}
         {activeTab==="diary"&&<DiaryTab diary={diary} setDiary={setDiary} staff={staff} showToast={showToast} onDel={handleDel}/>}
+        {activeTab==="furusato"&&<FurusatoTab furusatoOrders={furusatoOrders} setFurusatoOrders={setFurusatoOrders} showToast={showToast} onDel={handleDel}/>}
         {activeTab==="import"&&<ImportTab orders={orders} setOrders={setOrders} wholesale={wholesale} setWholesale={setWholesale} showToast={showToast}/>}
         {activeTab==="setup"&&<SetupTab staff={staff} setStaff={setStaff} products={products} setProducts={setProducts} clients={clients} setClients={setClients} showToast={showToast} onExportAll={handleExport}/>}
       </div>
