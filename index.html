@@ -792,7 +792,8 @@ function CalendarTab({orders,wholesale,furusatoOrders}){
   const getEvents=(dateStr)=>{
     const evts=[];
     orders.forEach(o=>{
-      if(o.shipDate===dateStr){
+      const ecDate=o.shipDate||o.created?.slice(0,10)||"";
+      if(ecDate===dateStr){
         evts.push({type:"ec",label:o.customer,sub:o.product,status:o.status,color:C.cyan});
       }
     });
