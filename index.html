@@ -544,7 +544,7 @@ function DiaryTab({diary,setDiary,staff,showToast,onDel}){
   const [filterTag,setFilterTag]=useState("全て");
   const [form,setForm]=useState({date:today(),author:"",content:"",tag:"池管理"});
   const filtered=filterTag==="全て"?diary:diary.filter(d=>d.tag===filterTag);
-  const add=()=>{if(!form.content){showToast("内容を入力してください","error");return;}setDiary(p=>[{id:genId("D"),date:form.date,author:form.author,content:form.content,tag:form.tag},...p]);setShowNew(false);setForm({date:today(),author:"",content:"",tag:"池管理"});showToast("日報を追加しました");};
+  const add=async()=>{if(!form.content){showToast("内容を入力してください","error");return;}const newEntry={id:genId("D"),date:form.date,author:form.author,content:form.content,tag:form.tag};setDiary(p=>[newEntry,...p]);setShowNew(false);setForm({date:today(),author:"",content:"",tag:"池管理"});showToast("日報を追加しました");try{await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`📝【日報】${form.date}\n記録者：${form.author||"不明"}\nカテゴリ：${form.tag}\n\n${form.content}`})});}catch(e){console.log("LINE通知エラー",e);}};
   const doDelete=id=>{setConfirm({msg:"この日報を削除しますか？",onOk:async()=>{setDiary(p=>p.filter(d=>d.id!==id));await onDel("diary","id",id);setConfirm(null);showToast("削除しました");}});};
   const tc=t=>({池管理:C.cyan,出荷:C.green,仕入:C.gold,清掃:C.orange,会議:C.navy,その他:C.sub}[t]||C.sub);
   return(
