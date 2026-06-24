@@ -1,13 +1,18 @@
 export default async function handler(req, res) {
   try {
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+    const LINE_TOKEN = process.env.LINE_TOKEN;
+    const LINE_GROUP_ID = process.env.LINE_GROUP_ID;
+
     const headers = {
-      apikey: process.env.SUPABASE_ANON_KEY,
-      Authorization: 'Bearer ' + process.env.SUPABASE_ANON_KEY,
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: 'Bearer ' + SUPABASE_ANON_KEY,
     };
 
     const [ecRes, wsRes] = await Promise.all([
-      fetch(process.env.SUPABASE_URL + '/rest/v1/ec_orders?select=*', { headers }),
-      fetch(process.env.SUPABASE_URL + '/rest/v1/ws_orders?select=*', { headers }),
+      fetch(SUPABASE_URL + '/rest/v1/ec_orders?select=*', { headers }),
+      fetch(SUPABASE_URL + '/rest/v1/ws_orders?select=*', { headers }),
     ]);
     const ecOrders = ecRes.ok ? await ecRes.json() : [];
     const wsOrders = wsRes.ok ? await wsRes.json() : [];
@@ -20,7 +25,7 @@ export default async function handler(req, res) {
     const wsShip = wsOrders.filter(
       (w) => w.ship_date === todayStr && w.delivery_status !== '仕入確定'
     );
-    const unhandled = ecOrders.filter((o) => o.alert);
+    const unhandled = ecOrders.filter((o) => o.status === '未対応');
 
     const dateLabel = new Date().toLocaleDateString('ja-JP', {
       year: 'numeric', month: 'long', day: 'numeric', weekday: 'short', timeZone: 'Asia/Tokyo',
@@ -39,16 +44,23 @@ export default async function handler(req, res) {
         ? `　${unhandled.slice(0, 3).map((o) => o.customer).join('、')}${unhandled.length > 3 ? '...' : ''}`
         : '',
       '',
-      '✅ 自動Cron稼働確認（毎朝8時送信）',
+      '✅ 自動日次レポート（毎朝8時）',
     ].filter((l) => l !== undefined);
 
-    const lineRes = await fetch('https://' + req.headers.host + '/api/line-message', {
+    // 直接LINE APIに送信
+    const lineRes = await fetch('https://api.line.me/v2/bot/message/push', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: lines.join('\n') }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + LINE_TOKEN,
+      },
+      body: JSON.stringify({
+        to: LINE_GROUP_ID,
+        messages: [{ type: 'text', text: lines.join('\n') }],
+      }),
     });
-    const lineData = await lineRes.json();
 
+    const lineData = await lineRes.json();
     res.status(200).json({ ok: true, lineData });
   } catch (e) {
     console.log('日次レポートCronエラー:', e.message);
