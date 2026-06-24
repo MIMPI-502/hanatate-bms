@@ -480,8 +480,9 @@ function InventoryTab({products,setProducts,inventory,setInventory,showToast}){
 }
 
 // ── 財務タブ ──
-function FinanceTab({orders,wholesale,reports,onExport}){
+function FinanceTab({orders,wholesale,furusatoOrders=[],reports,onExport}){
   const ecSales=orders.filter(o=>["発送済み","完了"].includes(o.status)).reduce((s,o)=>s+o.amount,0);
+  const fnSales=furusatoOrders.reduce((s,o)=>s+(Number(o.donationAmount||o.donation_amount)||0),0);
   const wsSales=wholesale.filter(w=>w.salesRecorded).reduce((s,w)=>s+w.amount,0);
   const total=ecSales+wsSales;
   const pending=wholesale.filter(w=>!w.salesRecorded).reduce((s,w)=>s+w.amount,0);
@@ -720,8 +721,11 @@ function CalendarTab({orders,wholesale,furusatoOrders}){
       }
     });
     furusatoOrders.forEach(o=>{
-      if(o.scheduledShipDate===dateStr||o.donationDate===dateStr){
-        evts.push({type:"fn",label:o.donorName||"寄附者",sub:o.productName,status:o.status,color:"#9C6FD6"});
+      const fnDate=o.scheduledShipDate||o.scheduled_shipment_date||o.donationDate||o.shipment_request_date||"";
+      if(fnDate===dateStr){
+        const fnName=o.lastName?`${o.lastName} ${o.firstName||""}`.trim():o.last_name?`${o.last_name} ${o.first_name||""}`.trim():o.donorName||"寄附者";
+        const fnProduct=o.productName||o.product_name||"";
+        evts.push({type:"fn",label:fnName,sub:fnProduct,status:o.deliveryStatus||o.delivery_status||o.status||"配送中",color:"#9C6FD6"});
       }
     });
     return evts;
@@ -752,7 +756,7 @@ function CalendarTab({orders,wholesale,furusatoOrders}){
   const monthStr=`${year}-${String(month+1).padStart(2,"0")}`;
   const monthEC=orders.filter(o=>o.shipDate?.startsWith(monthStr)).length;
   const monthWS=wholesale.filter(w=>w.shipDate?.startsWith(monthStr)).length;
-  const monthFN=furusatoOrders.filter(o=>o.scheduledShipDate?.startsWith(monthStr)||o.donationDate?.startsWith(monthStr)).length;
+  const monthFN=furusatoOrders.filter(o=>(o.scheduledShipDate||o.scheduled_shipment_date||o.donationDate||o.shipment_request_date||"").startsWith(monthStr)).length;
 
   return(
     <div>
@@ -1201,7 +1205,7 @@ function App(){
         {activeTab==="wholesale"&&<WholesaleTab wholesale={wholesale} setWholesale={setWholesale} products={products} clients={clients} showToast={showToast} onSave={handleSave} onDel={handleDel}/>}
         {activeTab==="alert"&&<AlertTab orders={orders} wholesale={wholesale} onLine={handleLine} lineSending={lineSending} autoNotifyEnabled={autoNotifyEnabled} setAutoNotifyEnabled={setAutoNotifyEnabled} notifyLog={notifyLog} onMorning={sendMorningReport}/>}
         {activeTab==="inventory"&&<InventoryTab products={products} setProducts={setProducts} inventory={inventory} setInventory={setInventory} showToast={showToast}/>}
-        {activeTab==="finance"&&<FinanceTab orders={orders} wholesale={wholesale} reports={D_REPORTS} onExport={handleExport}/>}
+        {activeTab==="finance"&&<FinanceTab orders={orders} wholesale={wholesale} furusatoOrders={furusatoOrders} reports={D_REPORTS} onExport={handleExport}/>}
         {activeTab==="diary"&&<DiaryTab diary={diary} setDiary={setDiary} staff={staff} showToast={showToast} onDel={handleDel}/>}
         {activeTab==="calendar"&&<CalendarTab orders={orders} wholesale={wholesale} furusatoOrders={furusatoOrders}/>}
         {activeTab==="furusato"&&<FurusatoTab furusatoOrders={furusatoOrders} setFurusatoOrders={setFurusatoOrders} showToast={showToast} onDel={handleDel}/>}
