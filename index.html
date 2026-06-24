@@ -1182,7 +1182,7 @@ function App(){
     })();
   },[loggedIn]);
 
-  const handleSave=useCallback(async(table,data)=>{if(IS_DEMO){showToast("保存しました（デモ）");return;}try{await db.upsert(table,data);showToast("保存しました");}catch(e){showToast("保存エラー","error");}},[showToast]);
+  const handleSave=useCallback(async(table,data)=>{if(IS_DEMO){showToast("保存しました（デモ）");return;}try{const arr=Array.isArray(data)?data:[data];await db.upsert(table,arr);}catch(e){console.log("保存エラー",e,table,data);showToast("保存エラー","error");}},[showToast]);
   const handleDel=useCallback(async(table,col,val)=>{if(IS_DEMO)return;try{await db.del(table,col,val);}catch(e){showToast("削除エラー","error");}},[showToast]);
 
   const handleLine=useCallback(async()=>{
