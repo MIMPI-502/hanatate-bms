@@ -530,7 +530,7 @@ function FinanceTab({orders,wholesale,furusatoOrders=[],reports,onExport}){
       </div>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:16,marginBottom:14}}>
         <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:10}}>📊 今月の内訳</div>
-        {[{l:"EC直販",v:bd["EC"]||0,c:C.cyan},{l:"ふるさと納税",v:bd["ふるさと納税"]||0,c:C.gold},{l:"卸売（計上済）",v:wsSales,c:C.green},{l:"卸売（未計上）",v:pending,c:C.orange}].map(x=>(<div key={x.l} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:`1px solid ${C.border}`}}><div style={{width:10,height:10,borderRadius:"50%",background:x.c}}/><div style={{flex:1,fontSize:13}}>{x.l}</div><div style={{fontWeight:700,fontSize:14,color:x.c}}>¥{fmt(x.v)}</div></div>))}
+        {[{l:"EC直販",v:bd["EC"]||0,c:C.cyan},{l:"ふるさと納税",v:fnSales,c:C.gold},{l:"卸売（計上済）",v:wsSales,c:C.green},{l:"卸売（未計上）",v:pending,c:C.orange}].map(x=>(<div key={x.l} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:`1px solid ${C.border}`}}><div style={{width:10,height:10,borderRadius:"50%",background:x.c}}/><div style={{flex:1,fontSize:13}}>{x.l}</div><div style={{fontWeight:700,fontSize:14,color:x.c}}>¥{fmt(x.v)}</div></div>))}
         <div style={{display:"flex",justifyContent:"space-between",padding:"12px 0 0",fontWeight:800,fontSize:15}}><span>合計（確定）</span><span style={{color:C.navy}}>¥{fmt(total)}</span></div>
       </div>
     </div>
