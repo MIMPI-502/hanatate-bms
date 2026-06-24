@@ -42,6 +42,51 @@ const CONFIG={
 };
 const IS_DEMO=CONFIG.SUPABASE_URL.includes("YOUR_PROJECT");
 
+const FN_PRICE_MAP = {
+  '国産鰻の蒲焼2尾': 3900,
+  '国産鰻の蒲焼3尾': 5400,
+  '国産鰻の蒲焼4尾': 7200,
+  '国産鰻の蒲焼5尾': 9000,
+  '国産鰻の白焼2尾': 4200,
+  '国産鰻の白焼3尾': 6000,
+  '国産鰻の白焼4尾': 8100,
+  '国産鰻の白焼5尾': 10200,
+  '国産 うなぎ 蒲焼き': 3900,
+  '国産 うなぎ 白焼き': 4200,
+};
+const getFnSalesPrice = (productName) => {
+  if (!productName) return 0;
+  for (const [key, val] of Object.entries(FN_PRICE_MAP)) {
+    if (productName.includes(key.replace('尾','').trim()) ||
+        (productName.includes('蒲焼') && productName.includes('2尾')) ||
+        (productName.includes('蒲焼') && productName.includes('3尾')) ||
+        (productName.includes('蒲焼') && productName.includes('4尾')) ||
+        (productName.includes('蒲焼') && productName.includes('5尾')) ||
+        (productName.includes('白焼') && productName.includes('2尾')) ||
+        (productName.includes('白焼') && productName.includes('3尾')) ||
+        (productName.includes('白焼') && productName.includes('4尾')) ||
+        (productName.includes('白焼') && productName.includes('5尾'))) {
+      // 蒲焼か白焼かと尾数で判定
+      const is蒲焼 = productName.includes('蒲焼');
+      const is白焼 = productName.includes('白焼');
+      const has2 = productName.includes('2尾') || productName.includes('2 尾');
+      const has3 = productName.includes('3尾') || productName.includes('3 尾');
+      const has4 = productName.includes('4尾') || productName.includes('4 尾');
+      const has5 = productName.includes('5尾') || productName.includes('5 尾');
+      if (is蒲焼 && has2) return 3900;
+      if (is蒲焼 && has3) return 5400;
+      if (is蒲焼 && has4) return 7200;
+      if (is蒲焼 && has5) return 9000;
+      if (is白焼 && has2) return 4200;
+      if (is白焼 && has3) return 6000;
+      if (is白焼 && has4) return 8100;
+      if (is白焼 && has5) return 10200;
+    }
+  }
+  return 0;
+};
+
+
 // ── Supabaseクライアント ──
 const toSnake=s=>s.replace(/[A-Z]/g,m=>"_"+m.toLowerCase());
 const toCamel=s=>s.replace(/_([a-z])/g,(_,c)=>c.toUpperCase());
@@ -483,7 +528,7 @@ function InventoryTab({products,setProducts,inventory,setInventory,showToast}){
 // ── 財務タブ ──
 function FinanceTab({orders,wholesale,furusatoOrders=[],reports,onExport}){
   const ecSales=orders.filter(o=>["発送済み","完了"].includes(o.status)).reduce((s,o)=>s+o.amount,0);
-  const fnSales=furusatoOrders.reduce((s,o)=>s+(Number(o.donationAmount||o.donation_amount)||0),0);
+  const fnSales=furusatoOrders.reduce((s,o)=>s+getFnSalesPrice(o.productName||o.product_name),0);
   const wsSales=wholesale.filter(w=>w.salesRecorded).reduce((s,w)=>s+w.amount,0);
   const total=ecSales+wsSales+fnSales;
   const pending=wholesale.filter(w=>!w.salesRecorded).reduce((s,w)=>s+w.amount,0);
@@ -500,7 +545,7 @@ function FinanceTab({orders,wholesale,furusatoOrders=[],reports,onExport}){
     const m=(o.scheduledShipDate||o.scheduled_shipment_date||o.shipment_request_date||"").substring(0,7);
     if(!m)return;
     if(!monthlyMap[m])monthlyMap[m]={month:m,ec:0,furusato:0,wholesale:0};
-    monthlyMap[m].furusato+=Number(o.donationAmount||o.donation_amount)||0;
+    monthlyMap[m].furusato+=getFnSalesPrice(o.productName||o.product_name);
   });
   wholesale.forEach(w=>{
     const m=(w.shipDate||w.created||"").substring(0,7);
