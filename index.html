@@ -633,9 +633,12 @@ function ImportTab({orders,setOrders,wholesale,setWholesale,furusatoOrders,setFu
   };
   const handleFile=(e)=>{
     const file=e.target.files[0];if(!file)return;
-    const reader=new FileReader();
-    reader.onload=(ev)=>{const text=ev.target.result;setCsvText(text);setPreview(parseCSV(text).slice(0,5));};
-    reader.readAsText(file,"UTF-8");
+    const tryRead=(enc)=>new Promise(res=>{const r=new FileReader();r.onload=(ev)=>res(ev.target.result);r.readAsText(file,enc);});
+    tryRead("Shift_JIS").then(text=>{
+      const hasGarble=/[�◆]{3,}/.test(text);
+      if(hasGarble){tryRead("UTF-8").then(t=>{setCsvText(t);setPreview(parseCSV(t).slice(0,5));});}
+      else{setCsvText(text);setPreview(parseCSV(text).slice(0,5));}
+    });
   };
   const handleImport=async()=>{
     if(!csvText){showToast("CSVファイルを選択してください","error");return;}
