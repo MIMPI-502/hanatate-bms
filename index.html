@@ -168,14 +168,15 @@ function LoginScreen({onLogin}){
 }
 
 // ── EC注文タブ ──
-function EcTab({orders,setOrders,staff,products,showToast,onSave,onDel}){
+function EcTab({orders,setOrders,furusatoOrders=[],staff,products,showToast,onSave,onDel}){
   const [filter,setFilter]=useState("全て");
   const [detail,setDetail]=useState(null);
   const [showNew,setShowNew]=useState(false);
   const [editMode,setEditMode]=useState(false);
   const [confirm,setConfirm]=useState(null);
   const [form,setForm]=useState({customer:"",type:"EC",product:"",qty:1,amount:0,shipDate:"",stock:true,payment:false,memo:""});
-  const filtered=filter==="全て"?orders:orders.filter(o=>o.type===filter||o.status===filter);
+  const allOrders=filter==="ふるさと納税"?furusatoOrders.map(o=>({...o,customer:o.lastName?`${o.lastName} ${o.firstName||""}`.trim():o.last_name?`${o.last_name} ${o.first_name||""}`.trim():"",product:o.productName||o.product_name||"",amount:o.donationAmount||o.donation_amount||0,status:o.deliveryStatus||o.delivery_status||"配送中",type:"ふるさと納税",shipDate:o.scheduledShipDate||o.scheduled_shipment_date||""})):orders;
+  const filtered=filter==="全て"?orders:filter==="ふるさと納税"?allOrders:orders.filter(o=>o.type===filter||o.status===filter);
   const upd=(id,f,v)=>{setOrders(p=>p.map(o=>{if(o.id!==id)return o;const u={...o,[f]:v};u.alert=!u.stock||!u.payment||u.status==="未対応";return u;}));setDetail(p=>p&&p.id===id?{...p,[f]:v}:p);};
   const addOrder=()=>{
     if(!form.customer||!form.product){showToast("顧客名と商品を入力してください","error");return;}
@@ -721,7 +722,7 @@ function CalendarTab({orders,wholesale,furusatoOrders}){
       }
     });
     furusatoOrders.forEach(o=>{
-      const fnDate=o.scheduledShipDate||o.scheduled_shipment_date||o.donationDate||o.shipment_request_date||"";
+      const fnDate=o.scheduledShipDate||o.scheduled_shipment_date||o.shipment_request_date||o.donationDate||"";
       if(fnDate===dateStr){
         const fnName=o.lastName?`${o.lastName} ${o.firstName||""}`.trim():o.last_name?`${o.last_name} ${o.first_name||""}`.trim():o.donorName||"寄附者";
         const fnProduct=o.productName||o.product_name||"";
@@ -1201,7 +1202,7 @@ function App(){
         </div>
       </div>
       <div style={{padding:"16px 16px 80px"}}>
-        {activeTab==="ec"&&<EcTab orders={orders} setOrders={setOrders} staff={staff} products={products} showToast={showToast} onSave={handleSave} onDel={handleDel}/>}
+        {activeTab==="ec"&&<EcTab orders={orders} setOrders={setOrders} furusatoOrders={furusatoOrders} staff={staff} products={products} showToast={showToast} onSave={handleSave} onDel={handleDel}/>}
         {activeTab==="wholesale"&&<WholesaleTab wholesale={wholesale} setWholesale={setWholesale} products={products} clients={clients} showToast={showToast} onSave={handleSave} onDel={handleDel}/>}
         {activeTab==="alert"&&<AlertTab orders={orders} wholesale={wholesale} onLine={handleLine} lineSending={lineSending} autoNotifyEnabled={autoNotifyEnabled} setAutoNotifyEnabled={setAutoNotifyEnabled} notifyLog={notifyLog} onMorning={sendMorningReport}/>}
         {activeTab==="inventory"&&<InventoryTab products={products} setProducts={setProducts} inventory={inventory} setInventory={setInventory} showToast={showToast}/>}
