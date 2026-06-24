@@ -635,7 +635,7 @@ function ImportTab({orders,setOrders,wholesale,setWholesale,furusatoOrders,setFu
     const file=e.target.files[0];if(!file)return;
     const reader=new FileReader();
     reader.onload=(ev)=>{const text=ev.target.result;setCsvText(text);setPreview(parseCSV(text).slice(0,5));};
-    reader.readAsText(file,"UTF-8");
+    if(csvType==="furusato"){reader.readAsText(file,"Shift_JIS");}else{reader.readAsText(file,"UTF-8");}
   };
   const handleImport=async()=>{
     if(!csvText){showToast("CSVファイルを選択してください","error");return;}
