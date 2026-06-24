@@ -42,6 +42,19 @@ const CONFIG={
 };
 const IS_DEMO=CONFIG.SUPABASE_URL.includes("YOUR_PROJECT");
 
+// Vercel環境変数からSupabase設定を動的取得
+async function loadConfig(){
+  try{
+    const r=await fetch('/api/get-config');
+    if(r.ok){
+      const c=await r.json();
+      if(c.supabaseUrl)CONFIG.SUPABASE_URL=c.supabaseUrl;
+      if(c.supabaseAnonKey)CONFIG.SUPABASE_ANON_KEY=c.supabaseAnonKey;
+    }
+  }catch(e){console.log('config load error',e);}
+}
+loadConfig();
+
 const FN_PRICE_MAP = {
   '国産鰻の蒲焼2尾': 3900,
   '国産鰻の蒲焼3尾': 5400,
