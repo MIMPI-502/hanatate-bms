@@ -485,10 +485,32 @@ function FinanceTab({orders,wholesale,furusatoOrders=[],reports,onExport}){
   const ecSales=orders.filter(o=>["発送済み","完了"].includes(o.status)).reduce((s,o)=>s+o.amount,0);
   const fnSales=furusatoOrders.reduce((s,o)=>s+(Number(o.donationAmount||o.donation_amount)||0),0);
   const wsSales=wholesale.filter(w=>w.salesRecorded).reduce((s,w)=>s+w.amount,0);
-  const total=ecSales+wsSales;
+  const total=ecSales+wsSales+fnSales;
   const pending=wholesale.filter(w=>!w.salesRecorded).reduce((s,w)=>s+w.amount,0);
   const bd=orders.reduce((acc,o)=>{if(["発送済み","完了"].includes(o.status))acc[o.type]=(acc[o.type]||0)+o.amount;return acc;},{});
-  const maxBar=Math.max(...reports.map(r=>r.ec+r.furusato+r.wholesale),1);
+  // 月別集計を実データから生成
+  const monthlyMap={};
+  [...orders].forEach(o=>{
+    const m=(o.shipDate||o.created||"").substring(0,7);
+    if(!m)return;
+    if(!monthlyMap[m])monthlyMap[m]={month:m,ec:0,furusato:0,wholesale:0};
+    if(["発送済み","完了"].includes(o.status))monthlyMap[m].ec+=o.amount||0;
+  });
+  furusatoOrders.forEach(o=>{
+    const m=(o.scheduledShipDate||o.scheduled_shipment_date||o.shipment_request_date||"").substring(0,7);
+    if(!m)return;
+    if(!monthlyMap[m])monthlyMap[m]={month:m,ec:0,furusato:0,wholesale:0};
+    monthlyMap[m].furusato+=Number(o.donationAmount||o.donation_amount)||0;
+  });
+  wholesale.forEach(w=>{
+    const m=(w.shipDate||w.created||"").substring(0,7);
+    if(!m)return;
+    if(!monthlyMap[m])monthlyMap[m]={month:m,ec:0,furusato:0,wholesale:0};
+    if(w.salesRecorded)monthlyMap[m].wholesale+=w.amount||0;
+  });
+  const dynamicReports=Object.values(monthlyMap).sort((a,b)=>a.month.localeCompare(b.month));
+  const activeReports=dynamicReports.length>0?dynamicReports:reports;
+  const maxBar=Math.max(...activeReports.map(r=>r.ec+r.furusato+r.wholesale),1);
   return(
     <div>
       <div style={{background:C.navy,borderRadius:10,padding:"18px 20px",marginBottom:14,color:"white"}}>
@@ -503,7 +525,7 @@ function FinanceTab({orders,wholesale,furusatoOrders=[],reports,onExport}){
       </div>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:16,marginBottom:14}}>
         <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:12}}>📈 月次売上推移</div>
-        {reports.map(r=>{const tot=r.ec+r.furusato+r.wholesale;return(<div key={r.month} style={{marginBottom:10}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12,fontWeight:600}}>{r.month}</span><span style={{fontSize:12,fontWeight:700,color:C.navy}}>¥{fmt(tot)}</span></div><div style={{display:"flex",borderRadius:4,overflow:"hidden",height:16,background:"#eee"}}><div style={{width:`${r.ec/maxBar*100}%`,background:C.cyan}}/><div style={{width:`${r.furusato/maxBar*100}%`,background:C.gold}}/><div style={{width:`${r.wholesale/maxBar*100}%`,background:C.green}}/></div></div>);})}
+        {activeReports.map(r=>{const tot=r.ec+r.furusato+r.wholesale;return(<div key={r.month} style={{marginBottom:10}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12,fontWeight:600}}>{r.month}</span><span style={{fontSize:12,fontWeight:700,color:C.navy}}>¥{fmt(tot)}</span></div><div style={{display:"flex",borderRadius:4,overflow:"hidden",height:16,background:"#eee"}}><div style={{width:`${r.ec/maxBar*100}%`,background:C.cyan}}/><div style={{width:`${r.furusato/maxBar*100}%`,background:C.gold}}/><div style={{width:`${r.wholesale/maxBar*100}%`,background:C.green}}/></div></div>);})}
         <div style={{display:"flex",gap:12,marginTop:8,flexWrap:"wrap"}}>{[{l:"EC直販",c:C.cyan},{l:"ふるさと納税",c:C.gold},{l:"卸売",c:C.green}].map(x=>(<div key={x.l} style={{display:"flex",alignItems:"center",gap:5,fontSize:11}}><div style={{width:10,height:10,borderRadius:2,background:x.c}}/><span style={{color:C.sub}}>{x.l}</span></div>))}</div>
       </div>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:16,marginBottom:14}}>
