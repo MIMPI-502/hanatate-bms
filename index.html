@@ -70,7 +70,7 @@ const DICT={
     tabCalendar:"カレンダー",tabInventory:"在庫",tabWholesale:"卸先",
     tabFinance:"財務",tabImport:"自動取込",tabSetup:"設定",
     // 共通
-    save:"💾 保存",saved:t("saved"),del:"🗑️ 削除",deleted:t("deleted"),
+    save:"💾 保存",saved:"保存しました",del:"🗑️ 削除",deleted:"削除しました",
     cancel:"キャンセル",back:"← 戻る",edit:"✏️ 内容を編集",saveDone:"✓ 変更を保存",
     add:"＋追加",noData:"データがありません",
     errInput:"入力エラー",
@@ -84,7 +84,7 @@ const DICT={
     ecAddBtn:"＋ 注文を追加",ecDetail:"注文詳細",ecEditTitle:"✏️ 編集",
     ecCustomerLbl:"顧客名",ecProductLbl:"商品",ecAmountLbl:"金額",ecTypeLbl:"種別",
     ecCreated:"注文日時",ecShipDateLbl:"発送予定日",ecAssigned:"担当者",
-    ecMemoLbl:"メモ",ecStatusChange:t("fnStatusChange"),ecSetShipDate:"発送予定日",
+    ecMemoLbl:"メモ",ecStatusChange:"ステータス変更",ecSetShipDate:"発送予定日",
     ecAssignStaff:"担当者を割り当てる",ecNoStaff:"⚙️設定タブで担当者を追加してください",
     ecNoOrder:"該当する注文がありません",
     ecDelMsg:"この注文を削除しますか？
@@ -109,46 +109,46 @@ const DICT={
     wsEditDone:"編集しました",wsInvoiceIssued:"✓ 納品書",wsInvoiceNone:"納品書未発行",
     wsSalesOk:"✓ 売上計上",wsSalesNone:"売上未計上",wsOrderPfx:"受注:",wsPurchasePfx:"発注:",wsDeliveryPfx2:"仕入:",
     // アラート
-    alertAll:t("alertAll"),alertNeeded:"要対応",alertCheck:"複数名で確認してください",
+    alertAll:"全て対応済みです",alertNeeded:"要対応",alertCheck:"複数名で確認してください",
     alertSendLine:"📲 LINE通知",alertSending:"送信中...",alertDemo:"🧪 デモモード：LINE通知はコンソールに出力されます",
-    alertTodayShip:{t("alertTodayShip")},alertEcSection:{t("alertEcSection")},
-    alertWsSection:{t("alertWsSection")},alertNone:t("alertNone"),
-    alertRuleTitle:{t("alertRuleTitle")},
-    alertAutoTitle:{t("alertAutoTitle")},
+    alertTodayShip:"📅 本日の発送・納品予定",alertEcSection:"🛒 EC・ふるさと納税",
+    alertWsSection:"📦 卸先管理",alertNone:"✅ アラートなし",
+    alertRuleTitle:"📋 確認ルール",
+    alertAutoTitle:"🤖 自動通知（LINE Messaging API）",
     alertAutoOn:"ON ✓",alertAutoOff:"OFF",
     alertSendNow:"📲 今すぐ日次レポートを送信",alertDemoConsole:"デモ時はコンソールに出力されます",
-    alertLogTitle:{t("alertLogTitle")},alertShipSub:t("alertShipSub"),alertDelivSub:t("alertDelivSub"),
+    alertLogTitle:"📋 通知履歴",alertShipSub:"発送予定日が本日です",alertDelivSub:"納品予定日が本日です",
     alertNoStock:"⛔ 在庫なし",alertNoPayment:"⛔ 決済未確認",alertUnhandled:"⚡ 未対応",alertUnassigned:"👤 担当未割当",
     alertNoOrder:"⚡ 発注未完了",alertNoInvoice:"📄 納品書未発行",alertNoSales:"💴 売上未計上",
     // 在庫
-    invInStock:"在庫あり商品",invOutOfStock:"欠品中",invTitle:t("invTitle"),
-    invHistoryTitle:t("invHistoryTitle"),invNoHistory:"履歴がありません",
+    invInStock:"在庫あり商品",invOutOfStock:"欠品中",invTitle:"📦 商品在庫一覧",
+    invHistoryTitle:"📋 入出庫履歴",invNoHistory:"履歴がありません",
     invIn:"＋ 入庫",invOut:"－ 出庫",invAdjIn:"＋ 入庫",invAdjOut:"－ 出庫",
     invCurrentStock:"現在の在庫",invQtyIn:"入庫数量",invQtyOut:"出庫数量",
-    invNewStock:t("invNewStock"),invUnit:"個",invMemo:"メモ（任意）",
+    invNewStock:"更新後の在庫：",invUnit:"個",invMemo:"メモ（任意）",
     invRecordIn:"＋ 入庫を記録",invRecordOut:"－ 出庫を記録",
     invUpdated:"在庫を更新しました",invOutBadge:"欠品中",invLowBadge:"残りわずか",
     // 財務
-    finMonthSales:t("finMonthSales"),finPending:"未計上:",
+    finMonthSales:"今月の確定売上",finPending:"未計上:",
     finExportEc:"📥 EC注文",finExportWs:"📥 卸先",finExportAll:"📥 全データ",
-    finChartTitle:t("finChartTitle"),finBreakTitle:t("finBreakTitle"),
+    finChartTitle:"📈 月次売上推移",finBreakTitle:"📊 今月の内訳",
     finEc:"EC直販",finFurusato:"ふるさと納税",finWs:"卸売",finWsRecorded:"卸売（計上済）",
-    finWsPending:"卸売（未計上）",finTotalConfirmed:t("finTotalConfirmed"),
+    finWsPending:"卸売（未計上）",finTotalConfirmed:"合計（確定）",
     // 日報
     diaryNewBtn:"＋ 日報・作業メモを追加",diaryNoData:"日報がありません",
     diaryNewModal:"＋ 日報・作業メモ",diaryDate:"日付",diaryAuthor:"記録者",
     diarySelectAuthor:"── 選択 ──",diaryCategory:"カテゴリ",diaryContent:"作業内容",
     diaryPlaceholder:"今日の作業内容を入力...",diaryAddBtn:"＋ 日報を追加",
-    diaryDelMsg:t("diaryDelMsg"),diaryDelBtn:"削除",
+    diaryDelMsg:"この日報を削除しますか？",diaryDelBtn:"削除",
     diaryAddDone:"日報を追加しました",diaryErrInput:"内容を入力してください",
     // 自動取込
     importCsv:"📂 CSV取込",importRoadmap:"📋 ロードマップ",
-    importCsvTitle:t("importCsvTitle"),importType:"取込種別",
+    importCsvTitle:"📂 CSVファイルから一括取込",importType:"取込種別",
     importEcOpt:"🛒 EC注文（Shopify等）",importFnOpt:"🏠 ふるさと納税",importWsOpt:"📦 卸売注文",
     importSampleNote:"サンプルCSVをダウンロードして形式を確認できます",
     importSampleEc:"花立山EC",importSampleFn:"ふるさと納税",importSampleWs:"卸売",
-    importSelectFile:"CSVファイルを選択",importPreview:t("importPreview"),
-    importPreviewCount:t("importPreviewCount"),importBtn:"📥 一括取込を実行",importingBtn:"取込中...",
+    importSelectFile:"CSVファイルを選択",importPreview:"プレビュー（最初の5件）",
+    importPreviewCount:"件を取り込みます",importBtn:"📥 一括取込を実行",importingBtn:"取込中...",
     importErrSelect:"CSVファイルを選択してください",importDone:"件のふるさと納税データを取り込みました",
     importEcDone:"件のEC注文を取り込みました",importWsDone:"件の卸注文を取り込みました",
     importSampleDl:"サンプルCSVをダウンロードしました",importFormats:"💡 対応しているCSV形式",
@@ -156,30 +156,30 @@ const DICT={
     // 設定
     setupStaff:"👤 担当者",setupProducts:"🐟 商品",setupClients:"🏢 得意先",
     setupBackup:"💾 バックアップ",setupSystem:"🔧 本番設定",
-    setupStaffTitle:t("setupStaffTitle"),setupStaffNone:"まだ登録されていません",
+    setupStaffTitle:"登録済み担当者",setupStaffNone:"まだ登録されていません",
     setupStaffPlaceholder:"名前を入力...",setupStaffAddDone:"担当者を追加しました",
     setupStaffExist:"すでに登録されています",
-    setupProdTitle:t("setupProdTitle"),setupProdName:"商品名",setupProdPrice:"価格（円）",
+    setupProdTitle:"商品を追加",setupProdName:"商品名",setupProdPrice:"価格（円）",
     setupProdStock:"初期在庫数",setupProdCategory:"カテゴリ",setupProdAddBtn:"＋ 商品を追加",
     setupProdAddDone:"商品を追加しました",setupProdErrInput:"商品名を入力してください",
     setupProdEdit:"編集",setupProdDel:"削除",setupProdDone:"✓ 完了",
     setupProdStockLbl:"在庫:",
-    setupClientTitle:t("setupClientTitle"),setupClientName:"会社名 *",
+    setupClientTitle:"得意先を追加",setupClientName:"会社名 *",
     setupClientTel:"電話番号",setupClientAddr:"住所",setupClientMemo:"メモ",
     setupClientAddBtn:"＋ 得意先を追加",setupClientAddDone:"得意先を追加しました",
     setupClientErrInput:"会社名を入力してください",
-    setupBackupTitle:t("setupBackupTitle"),
-    setupBackupNote:t("setupBackupNote"),
+    setupBackupTitle:"💾 データバックアップ（CSV）",
+    setupBackupNote:"データをCSVファイルとしてダウンロードできます。Excelで開くことができます。週1回の定期バックアップを推奨します。",
     setupBackupAll:"📥 全データをまとめてダウンロード",
     setupBackupTip:"💡 推奨：週1回、全データをダウンロードして保管してください。",
     setupDemoMode:"🧪 現在デモモードで動作中です。下記を設定すると本番稼働できます。",setupLiveMode:"✅ 本番モードで稼働中",
     // カレンダー
     calEcLbl:"🛒 EC",calWsLbl:"📦 卸先",calFnLbl:"🏠 ふるさと",
-    calSchedule:t("calSchedule"),calNoSchedule:t("calNoSchedule"),
+    calSchedule:"の予定",calNoSchedule:"予定なし",
     calLegendEc:"🛒 EC注文",calLegendWs:"📦 卸先",calLegendFn:"🏠 ふるさと納税",
-    calDays:[...t("calDays")],
+    calDays:["日","月","火","水","木","金","土"],
     // ふるさと納税
-    fnTotal:t("fnTotal"),fnDone:t("fnDone"),fnUnhandled:t("fnUnhandled"),
+    fnTotal:"総件数",fnDone:"発送済/完了",fnUnhandled:"未対応",
     fnNoData:"データがありません",fnNoCsvHint:"「自動取込」タブからCSVを読み込んでください",
     fnDetail:"ふるさと納税 詳細",fnDonor:"寄附者名",fnProduct:"返礼品",
     fnProductCode:"商品コード",fnShipRequest:"出荷依頼日",fnShipSched:"発送予定日",
@@ -452,7 +452,7 @@ const ST_WS_O=["未入力","受注入力済"];
 const ST_WS_P=["未発注","発注済"];
 const ST_WS_D=["未確定","仕入確定"];
 const DIARY_TAGS=["池管理","出荷","仕入","清掃","会議","その他"];
-const TABS=[
+const getTABS=()=>[
   {id:"ec",icon:"🛒",label:t("tabEc")},
   {id:"furusato",icon:"🏠",label:t("tabFurusato")},
   {id:"diary",icon:"📝",label:t("tabDiary")},
@@ -1569,7 +1569,7 @@ function App(){
           </div>
         </div>
         <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch"}}>
-          {TABS.map(t=>(<button key={t.id} onClick={()=>setActiveTab(t.id)} style={{flex:"0 0 auto",padding:"10px 12px 11px",border:"none",background:"none",color:activeTab===t.id?C.goldL:"rgba(255,255,255,0.4)",borderBottom:`2px solid ${activeTab===t.id?C.goldL:"transparent"}`,fontSize:12,cursor:"pointer",fontWeight:activeTab===t.id?700:400,display:"flex",flexDirection:"column",alignItems:"center",gap:2,minWidth:50}}><span style={{fontSize:15}}>{t.icon}</span><span style={{whiteSpace:"nowrap"}}>{t.label}{t.id==="alert"&&alertCount>0?` (${alertCount})`:""}</span></button>))}
+          {getTABS().map(t=>(<button key={t.id} onClick={()=>setActiveTab(t.id)} style={{flex:"0 0 auto",padding:"10px 12px 11px",border:"none",background:"none",color:activeTab===t.id?C.goldL:"rgba(255,255,255,0.4)",borderBottom:`2px solid ${activeTab===t.id?C.goldL:"transparent"}`,fontSize:12,cursor:"pointer",fontWeight:activeTab===t.id?700:400,display:"flex",flexDirection:"column",alignItems:"center",gap:2,minWidth:50}}><span style={{fontSize:15}}>{t.icon}</span><span style={{whiteSpace:"nowrap"}}>{t.label}{t.id==="alert"&&alertCount>0?` (${alertCount})`:""}</span></button>))}
         </div>
       </div>
       <div style={{padding:"16px 16px 80px"}}>
