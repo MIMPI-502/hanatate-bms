@@ -1321,17 +1321,17 @@ function App(){
     <div style={{fontFamily:"'Helvetica Neue',Arial,'Hiragino Sans',sans-serif",background:C.bg,minHeight:"100vh",maxWidth:600,margin:"0 auto"}}>
       <div style={{background:C.navy,padding:"14px 18px 0",position:"sticky",top:0,zIndex:50}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-          <div><div style={{color:"white",fontWeight:800,fontSize:15}}>花立山養鰻</div><div style={{color:C.goldL,fontSize:10,opacity:0.85}}>業務管理システム {IS_DEMO?"🧪 デモ":"🟢 本番"}</div></div>
+          <div><div style={{color:"white",fontWeight:800,fontSize:18}}>花立山養鰻</div><div style={{color:C.goldL,fontSize:12,opacity:0.85}}>業務管理システム {IS_DEMO?"🧪 デモ":"🟢 本番"}</div></div>
           <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:8}}>
             {alertCount>0&&<div style={{background:C.red,color:"white",borderRadius:20,padding:"4px 10px",fontSize:12,fontWeight:800}}>⚠️ {alertCount}件</div>}
             <button onClick={()=>setLoggedIn(false)} style={{background:"none",border:`1px solid rgba(255,255,255,0.3)`,color:"rgba(255,255,255,0.7)",borderRadius:6,padding:"4px 8px",fontSize:11,cursor:"pointer"}}>ログアウト</button>
           </div>
         </div>
-        <div style={{display:"flex",overflowX:"auto"}}>
-          {TABS.map(t=>(<button key={t.id} onClick={()=>setActiveTab(t.id)} style={{flex:"0 0 auto",padding:"8px 10px 9px",border:"none",background:"none",color:activeTab===t.id?C.goldL:"rgba(255,255,255,0.4)",borderBottom:`2px solid ${activeTab===t.id?C.goldL:"transparent"}`,fontSize:9,cursor:"pointer",fontWeight:activeTab===t.id?700:400,display:"flex",flexDirection:"column",alignItems:"center",gap:2,minWidth:50}}><span style={{fontSize:15}}>{t.icon}</span><span style={{whiteSpace:"nowrap"}}>{t.label}{t.id==="alert"&&alertCount>0?` (${alertCount})`:""}</span></button>))}
+        <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch",msOverflowStyle:"none",scrollbarWidth:"none"}}>
+          {TABS.map(t=>(<button key={t.id} onClick={()=>setActiveTab(t.id)} style={{flex:"0 0 auto",padding:"10px 14px 11px",border:"none",background:"none",color:activeTab===t.id?C.goldL:"rgba(255,255,255,0.4)",borderBottom:`2px solid ${activeTab===t.id?C.goldL:"transparent"}`,fontSize:9,cursor:"pointer",fontWeight:activeTab===t.id?700:400,display:"flex",flexDirection:"column",alignItems:"center",gap:2,minWidth:50}}><span style={{fontSize:15}}>{t.icon}</span><span style={{whiteSpace:"nowrap"}}>{t.label}{t.id==="alert"&&alertCount>0?` (${alertCount})`:""}</span></button>))}
         </div>
       </div>
-      <div style={{padding:"16px 16px 80px"}}>
+      <div style={{padding:"14px 12px 100px"}}>
         {activeTab==="ec"&&<EcTab orders={orders} setOrders={setOrders} furusatoOrders={furusatoOrders} staff={staff} products={products} showToast={showToast} onSave={handleSave} onDel={handleDel}/>}
         {activeTab==="wholesale"&&<WholesaleTab wholesale={wholesale} setWholesale={setWholesale} products={products} clients={clients} showToast={showToast} onSave={handleSave} onDel={handleDel}/>}
         {activeTab==="alert"&&<AlertTab orders={orders} wholesale={wholesale} onLine={handleLine} lineSending={lineSending} autoNotifyEnabled={autoNotifyEnabled} setAutoNotifyEnabled={setAutoNotifyEnabled} notifyLog={notifyLog} onMorning={sendMorningReport}/>}
