@@ -238,7 +238,7 @@ function EcTab({orders,setOrders,furusatoOrders=[],staff,products,showToast,onSa
   const [form,setForm]=useState({customer:"",type:"EC",product:"",qty:1,amount:0,shipDate:"",stock:true,payment:false,memo:""});
   const allOrders=filter==="ふるさと納税"?furusatoOrders.map(o=>({...o,customer:o.lastName?`${o.lastName} ${o.firstName||""}`.trim():o.last_name?`${o.last_name} ${o.first_name||""}`.trim():"",product:o.productName||o.product_name||"",amount:o.donationAmount||o.donation_amount||0,status:o.deliveryStatus||o.delivery_status||"配送中",type:"ふるさと納税",shipDate:o.scheduledShipDate||o.scheduled_shipment_date||""})):orders;
   const filtered=filter==="全て"?orders:filter==="ふるさと納税"?allOrders:orders.filter(o=>o.type===filter||o.status===filter);
-  const upd=(id,f,v)=>{setOrders(p=>p.map(o=>{if(o.id!==id)return o;const u={...o,[f]:v};u.alert=!u.stock||!u.payment||u.status==="未対応";if(f==="stock"&&!v){const issues=["在庫なし"];sendUrgentAlert({...o,[f]:v},issues).catch(()=>{});}if(f==="payment"&&!v){const issues=["決済未確認"];sendUrgentAlert({...o,[f]:v},issues).catch(()=>{});}return u;}));setDetail(p=>p&&p.id===id?{...p,[f]:v}:p);};
+  const upd=(id,f,v)=>{setOrders(p=>p.map(o=>{if(o.id!==id)return o;const u={...o,[f]:v};u.alert=!u.stock||!u.payment||u.status==="未対応";return u;}));setDetail(p=>p&&p.id===id?{...p,[f]:v}:p);};
   const addOrder=()=>{
     if(!form.customer||!form.product){showToast("顧客名と商品を入力してください","error");return;}
     const o={id:genId("EC"),customer:form.customer,type:form.type,product:form.product,qty:Number(form.qty),amount:Number(form.amount),status:"未対応",stock:form.stock,payment:form.payment,assigned:null,shipDate:form.shipDate,created:nowStr(),alert:true,memo:form.memo};
@@ -1028,7 +1028,7 @@ function FurusatoTab({furusatoOrders,setFurusatoOrders,showToast,onDel}){
 }
 
 // ── 設定タブ ──
-function SetupTab({staff,setStaff,saveStaff,products,setProducts,clients,setClients,showToast,onExportAll}){
+function SetupTab({staff,setStaff,products,setProducts,clients,setClients,showToast,onExportAll}){
   const [sec,setSec]=useState("staff");
   const [ns,setNs]=useState("");
   const [np,setNp]=useState({name:"",price:"",category:"EC",stock:0});
@@ -1036,7 +1036,7 @@ function SetupTab({staff,setStaff,saveStaff,products,setProducts,clients,setClie
   const [epId,setEpId]=useState(null);
   const [ecId,setEcId]=useState(null);
   const [confirm,setConfirm]=useState(null);
-  const addStaff=async()=>{const n=ns.trim();if(!n)return;if(staff.includes(n)){showToast("すでに登録されています","error");return;}const newStaff=[...staff,n];setStaff(newStaff);setNs("");showToast("担当者を追加しました");if(saveStaff)saveStaff(newStaff);try{const staffData=newStaff.map(s=>({id:s,name:s}));await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`👤【担当者登録】\n「${n}」さんが担当者に追加されました`})});}catch(e){console.log("LINE通知エラー",e);}};
+  const addStaff=async()=>{const n=ns.trim();if(!n)return;if(staff.includes(n)){showToast("すでに登録されています","error");return;}setStaff(p=>[...p,n]);setNs("");showToast("担当者を追加しました");try{await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`👤【担当者登録】\n「${n}」さんが担当者に追加されました`})});}catch(e){console.log("LINE通知エラー",e);}};
   const addProd=()=>{if(!np.name){showToast("商品名を入力してください","error");return;}setProducts(p=>[...p,{id:genId("P"),name:np.name,price:Number(np.price)||0,category:np.category,stock:Number(np.stock)||0}]);setNp({name:"",price:"",category:"EC",stock:0});showToast("商品を追加しました");};
   const addClient=()=>{if(!nc.name){showToast("会社名を入力してください","error");return;}setClients(p=>[...p,{id:genId("C"),name:nc.name,tel:nc.tel,address:nc.address,memo:nc.memo}]);setNc({name:"",tel:"",address:"",memo:""});showToast("得意先を追加しました");};
   const SECS=[{id:"staff",l:"👤 担当者"},{id:"products",l:"🐟 商品"},{id:"clients",l:"🏢 得意先"},{id:"backup",l:"💾 バックアップ"},{id:"system",l:"🔧 本番設定"}];
@@ -1185,50 +1185,6 @@ function App(){
     showToast(IS_DEMO?"📲 朝の日次レポート（デモ・コンソール確認）":"📲 朝の日次レポートを送信しました");
   },[addLog,showToast]);
 
-  // 在庫なし・決済NGの即時通知
-  const sendUrgentAlert=useCallback(async(order,issues)=>{
-    const lines=[
-      "🚨【花立山養鰻】緊急対応が必要です",
-      ,
-      "",
-      ,
-      ,
-      "",
-      ...issues.map(i=>),
-      "",
-      "即時対応をお願いします"
-    ];
-    await lineMessage(lines.join("
-"));
-    addLog("緊急アラート",);
-  },[addLog]);
-
-  // 24時間以上未対応チェック
-  const check24h=useCallback(async()=>{
-    const ords=ordersRef.current;
-    const now=new Date();
-    const overdue=ords.filter(o=>{
-      if(o.status!=="未対応")return false;
-      if(!o.created_at&&!o.order_date)return false;
-      const created=new Date(o.created_at||o.order_date);
-      const diffH=(now-created)/(1000*60*60);
-      return diffH>=24;
-    });
-    if(overdue.length===0)return;
-    const lines=[
-      "🚨【花立山養鰻】24時間以上未対応の注文があります",
-      ,
-      "",
-      ,
-      ...overdue.slice(0,5).map(o=>)
-      ,"",
-      "早急に対応をお願いします"
-    ];
-    await lineMessage(lines.join("
-"));
-    addLog("24h未対応アラート",);
-  },[addLog]);
-
   const sendAlertNotify=useCallback(async(reason)=>{
     const ords=ordersRef.current,ws=wholesaleRef.current;
     const ecA=ords.filter(o=>o.alert);
@@ -1258,7 +1214,6 @@ function App(){
       if(!lastAlertRef.current||nowMs-lastAlertRef.current>CONFIG.ALERT_INTERVAL_MIN*60*1000){
         lastAlertRef.current=nowMs;
         await sendAlertNotify("定期アラートチェック");
-        await check24h();
         const lowProds=productsRef.current.filter(p=>p.stock<=CONFIG.LOW_STOCK_THRESHOLD);
         if(lowProds.length>0)await sendStockAlert(lowProds);
       }
@@ -1289,7 +1244,6 @@ function App(){
     })();
   },[loggedIn]);
 
-  const saveStaff=useCallback(async(staffList)=>{if(IS_DEMO)return;try{await db.upsert("staff",staffList.map(s=>({id:s,name:s})));}catch(e){console.log("スタッフ保存エラー",e);}},[]);
   const handleSave=useCallback(async(table,data)=>{if(IS_DEMO){showToast("保存しました（デモ）");return;}try{const arr=Array.isArray(data)?data:[data];await db.upsert(table,arr);}catch(e){console.log("保存エラー",e,table,data);showToast("保存エラー","error");}},[showToast]);
   const handleDel=useCallback(async(table,col,val)=>{if(IS_DEMO)return;try{await db.del(table,col,val);}catch(e){showToast("削除エラー","error");}},[showToast]);
 
@@ -1341,7 +1295,7 @@ function App(){
         {activeTab==="calendar"&&<CalendarTab orders={orders} wholesale={wholesale} furusatoOrders={furusatoOrders}/>}
         {activeTab==="furusato"&&<FurusatoTab furusatoOrders={furusatoOrders} setFurusatoOrders={setFurusatoOrders} showToast={showToast} onDel={handleDel}/>}
         {activeTab==="import"&&<ImportTab orders={orders} setOrders={setOrders} wholesale={wholesale} setWholesale={setWholesale} furusatoOrders={furusatoOrders} setFurusatoOrders={setFurusatoOrders} showToast={showToast}/>}
-        {activeTab==="setup"&&<SetupTab staff={staff} setStaff={setStaff} saveStaff={saveStaff} products={products} setProducts={setProducts} clients={clients} setClients={setClients} showToast={showToast} onExportAll={handleExport}/>}
+        {activeTab==="setup"&&<SetupTab staff={staff} setStaff={setStaff} products={products} setProducts={setProducts} clients={clients} setClients={setClients} showToast={showToast} onExportAll={handleExport}/>}
       </div>
       <Toast msg={toast?.msg} type={toast?.type}/>
     </div>
