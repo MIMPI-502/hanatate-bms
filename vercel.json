@@ -3,6 +3,14 @@
     {
       "path": "/api/daily-report",
       "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/subscrip-monthly",
+      "schedule": "0 15 1 * *"
+    },
+    {
+      "path": "/api/subscrip-retention",
+      "schedule": "0 15 15 * *"
     }
   ]
 }
