@@ -1028,7 +1028,7 @@ function FurusatoTab({furusatoOrders,setFurusatoOrders,showToast,onDel}){
 }
 
 // ── 設定タブ ──
-function SetupTab({staff,setStaff,products,setProducts,clients,setClients,showToast,onExportAll}){
+function SetupTab({staff,setStaff,saveStaff,products,setProducts,clients,setClients,showToast,onExportAll}){
   const [sec,setSec]=useState("staff");
   const [ns,setNs]=useState("");
   const [np,setNp]=useState({name:"",price:"",category:"EC",stock:0});
@@ -1036,7 +1036,7 @@ function SetupTab({staff,setStaff,products,setProducts,clients,setClients,showTo
   const [epId,setEpId]=useState(null);
   const [ecId,setEcId]=useState(null);
   const [confirm,setConfirm]=useState(null);
-  const addStaff=async()=>{const n=ns.trim();if(!n)return;if(staff.includes(n)){showToast("すでに登録されています","error");return;}setStaff(p=>[...p,n]);setNs("");showToast("担当者を追加しました");try{await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`👤【担当者登録】\n「${n}」さんが担当者に追加されました`})});}catch(e){console.log("LINE通知エラー",e);}};
+  const addStaff=async()=>{const n=ns.trim();if(!n)return;if(staff.includes(n)){showToast("すでに登録されています","error");return;}const newStaff=[...staff,n];setStaff(newStaff);setNs("");showToast("担当者を追加しました");if(saveStaff)saveStaff(newStaff);try{const staffData=newStaff.map(s=>({id:s,name:s}));await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`👤【担当者登録】\n「${n}」さんが担当者に追加されました`})});}catch(e){console.log("LINE通知エラー",e);}};
   const addProd=()=>{if(!np.name){showToast("商品名を入力してください","error");return;}setProducts(p=>[...p,{id:genId("P"),name:np.name,price:Number(np.price)||0,category:np.category,stock:Number(np.stock)||0}]);setNp({name:"",price:"",category:"EC",stock:0});showToast("商品を追加しました");};
   const addClient=()=>{if(!nc.name){showToast("会社名を入力してください","error");return;}setClients(p=>[...p,{id:genId("C"),name:nc.name,tel:nc.tel,address:nc.address,memo:nc.memo}]);setNc({name:"",tel:"",address:"",memo:""});showToast("得意先を追加しました");};
   const SECS=[{id:"staff",l:"👤 担当者"},{id:"products",l:"🐟 商品"},{id:"clients",l:"🏢 得意先"},{id:"backup",l:"💾 バックアップ"},{id:"system",l:"🔧 本番設定"}];
@@ -1289,6 +1289,7 @@ function App(){
     })();
   },[loggedIn]);
 
+  const saveStaff=useCallback(async(staffList)=>{if(IS_DEMO)return;try{await db.upsert("staff",staffList.map(s=>({id:s,name:s})));}catch(e){console.log("スタッフ保存エラー",e);}},[]);
   const handleSave=useCallback(async(table,data)=>{if(IS_DEMO){showToast("保存しました（デモ）");return;}try{const arr=Array.isArray(data)?data:[data];await db.upsert(table,arr);}catch(e){console.log("保存エラー",e,table,data);showToast("保存エラー","error");}},[showToast]);
   const handleDel=useCallback(async(table,col,val)=>{if(IS_DEMO)return;try{await db.del(table,col,val);}catch(e){showToast("削除エラー","error");}},[showToast]);
 
@@ -1340,7 +1341,7 @@ function App(){
         {activeTab==="calendar"&&<CalendarTab orders={orders} wholesale={wholesale} furusatoOrders={furusatoOrders}/>}
         {activeTab==="furusato"&&<FurusatoTab furusatoOrders={furusatoOrders} setFurusatoOrders={setFurusatoOrders} showToast={showToast} onDel={handleDel}/>}
         {activeTab==="import"&&<ImportTab orders={orders} setOrders={setOrders} wholesale={wholesale} setWholesale={setWholesale} furusatoOrders={furusatoOrders} setFurusatoOrders={setFurusatoOrders} showToast={showToast}/>}
-        {activeTab==="setup"&&<SetupTab staff={staff} setStaff={setStaff} products={products} setProducts={setProducts} clients={clients} setClients={setClients} showToast={showToast} onExportAll={handleExport}/>}
+        {activeTab==="setup"&&<SetupTab staff={staff} setStaff={setStaff} saveStaff={saveStaff} products={products} setProducts={setProducts} clients={clients} setClients={setClients} showToast={showToast} onExportAll={handleExport}/>}
       </div>
       <Toast msg={toast?.msg} type={toast?.type}/>
     </div>
