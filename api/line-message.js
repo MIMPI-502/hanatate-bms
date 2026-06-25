@@ -4,21 +4,30 @@ export default async function handler(req, res) {
   const token = process.env.LINE_TOKEN;
   const groupId = process.env.LINE_GROUP_ID;
 
-  console.log('LINE_TOKEN exists:', !!token, 'length:', token ? token.length : 0);
-  console.log('LINE_GROUP_ID:', groupId);
+  if (!token) return res.status(400).json({ ok: false, error: 'LINE_TOKEN未設定' });
+  if (!groupId) return res.status(400).json({ ok: false, error: 'LINE_GROUP_ID未設定' });
 
-  const response = await fetch('https://api.line.me/v2/bot/message/push', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
-    },
-    body: JSON.stringify({
-      to: groupId,
-      messages: [{ type: 'text', text: message }],
-    }),
-  });
-  const data = await response.json();
-  console.log('LINE API status:', response.status, 'response:', JSON.stringify(data));
-  res.status(response.ok ? 200 : 400).json({ ok: response.ok, data });
+  try {
+    const response = await fetch('https://api.line.me/v2/bot/message/push', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+      },
+      body: JSON.stringify({
+        to: groupId,
+        messages: [{ type: 'text', text: message || 'テスト通知' }],
+      }),
+    });
+    const data = await response.json();
+    res.status(200).json({ 
+      ok: response.ok, 
+      status: response.status,
+      data,
+      tokenLength: token.length,
+      groupId: groupId
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
 }
