@@ -172,6 +172,7 @@ const ST_WS_D=["未確定","仕入確定"];
 const DIARY_TAGS=["池管理","出荷","仕入","清掃","会議","その他"];
 const TABS=[
   {id:"ec",icon:"🛒",label:"EC注文"},
+  {id:"subscrip",icon:"♻️",label:"サブスク"},
   {id:"furusato",icon:"🏠",label:"ふるさと納税"},
   {id:"diary",icon:"📝",label:"日報"},
   {id:"alert",icon:"🔔",label:"アラート"},
@@ -1028,6 +1029,211 @@ function FurusatoTab({furusatoOrders,setFurusatoOrders,showToast,onDel}){
 }
 
 // ── 設定タブ ──
+
+// ══════════════════════════════
+//  サブスクリプション管理タブ
+// ══════════════════════════════
+function SubscripTab({showToast}){
+  const [members,setMembers]=useState([]);
+  const [loading,setLoading]=useState(false);
+  const [sec,setSec]=useState("members");
+  const [form,setForm]=useState({name:"",email:"",tel:"",plan:"ume",address:"",start:new Date().toISOString().slice(0,10),status:"active"});
+  const PLAN_MAP={ume:{label:"梅プラン",price:4500,content:"蒲焼2尾"},take:{label:"竹プラン",price:8000,content:"蒲焼4尾"}};
+
+  useEffect(()=>{loadMembers();},[]);
+
+  async function loadMembers(){
+    setLoading(true);
+    try{
+      const r=await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/subscrip_members?select=*&order=created_at.desc`,{
+        headers:{"apikey":CONFIG.SUPABASE_ANON_KEY,"Authorization":`Bearer ${CONFIG.SUPABASE_ANON_KEY}`}
+      });
+      if(r.ok){const d=await r.json();setMembers(d);}
+    }catch(e){console.error(e);}
+    setLoading(false);
+  }
+
+  async function addMember(){
+    if(!form.name||!form.email){showToast("名前とメールは必須です","error");return;}
+    const id="sub_"+Date.now();
+    const row={id,name:form.name,email:form.email,tel:form.tel,plan:form.plan,address:form.address,start_date:form.start,status:form.status,created_at:new Date().toISOString(),next_charge:form.start,charge_count:0};
+    try{
+      const r=await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/subscrip_members`,{
+        method:"POST",
+        headers:{"apikey":CONFIG.SUPABASE_ANON_KEY,"Authorization":`Bearer ${CONFIG.SUPABASE_ANON_KEY}`,"Content-Type":"application/json","Prefer":"return=representation"},
+        body:JSON.stringify(row)
+      });
+      if(r.ok){showToast("会員登録完了");loadMembers();setSec("members");}
+      else{const e=await r.json();showToast("エラー: "+JSON.stringify(e),"error");}
+    }catch(e){showToast("エラー","error");}
+  }
+
+  async function updateStatus(id,status){
+    try{
+      await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/subscrip_members?id=eq.${id}`,{
+        method:"PATCH",
+        headers:{"apikey":CONFIG.SUPABASE_ANON_KEY,"Authorization":`Bearer ${CONFIG.SUPABASE_ANON_KEY}`,"Content-Type":"application/json"},
+        body:JSON.stringify({status})
+      });
+      showToast(status==="active"?"再開しました":"停止しました");
+      loadMembers();
+    }catch(e){showToast("エラー","error");}
+  }
+
+  async function runMonthlyCharge(){
+    const active=members.filter(m=>m.status==="active");
+    if(active.length===0){showToast("アクティブ会員なし");return;}
+    setLoading(true);
+    let success=0;
+    for(const m of active){
+      const plan=PLAN_MAP[m.plan];
+      try{
+        // 決済ログに記録
+        await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/subscrip_charges`,{
+          method:"POST",
+          headers:{"apikey":CONFIG.SUPABASE_ANON_KEY,"Authorization":`Bearer ${CONFIG.SUPABASE_ANON_KEY}`,"Content-Type":"application/json"},
+          body:JSON.stringify({id:"chg_"+Date.now()+"_"+m.id,member_id:m.id,member_name:m.name,plan:m.plan,amount:plan.price,status:"pending",charge_date:new Date().toISOString().slice(0,10),created_at:new Date().toISOString()})
+        });
+        success++;
+      }catch(e){}
+    }
+    // LINE通知
+    await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`【サブスク月次処理】\n対象会員:${active.length}名\n処理完了:${success}名\nStripe決済は別途実行してください`})});
+    showToast(`${success}件の月次処理を記録しました`);
+    setLoading(false);
+  }
+
+  async function sendShippingList(){
+    const active=members.filter(m=>m.status==="active");
+    const list=active.map((m,i)=>`${i+1}. ${m.name} / ${PLAN_MAP[m.plan]?.label} / ${m.address||"住所未登録"}`).join("\n");
+    const msg=`【サブスク発送リスト】\n${new Date().toLocaleDateString("ja-JP")}\n会員数:${active.length}名\n\n${list}\n\n発送をお願いします`;
+    await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:msg})});
+    showToast("昭次郎さんのLINEに発送リストを送信しました");
+  }
+
+  const totalMonthly=members.filter(m=>m.status==="active").reduce((s,m)=>s+(PLAN_MAP[m.plan]?.price||0),0);
+  const S={
+    card:{background:"#fff",border:"1px solid #e0d8cc",borderRadius:6,padding:16,marginBottom:12},
+    badge:(c)=>({display:"inline-block",padding:"2px 8px",borderRadius:3,fontSize:11,background:c==="active"?"#27ae6020":c==="paused"?"#f39c1220":"#e74c3c20",color:c==="active"?"#27ae60":c==="paused"?"#f39c12":"#e74c3c",fontWeight:500}),
+    btn:(c)=>({padding:"8px 16px",background:c||"#C8963E",color:"#fff",border:"none",borderRadius:4,cursor:"pointer",fontSize:13,fontFamily:"inherit"}),
+    secBtn:(active)=>({padding:"8px 16px",background:active?"#C8963E":"#f0ede8",color:active?"#fff":"#666",border:"1px solid "+(active?"#C8963E":"#ddd"),borderRadius:4,cursor:"pointer",fontSize:13,fontFamily:"inherit"}),
+  };
+
+  return(
+    <div style={{padding:16}}>
+      {/* サマリ */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:16}}>
+        {[
+          {label:"アクティブ会員",val:members.filter(m=>m.status==="active").length+"名",color:"#27ae60"},
+          {label:"月間売上見込",val:"¥"+totalMonthly.toLocaleString(),color:"#C8963E"},
+          {label:"年間換算",val:"¥"+(totalMonthly*12).toLocaleString(),color:"#1e4d6b"},
+        ].map(m=>(
+          <div key={m.label} style={{background:"#fff",border:"1px solid #e0d8cc",borderRadius:6,padding:12,textAlign:"center"}}>
+            <div style={{fontSize:18,fontWeight:700,color:m.color}}>{m.val}</div>
+            <div style={{fontSize:11,color:"#888",marginTop:4}}>{m.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* セクション切替 */}
+      <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>
+        {[{id:"members",label:"会員一覧"},{id:"add",label:"＋ 会員追加"},{id:"actions",label:"⚡ AI自動実行"}].map(s=>(
+          <button key={s.id} style={S.secBtn(sec===s.id)} onClick={()=>setSec(s.id)}>{s.label}</button>
+        ))}
+      </div>
+
+      {/* 会員一覧 */}
+      {sec==="members"&&(
+        <div>
+          {loading&&<div style={{textAlign:"center",color:"#888",padding:20}}>読み込み中…</div>}
+          {!loading&&members.length===0&&(
+            <div style={{textAlign:"center",padding:32,color:"#aaa"}}>
+              <div style={{fontSize:32,marginBottom:8}}>♻️</div>
+              <div>会員がいません。「会員追加」から登録してください。</div>
+            </div>
+          )}
+          {members.map(m=>(
+            <div key={m.id} style={S.card}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8}}>
+                <div>
+                  <div style={{fontWeight:600,fontSize:15}}>{m.name}</div>
+                  <div style={{fontSize:12,color:"#888",marginTop:2}}>{m.email} {m.tel&&`/ ${m.tel}`}</div>
+                  <div style={{marginTop:6,display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
+                    <span style={S.badge(m.status)}>{m.status==="active"?"稼働中":m.status==="paused"?"休止中":"解約"}</span>
+                    <span style={{fontSize:12,background:"#f0ede8",padding:"2px 8px",borderRadius:3}}>{PLAN_MAP[m.plan]?.label} ¥{(PLAN_MAP[m.plan]?.price||0).toLocaleString()}/月</span>
+                    <span style={{fontSize:11,color:"#aaa"}}>開始: {m.start_date}</span>
+                  </div>
+                  {m.address&&<div style={{fontSize:11,color:"#888",marginTop:4}}>📍 {m.address}</div>}
+                </div>
+                <div style={{display:"flex",gap:6}}>
+                  {m.status==="active"?
+                    <button style={{...S.btn("#e67e22"),fontSize:11,padding:"6px 12px"}} onClick={()=>updateStatus(m.id,"paused")}>休止</button>:
+                    <button style={{...S.btn("#27ae60"),fontSize:11,padding:"6px 12px"}} onClick={()=>updateStatus(m.id,"active")}>再開</button>
+                  }
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 会員追加フォーム */}
+      {sec==="add"&&(
+        <div style={S.card}>
+          <div style={{fontWeight:600,marginBottom:14}}>新規会員登録</div>
+          {[
+            {label:"お名前 *",key:"name",type:"text",placeholder:"山田太郎"},
+            {label:"メールアドレス *",key:"email",type:"email",placeholder:"example@email.com"},
+            {label:"電話番号",key:"tel",type:"tel",placeholder:"090-0000-0000"},
+            {label:"住所",key:"address",type:"text",placeholder:"福岡県…"},
+            {label:"開始日",key:"start",type:"date"},
+          ].map(f=>(
+            <div key={f.key} style={{marginBottom:12}}>
+              <div style={{fontSize:12,color:"#666",marginBottom:4}}>{f.label}</div>
+              <input type={f.type} value={form[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.value})}
+                placeholder={f.placeholder} style={{width:"100%",padding:"8px 10px",border:"1px solid #ddd",borderRadius:4,fontSize:14,fontFamily:"inherit"}}/>
+            </div>
+          ))}
+          <div style={{marginBottom:14}}>
+            <div style={{fontSize:12,color:"#666",marginBottom:4}}>プラン *</div>
+            <select value={form.plan} onChange={e=>setForm({...form,plan:e.target.value})}
+              style={{width:"100%",padding:"8px 10px",border:"1px solid #ddd",borderRadius:4,fontSize:14,fontFamily:"inherit"}}>
+              <option value="ume">梅プラン — ¥4,500/月（蒲焼2尾）</option>
+              <option value="take">竹プラン — ¥8,000/月（蒲焼4尾）</option>
+            </select>
+          </div>
+          <button style={{...S.btn(),width:"100%",padding:12,fontSize:15}} onClick={addMember}>会員登録する</button>
+        </div>
+      )}
+
+      {/* AI自動実行 */}
+      {sec==="actions"&&(
+        <div>
+          {[
+            {label:"📦 発送リストをLINE送信",desc:"アクティブ会員の発送リストを昭次郎さんのLINEに自動送信",action:sendShippingList,color:"#1e4d6b"},
+            {label:"💳 月次処理を実行",desc:"全アクティブ会員の月次決済ログを記録・LINE通知",action:runMonthlyCharge,color:"#C8963E"},
+          ].map(a=>(
+            <div key={a.label} style={S.card}>
+              <div style={{fontWeight:600,marginBottom:4}}>{a.label}</div>
+              <div style={{fontSize:12,color:"#888",marginBottom:12}}>{a.desc}</div>
+              <button style={{...S.btn(a.color)}} onClick={a.action} disabled={loading}>{loading?"処理中…":"実行する"}</button>
+            </div>
+          ))}
+          <div style={{background:"#fff8ec",border:"1px solid #f0c060",borderRadius:6,padding:14,marginTop:8}}>
+            <div style={{fontWeight:600,fontSize:13,marginBottom:6}}>🔜 次のフェーズで自動化予定</div>
+            <ul style={{fontSize:12,color:"#888",paddingLeft:16,lineHeight:2}}>
+              <li>Stripe連携で月次決済を完全自動化</li>
+              <li>毎月1日にVercel Cronで自動実行</li>
+              <li>解約防止メールのAI自動送信</li>
+              <li>Instagram自動投稿（集客AI）</li>
+            </ul>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SetupTab({staff,setStaff,products,setProducts,clients,setClients,showToast,onExportAll}){
   const [sec,setSec]=useState("staff");
   const [ns,setNs]=useState("");
@@ -1294,6 +1500,7 @@ function App(){
         {activeTab==="diary"&&<DiaryTab diary={diary} setDiary={setDiary} staff={staff} showToast={showToast} onDel={handleDel} onSave={handleSave}/>}
         {activeTab==="calendar"&&<CalendarTab orders={orders} wholesale={wholesale} furusatoOrders={furusatoOrders}/>}
         {activeTab==="furusato"&&<FurusatoTab furusatoOrders={furusatoOrders} setFurusatoOrders={setFurusatoOrders} showToast={showToast} onDel={handleDel}/>}
+        {activeTab==="subscrip"&&<SubscripTab showToast={showToast}/>}
         {activeTab==="import"&&<ImportTab orders={orders} setOrders={setOrders} wholesale={wholesale} setWholesale={setWholesale} furusatoOrders={furusatoOrders} setFurusatoOrders={setFurusatoOrders} showToast={showToast}/>}
         {activeTab==="setup"&&<SetupTab staff={staff} setStaff={setStaff} products={products} setProducts={setProducts} clients={clients} setClients={setClients} showToast={showToast} onExportAll={handleExport}/>}
       </div>
