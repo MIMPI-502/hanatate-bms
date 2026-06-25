@@ -792,7 +792,7 @@ function CalendarTab({orders,wholesale,furusatoOrders}){
   const getEvents=(dateStr)=>{
     const evts=[];
     orders.forEach(o=>{
-      const ecDate=o.shipDate||o.created?.slice(0,10)||"";
+      const ecDate=o.shipDate||(o.created?o.created.slice(0,10).replace(/\//g,"-"):"")||"";
       if(ecDate===dateStr){
         evts.push({type:"ec",label:o.customer,sub:o.product,status:o.status,color:C.cyan});
       }
