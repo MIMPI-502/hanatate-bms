@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鰻定期便のお申込み｜花立山養鰻</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#faf6ef;font-family:'Hiragino Sans','Noto Sans JP',sans-serif;color:#1a1208;min-height:100vh;}
+
+.hero{background:#1a1208;color:#faf6ef;text-align:center;padding:40px 20px 36px;}
+.hero-label{font-size:11px;letter-spacing:0.25em;color:#c8963e;margin-bottom:14px;}
+.hero h1{font-size:26px;font-weight:700;line-height:1.4;margin-bottom:10px;}
+.hero p{font-size:14px;color:#c8b89a;line-height:1.7;}
+
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:24px 16px 8px;max-width:500px;margin:0 auto;}
+.plan{background:#fff;border:2px solid #e0d8cc;border-radius:10px;padding:18px 14px;cursor:pointer;transition:all 0.2s;text-align:center;}
+.plan.selected{border-color:#c8963e;background:#fff8ee;}
+.plan-name{font-size:15px;font-weight:700;margin-bottom:6px;}
+.plan-price{font-size:22px;font-weight:700;color:#c8963e;margin-bottom:4px;}
+.plan-price span{font-size:13px;color:#888;font-weight:400;}
+.plan-content{font-size:12px;color:#888;background:#f5f0e8;padding:4px 10px;border-radius:20px;display:inline-block;margin-top:4px;}
+.plan-badge{font-size:10px;background:#c8963e;color:#fff;padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:8px;}
+
+.form-wrap{max-width:500px;margin:0 auto;padding:16px;}
+.form-card{background:#fff;border-radius:12px;padding:24px 20px;border:1px solid #e8e0d0;}
+.form-title{font-size:16px;font-weight:700;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid #f0e8d8;}
+
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;color:#666;margin-bottom:6px;font-weight:500;}
+.field label .req{color:#c8963e;margin-left:3px;}
+.field input,.field select{width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:15px;font-family:inherit;background:#fff;transition:border 0.2s;}
+.field input:focus,.field select:focus{outline:none;border-color:#c8963e;}
+.field-row{display:grid;grid-template-columns:120px 1fr;gap:10px;}
+
+.submit-btn{width:100%;padding:16px;background:#c8963e;color:#fff;border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;transition:background 0.2s;letter-spacing:0.05em;}
+.submit-btn:hover{background:#b8862e;}
+.submit-btn:disabled{background:#ccc;cursor:not-allowed;}
+
+.note{font-size:11px;color:#aaa;text-align:center;margin-top:14px;line-height:1.8;}
+
+.trust{display:flex;justify-content:center;gap:20px;padding:20px 16px;max-width:500px;margin:0 auto;}
+.trust-item{text-align:center;font-size:11px;color:#888;}
+.trust-icon{font-size:22px;display:block;margin-bottom:4px;}
+
+/* 完了画面 */
+.done{display:none;text-align:center;padding:60px 20px;max-width:500px;margin:0 auto;}
+.done-icon{font-size:60px;margin-bottom:20px;}
+.done h2{font-size:22px;font-weight:700;margin-bottom:12px;color:#1a1208;}
+.done p{font-size:14px;color:#666;line-height:1.8;}
+
+.loading{display:none;text-align:center;padding:40px;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-label">HANATATE EEL FARM — 花立山養鰻</div>
+  <h1>福岡・筑前町から届く<br>本物の国産鰻、毎月。</h1>
+  <p>杉樽仕込みの特別な鰻を<br>定期便でご自宅にお届けします</p>
+</div>
+
+<div id="mainForm">
+  <!-- プラン選択 -->
+  <div class="plans">
+    <div class="plan selected" id="plan-ume" onclick="selectPlan('ume')">
+      <div class="plan-badge">人気No.1</div>
+      <div class="plan-name">🌸 梅プラン</div>
+      <div class="plan-price">¥4,500<span>/月</span></div>
+      <div class="plan-content">蒲焼 2尾</div>
+    </div>
+    <div class="plan" id="plan-take" onclick="selectPlan('take')">
+      <div class="plan-badge" style="background:#1e4d6b;">ファミリー向け</div>
+      <div class="plan-name">🎋 竹プラン</div>
+      <div class="plan-price">¥8,000<span>/月</span></div>
+      <div class="plan-content">蒲焼 4尾</div>
+    </div>
+  </div>
+
+  <!-- 安心ポイント -->
+  <div class="trust">
+    <div class="trust-item"><span class="trust-icon">🔄</span>いつでも休止・解約</div>
+    <div class="trust-item"><span class="trust-icon">🐟</span>福岡県産100%</div>
+    <div class="trust-item"><span class="trust-icon">📦</span>毎月発送</div>
+  </div>
+
+  <!-- 申込フォーム -->
+  <div class="form-wrap">
+    <div class="form-card">
+      <div class="form-title">📝 お申込み情報の入力</div>
+
+      <div class="field">
+        <label>お名前<span class="req">*</span></label>
+        <input type="text" id="name" placeholder="山田 太郎" autocomplete="name">
+      </div>
+
+      <div class="field">
+        <label>メールアドレス<span class="req">*</span></label>
+        <input type="email" id="email" placeholder="example@email.com" autocomplete="email">
+      </div>
+
+      <div class="field">
+        <label>電話番号</label>
+        <input type="tel" id="tel" placeholder="090-0000-0000" autocomplete="tel">
+      </div>
+
+      <div class="field">
+        <label>郵便番号</label>
+        <input type="text" id="postal" placeholder="000-0000" maxlength="8">
+      </div>
+
+      <div class="field">
+        <label>お届け先住所<span class="req">*</span></label>
+        <input type="text" id="address" placeholder="福岡県〇〇市〇〇町…" autocomplete="street-address">
+      </div>
+
+      <input type="hidden" id="selectedPlan" value="ume">
+
+      <button class="submit-btn" id="submitBtn" onclick="submitForm()">申込を確定する →</button>
+      <p class="note">毎月自動でお届けします。休止・解約はいつでも可能です。<br>送信後、担当者よりご連絡いたします。</p>
+    </div>
+  </div>
+</div>
+
+<!-- 完了画面 -->
+<div class="done" id="doneScreen">
+  <div class="done-icon">🎉</div>
+  <h2>お申込みありがとうございます！</h2>
+  <p>花立山養鰻より<br>確認のご連絡をいたします。<br><br>毎月、本物の国産鰻を<br>お楽しみください🐟</p>
+</div>
+
+<script>
+let selectedPlan = 'ume';
+
+function selectPlan(plan) {
+  selectedPlan = plan;
+  document.getElementById('selectedPlan').value = plan;
+  document.querySelectorAll('.plan').forEach(el => el.classList.remove('selected'));
+  document.getElementById('plan-' + plan).classList.add('selected');
+}
+
+async function submitForm() {
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const tel = document.getElementById('tel').value.trim();
+  const postal = document.getElementById('postal').value.trim();
+  const address = document.getElementById('address').value.trim();
+
+  if (!name) { alert('お名前を入力してください'); return; }
+  if (!email || !email.includes('@')) { alert('正しいメールアドレスを入力してください'); return; }
+  if (!address) { alert('お届け先住所を入力してください'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '送信中…';
+
+  try {
+    const res = await fetch('https://hanatate-bms.vercel.app/api/subscrip-apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, tel, postal, address, plan: selectedPlan })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('mainForm').style.display = 'none';
+      document.getElementById('doneScreen').style.display = 'block';
+      window.scrollTo(0, 0);
+    } else {
+      alert('エラーが発生しました。もう一度お試しください。');
+      btn.disabled = false;
+      btn.textContent = '申込を確定する →';
+    }
+  } catch(e) {
+    alert('送信エラーです。時間をおいてお試しください。');
+    btn.disabled = false;
+    btn.textContent = '申込を確定する →';
+  }
+}
+</script>
+</body>
+</html>
