@@ -1281,8 +1281,8 @@ function App(){
             <button onClick={()=>setLoggedIn(false)} style={{background:"none",border:`1px solid rgba(255,255,255,0.3)`,color:"rgba(255,255,255,0.7)",borderRadius:6,padding:"4px 8px",fontSize:11,cursor:"pointer"}}>ログアウト</button>
           </div>
         </div>
-        <div style={{display:"flex",overflowX:"auto"}}>
-          {TABS.map(t=>(<button key={t.id} onClick={()=>setActiveTab(t.id)} style={{flex:"0 0 auto",padding:"8px 10px 9px",border:"none",background:"none",color:activeTab===t.id?C.goldL:"rgba(255,255,255,0.4)",borderBottom:`2px solid ${activeTab===t.id?C.goldL:"transparent"}`,fontSize:9,cursor:"pointer",fontWeight:activeTab===t.id?700:400,display:"flex",flexDirection:"column",alignItems:"center",gap:2,minWidth:50}}><span style={{fontSize:15}}>{t.icon}</span><span style={{whiteSpace:"nowrap"}}>{t.label}{t.id==="alert"&&alertCount>0?` (${alertCount})`:""}</span></button>))}
+        <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch"}}>
+          {TABS.map(t=>(<button key={t.id} onClick={()=>setActiveTab(t.id)} style={{flex:"0 0 auto",padding:"10px 12px 11px",border:"none",background:"none",color:activeTab===t.id?C.goldL:"rgba(255,255,255,0.4)",borderBottom:`2px solid ${activeTab===t.id?C.goldL:"transparent"}`,fontSize:12,cursor:"pointer",fontWeight:activeTab===t.id?700:400,display:"flex",flexDirection:"column",alignItems:"center",gap:2,minWidth:50}}><span style={{fontSize:15}}>{t.icon}</span><span style={{whiteSpace:"nowrap"}}>{t.label}{t.id==="alert"&&alertCount>0?` (${alertCount})`:""}</span></button>))}
         </div>
       </div>
       <div style={{padding:"16px 16px 80px"}}>
