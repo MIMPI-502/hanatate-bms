@@ -836,7 +836,7 @@ function CalendarTab({orders,wholesale,furusatoOrders}){
 
   // 今月の集計
   const monthStr=`${year}-${String(month+1).padStart(2,"0")}`;
-  const monthEC=orders.filter(o=>o.shipDate?.startsWith(monthStr)).length;
+  const monthEC=orders.filter(o=>(o.shipDate||o.created?.slice(0,7).replace(/\//g,"-")||"").startsWith(monthStr)).length;
   const monthWS=wholesale.filter(w=>w.shipDate?.startsWith(monthStr)).length;
   const monthFN=furusatoOrders.filter(o=>(o.scheduledShipDate||o.scheduled_shipment_date||o.donationDate||o.shipment_request_date||"").startsWith(monthStr)).length;
 
