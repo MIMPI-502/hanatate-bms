@@ -55,6 +55,288 @@ async function loadConfig(){
 }
 loadConfig();
 
+// ══════════════════════════════
+//  多言語辞書（日本語 / English）
+// ══════════════════════════════
+const DICT={
+  ja:{
+    // ログイン
+    appName:"花立山養鰻",appSub:"業務管理システム",
+    loginPw:"パスワードを入力してください",loginBtn:"ログイン",loginErr:"パスワードが正しくありません",
+    logout:"ログアウト",demoPw:"デモ用PW: hanatate2026",
+    liveMode:"🟢 本番",demoMode:"🧪 デモ",
+    // タブ
+    tabEc:"EC注文",tabFurusato:"ふるさと納税",tabDiary:"日報",tabAlert:"アラート",
+    tabCalendar:"カレンダー",tabInventory:"在庫",tabWholesale:"卸先",
+    tabFinance:"財務",tabImport:"自動取込",tabSetup:"設定",
+    // 共通
+    save:"💾 保存",saved:t("saved"),del:"🗑️ 削除",deleted:t("deleted"),
+    cancel:"キャンセル",back:"← 戻る",edit:"✏️ 内容を編集",saveDone:"✓ 変更を保存",
+    add:"＋追加",noData:"データがありません",
+    errInput:"入力エラー",
+    // EC注文
+    ecTitle:"本日の注文",ecAlert:"要対応",ecShipping:"発送待ち",
+    ecNewBtn:"＋ 新規注文を追加",ecNewModal:"＋ 新規注文",
+    ecType:"種別",ecCustomer:"顧客名 *",ecProduct:"商品（登録商品から選ぶか直接入力）",
+    ecSelectProduct:"── 登録商品から選択 ──",ecDirectInput:"または直接入力",
+    ecQty:"数量",ecAmount:"金額（円）",ecShipDate:"発送予定日",ecMemo:"メモ",
+    ecMemoPlaceholder:"備考",ecStock:"在庫あり",ecPayment:"決済OK",
+    ecAddBtn:"＋ 注文を追加",ecDetail:"注文詳細",ecEditTitle:"✏️ 編集",
+    ecCustomerLbl:"顧客名",ecProductLbl:"商品",ecAmountLbl:"金額",ecTypeLbl:"種別",
+    ecCreated:"注文日時",ecShipDateLbl:"発送予定日",ecAssigned:"担当者",
+    ecMemoLbl:"メモ",ecStatusChange:t("fnStatusChange"),ecSetShipDate:"発送予定日",
+    ecAssignStaff:"担当者を割り当てる",ecNoStaff:"⚙️設定タブで担当者を追加してください",
+    ecNoOrder:"該当する注文がありません",
+    ecDelMsg:"この注文を削除しますか？
+削除後は元に戻せません。",
+    ecErrInput:"顧客名と商品を入力してください",ecAddDone:"注文を追加しました",
+    ecAssignedLbl:"担当:",ecUnassigned:"未割当",ecShipDatePfx:"発送予定:",
+    // 卸先
+    wsRecorded:"計上済み売上",wsUnrecorded:"未計上件数",
+    wsNewBtn:"＋ 新規卸注文を追加",wsNewModal:"＋ 新規卸注文",
+    wsClient:"得意先",wsSelectClient:"── 登録得意先から選択 ──",
+    wsTel:"電話番号",wsTelPlaceholder:"例：092-123-4567",wsProduct:"商品",
+    wsSelectProduct:"── 登録商品から選択 ──",wsQty:"数量",wsUnitPrice:"単価（円）",
+    wsTotal:"合計：",wsShipDate:"納品予定日",wsMemo:"メモ",wsAddBtn:"＋ 卸注文を追加",
+    wsDetail:"卸先詳細",wsClientLbl:"得意先",wsTelLbl:"電話",wsProductLbl:"商品",
+    wsQtyLbl:"数量",wsUnitPriceLbl:"単価",wsTotalLbl:"合計",wsCreated:"受注日",
+    wsMemoLbl:"メモ",wsShipDateLbl:"納品予定日",
+    wsOrderMgmt:"受注管理",wsPurchaseMgmt:"発注管理",wsDeliveryMgmt:"仕入管理",
+    wsInvoice:"納品書発行",wsSalesRecord:"売上計上",
+    wsDeliveryPfx:"納品予定:",wsDelMsg:"この卸先注文を削除しますか？
+削除後は元に戻せません。",
+    wsErrInput:"得意先と商品を入力してください",wsAddDone:"卸先注文を追加しました",
+    wsEditDone:"編集しました",wsInvoiceIssued:"✓ 納品書",wsInvoiceNone:"納品書未発行",
+    wsSalesOk:"✓ 売上計上",wsSalesNone:"売上未計上",wsOrderPfx:"受注:",wsPurchasePfx:"発注:",wsDeliveryPfx2:"仕入:",
+    // アラート
+    alertAll:t("alertAll"),alertNeeded:"要対応",alertCheck:"複数名で確認してください",
+    alertSendLine:"📲 LINE通知",alertSending:"送信中...",alertDemo:"🧪 デモモード：LINE通知はコンソールに出力されます",
+    alertTodayShip:{t("alertTodayShip")},alertEcSection:{t("alertEcSection")},
+    alertWsSection:{t("alertWsSection")},alertNone:t("alertNone"),
+    alertRuleTitle:{t("alertRuleTitle")},
+    alertAutoTitle:{t("alertAutoTitle")},
+    alertAutoOn:"ON ✓",alertAutoOff:"OFF",
+    alertSendNow:"📲 今すぐ日次レポートを送信",alertDemoConsole:"デモ時はコンソールに出力されます",
+    alertLogTitle:{t("alertLogTitle")},alertShipSub:t("alertShipSub"),alertDelivSub:t("alertDelivSub"),
+    alertNoStock:"⛔ 在庫なし",alertNoPayment:"⛔ 決済未確認",alertUnhandled:"⚡ 未対応",alertUnassigned:"👤 担当未割当",
+    alertNoOrder:"⚡ 発注未完了",alertNoInvoice:"📄 納品書未発行",alertNoSales:"💴 売上未計上",
+    // 在庫
+    invInStock:"在庫あり商品",invOutOfStock:"欠品中",invTitle:t("invTitle"),
+    invHistoryTitle:t("invHistoryTitle"),invNoHistory:"履歴がありません",
+    invIn:"＋ 入庫",invOut:"－ 出庫",invAdjIn:"＋ 入庫",invAdjOut:"－ 出庫",
+    invCurrentStock:"現在の在庫",invQtyIn:"入庫数量",invQtyOut:"出庫数量",
+    invNewStock:t("invNewStock"),invUnit:"個",invMemo:"メモ（任意）",
+    invRecordIn:"＋ 入庫を記録",invRecordOut:"－ 出庫を記録",
+    invUpdated:"在庫を更新しました",invOutBadge:"欠品中",invLowBadge:"残りわずか",
+    // 財務
+    finMonthSales:t("finMonthSales"),finPending:"未計上:",
+    finExportEc:"📥 EC注文",finExportWs:"📥 卸先",finExportAll:"📥 全データ",
+    finChartTitle:t("finChartTitle"),finBreakTitle:t("finBreakTitle"),
+    finEc:"EC直販",finFurusato:"ふるさと納税",finWs:"卸売",finWsRecorded:"卸売（計上済）",
+    finWsPending:"卸売（未計上）",finTotalConfirmed:t("finTotalConfirmed"),
+    // 日報
+    diaryNewBtn:"＋ 日報・作業メモを追加",diaryNoData:"日報がありません",
+    diaryNewModal:"＋ 日報・作業メモ",diaryDate:"日付",diaryAuthor:"記録者",
+    diarySelectAuthor:"── 選択 ──",diaryCategory:"カテゴリ",diaryContent:"作業内容",
+    diaryPlaceholder:"今日の作業内容を入力...",diaryAddBtn:"＋ 日報を追加",
+    diaryDelMsg:t("diaryDelMsg"),diaryDelBtn:"削除",
+    diaryAddDone:"日報を追加しました",diaryErrInput:"内容を入力してください",
+    // 自動取込
+    importCsv:"📂 CSV取込",importRoadmap:"📋 ロードマップ",
+    importCsvTitle:t("importCsvTitle"),importType:"取込種別",
+    importEcOpt:"🛒 EC注文（Shopify等）",importFnOpt:"🏠 ふるさと納税",importWsOpt:"📦 卸売注文",
+    importSampleNote:"サンプルCSVをダウンロードして形式を確認できます",
+    importSampleEc:"花立山EC",importSampleFn:"ふるさと納税",importSampleWs:"卸売",
+    importSelectFile:"CSVファイルを選択",importPreview:t("importPreview"),
+    importPreviewCount:t("importPreviewCount"),importBtn:"📥 一括取込を実行",importingBtn:"取込中...",
+    importErrSelect:"CSVファイルを選択してください",importDone:"件のふるさと納税データを取り込みました",
+    importEcDone:"件のEC注文を取り込みました",importWsDone:"件の卸注文を取り込みました",
+    importSampleDl:"サンプルCSVをダウンロードしました",importFormats:"💡 対応しているCSV形式",
+    importRoadmapTitle:"📋 自動化ロードマップ",
+    // 設定
+    setupStaff:"👤 担当者",setupProducts:"🐟 商品",setupClients:"🏢 得意先",
+    setupBackup:"💾 バックアップ",setupSystem:"🔧 本番設定",
+    setupStaffTitle:t("setupStaffTitle"),setupStaffNone:"まだ登録されていません",
+    setupStaffPlaceholder:"名前を入力...",setupStaffAddDone:"担当者を追加しました",
+    setupStaffExist:"すでに登録されています",
+    setupProdTitle:t("setupProdTitle"),setupProdName:"商品名",setupProdPrice:"価格（円）",
+    setupProdStock:"初期在庫数",setupProdCategory:"カテゴリ",setupProdAddBtn:"＋ 商品を追加",
+    setupProdAddDone:"商品を追加しました",setupProdErrInput:"商品名を入力してください",
+    setupProdEdit:"編集",setupProdDel:"削除",setupProdDone:"✓ 完了",
+    setupProdStockLbl:"在庫:",
+    setupClientTitle:t("setupClientTitle"),setupClientName:"会社名 *",
+    setupClientTel:"電話番号",setupClientAddr:"住所",setupClientMemo:"メモ",
+    setupClientAddBtn:"＋ 得意先を追加",setupClientAddDone:"得意先を追加しました",
+    setupClientErrInput:"会社名を入力してください",
+    setupBackupTitle:t("setupBackupTitle"),
+    setupBackupNote:t("setupBackupNote"),
+    setupBackupAll:"📥 全データをまとめてダウンロード",
+    setupBackupTip:"💡 推奨：週1回、全データをダウンロードして保管してください。",
+    setupDemoMode:"🧪 現在デモモードで動作中です。下記を設定すると本番稼働できます。",setupLiveMode:"✅ 本番モードで稼働中",
+    // カレンダー
+    calEcLbl:"🛒 EC",calWsLbl:"📦 卸先",calFnLbl:"🏠 ふるさと",
+    calSchedule:t("calSchedule"),calNoSchedule:t("calNoSchedule"),
+    calLegendEc:"🛒 EC注文",calLegendWs:"📦 卸先",calLegendFn:"🏠 ふるさと納税",
+    calDays:[...t("calDays")],
+    // ふるさと納税
+    fnTotal:t("fnTotal"),fnDone:t("fnDone"),fnUnhandled:t("fnUnhandled"),
+    fnNoData:"データがありません",fnNoCsvHint:"「自動取込」タブからCSVを読み込んでください",
+    fnDetail:"ふるさと納税 詳細",fnDonor:"寄附者名",fnProduct:"返礼品",
+    fnProductCode:"商品コード",fnShipRequest:"出荷依頼日",fnShipSched:"発送予定日",
+    fnDelivNo:"配送No.",fnDonationNo:"寄附受付No.",fnDelivStatus:"配送ステータス",
+    fnTracking:"伝票番号",fnCarrier:"配送業者",fnPrefecture:"都道府県",
+    fnAddress:"住所",fnPhone:"電話番号",fnDonationAmt:"寄附金額",fnProductPrice:"謝礼品価格",
+    fnDonationYear:"寄附年度",fnMemo:"備考",fnStatusChange:"ステータス変更",
+    fnDelBtn:"🗑 削除",fnDelMsg:"削除しますか？",fnNoName:"（氏名なし）",fnNoProduct:"商品未設定",
+    fnUpdated:"ステータスを更新しました",fnUpdateErr:"更新エラー",
+    // ステータス
+    stUnhandled:"未対応",stPacking:"梱包中",stShipped:"発送済み",stDone:"完了",stAll:"全て",
+    stInStock:"受注入力済",stNoOrder:"未発注",stOrdered:"発注済",stUnconf:"未確定",stConfirmed:"仕入確定",stDelivering:"配送中",
+    ecTypeEc:"EC",ecTypeFn:"ふるさと納税",
+  },
+  en:{
+    // Login
+    appName:"Hanatate Eel Farm",appSub:"Business Management",
+    loginPw:"Enter your password",loginBtn:"Login",loginErr:"Incorrect password",
+    logout:"Logout",demoPw:"Demo PW: hanatate2026",
+    liveMode:"🟢 Live",demoMode:"🧪 Demo",
+    // Tabs
+    tabEc:"EC Orders",tabFurusato:"Hometown Tax",tabDiary:"Daily Log",tabAlert:"Alerts",
+    tabCalendar:"Calendar",tabInventory:"Inventory",tabWholesale:"Wholesale",
+    tabFinance:"Finance",tabImport:"Import",tabSetup:"Settings",
+    // Common
+    save:"💾 Save",saved:"Saved",del:"🗑️ Delete",deleted:"Deleted",
+    cancel:"Cancel",back:"← Back",edit:"✏️ Edit",saveDone:"✓ Save Changes",
+    add:"＋ Add",noData:"No data found",
+    errInput:"Input error",
+    // EC Orders
+    ecTitle:"Today's Orders",ecAlert:"Action Needed",ecShipping:"Awaiting Ship",
+    ecNewBtn:"＋ New Order",ecNewModal:"＋ New Order",
+    ecType:"Type",ecCustomer:"Customer *",ecProduct:"Product (select or type)",
+    ecSelectProduct:"── Select product ──",ecDirectInput:"or type directly",
+    ecQty:"Qty",ecAmount:"Amount (¥)",ecShipDate:"Ship Date",ecMemo:"Memo",
+    ecMemoPlaceholder:"Notes",ecStock:"In Stock",ecPayment:"Payment OK",
+    ecAddBtn:"＋ Add Order",ecDetail:"Order Detail",ecEditTitle:"✏️ Edit",
+    ecCustomerLbl:"Customer",ecProductLbl:"Product",ecAmountLbl:"Amount",ecTypeLbl:"Type",
+    ecCreated:"Order Date",ecShipDateLbl:"Ship Date",ecAssigned:"Assigned",
+    ecMemoLbl:"Memo",ecStatusChange:"Change Status",ecSetShipDate:"Ship Date",
+    ecAssignStaff:"Assign Staff",ecNoStaff:"⚙️ Add staff in Settings tab",
+    ecNoOrder:"No matching orders",
+    ecDelMsg:"Delete this order?
+This cannot be undone.",
+    ecErrInput:"Enter customer name and product",ecAddDone:"Order added",
+    ecAssignedLbl:"Staff:",ecUnassigned:"Unassigned",ecShipDatePfx:"Ship:",
+    // Wholesale
+    wsRecorded:"Recorded Sales",wsUnrecorded:"Unrecorded",
+    wsNewBtn:"＋ New Wholesale Order",wsNewModal:"＋ New Wholesale Order",
+    wsClient:"Client",wsSelectClient:"── Select client ──",
+    wsTel:"Phone",wsTelPlaceholder:"e.g. 092-123-4567",wsProduct:"Product",
+    wsSelectProduct:"── Select product ──",wsQty:"Qty",wsUnitPrice:"Unit Price (¥)",
+    wsTotal:"Total: ",wsShipDate:"Delivery Date",wsMemo:"Memo",wsAddBtn:"＋ Add Order",
+    wsDetail:"Wholesale Detail",wsClientLbl:"Client",wsTelLbl:"Phone",wsProductLbl:"Product",
+    wsQtyLbl:"Qty",wsUnitPriceLbl:"Unit Price",wsTotalLbl:"Total",wsCreated:"Order Date",
+    wsMemoLbl:"Memo",wsShipDateLbl:"Delivery Date",
+    wsOrderMgmt:"Order Mgmt",wsPurchaseMgmt:"Purchase Mgmt",wsDeliveryMgmt:"Procurement",
+    wsInvoice:"Invoice Issued",wsSalesRecord:"Sales Recorded",
+    wsDeliveryPfx:"Delivery:",wsDelMsg:"Delete this wholesale order?
+This cannot be undone.",
+    wsErrInput:"Enter client and product",wsAddDone:"Wholesale order added",
+    wsEditDone:"Changes saved",wsInvoiceIssued:"✓ Invoice",wsInvoiceNone:"No Invoice",
+    wsSalesOk:"✓ Sales Rec.",wsSalesNone:"Sales Pending",wsOrderPfx:"Order:",wsPurchasePfx:"Purchase:",wsDeliveryPfx2:"Supply:",
+    // Alerts
+    alertAll:"All clear",alertNeeded:"Action needed",alertCheck:"Please verify with team",
+    alertSendLine:"📲 LINE Notify",alertSending:"Sending...",alertDemo:"🧪 Demo mode: LINE output to console",
+    alertTodayShip:"📅 Today's Shipments & Deliveries",alertEcSection:"🛒 EC / Hometown Tax",
+    alertWsSection:"📦 Wholesale",alertNone:"✅ No alerts",
+    alertRuleTitle:"📋 Check Rules",
+    alertAutoTitle:"🤖 Auto Notify (LINE Messaging API)",
+    alertAutoOn:"ON ✓",alertAutoOff:"OFF",
+    alertSendNow:"📲 Send Daily Report Now",alertDemoConsole:"Demo: output to console",
+    alertLogTitle:"📋 Notification Log",alertShipSub:"Scheduled to ship today",alertDelivSub:"Scheduled for delivery today",
+    alertNoStock:"⛔ Out of stock",alertNoPayment:"⛔ Payment unconfirmed",alertUnhandled:"⚡ Unhandled",alertUnassigned:"👤 Unassigned",
+    alertNoOrder:"⚡ Purchase pending",alertNoInvoice:"📄 Invoice not issued",alertNoSales:"💴 Sales not recorded",
+    // Inventory
+    invInStock:"In-Stock Items",invOutOfStock:"Out of Stock",invTitle:"📦 Product Inventory",
+    invHistoryTitle:"📋 Movement History",invNoHistory:"No history",
+    invIn:"＋ Receive",invOut:"－ Issue",invAdjIn:"＋ Receive",invAdjOut:"－ Issue",
+    invCurrentStock:"Current Stock",invQtyIn:"Receive Qty",invQtyOut:"Issue Qty",
+    invNewStock:"Updated stock: ",invUnit:"",invMemo:"Memo (optional)",
+    invRecordIn:"＋ Record Receipt",invRecordOut:"－ Record Issue",
+    invUpdated:"Inventory updated",invOutBadge:"Out of Stock",invLowBadge:"Low Stock",
+    // Finance
+    finMonthSales:"This Month's Confirmed Sales",finPending:"Pending:",
+    finExportEc:"📥 EC Orders",finExportWs:"📥 Wholesale",finExportAll:"📥 All Data",
+    finChartTitle:"📈 Monthly Sales Trend",finBreakTitle:"📊 This Month Breakdown",
+    finEc:"EC Direct",finFurusato:"Hometown Tax",finWs:"Wholesale",finWsRecorded:"Wholesale (Recorded)",
+    finWsPending:"Wholesale (Pending)",finTotalConfirmed:"Total (Confirmed)",
+    // Diary
+    diaryNewBtn:"＋ Add Daily Log",diaryNoData:"No diary entries",
+    diaryNewModal:"＋ Daily Log / Work Note",diaryDate:"Date",diaryAuthor:"Author",
+    diarySelectAuthor:"── Select ──",diaryCategory:"Category",diaryContent:"Work Content",
+    diaryPlaceholder:"Enter today's work...",diaryAddBtn:"＋ Add Log",
+    diaryDelMsg:"Delete this log entry?",diaryDelBtn:"Delete",
+    diaryAddDone:"Log added",diaryErrInput:"Please enter content",
+    // Import
+    importCsv:"📂 CSV Import",importRoadmap:"📋 Roadmap",
+    importCsvTitle:"📂 Bulk Import from CSV",importType:"Import Type",
+    importEcOpt:"🛒 EC Orders (Shopify etc.)",importFnOpt:"🏠 Hometown Tax",importWsOpt:"📦 Wholesale Orders",
+    importSampleNote:"Download sample CSV to check the format",
+    importSampleEc:"EC Sample",importSampleFn:"Hometown Tax",importSampleWs:"Wholesale",
+    importSelectFile:"Select CSV File",importPreview:"Preview (first 5 rows)",
+    importPreviewCount:" rows to import",importBtn:"📥 Run Import",importingBtn:"Importing...",
+    importErrSelect:"Please select a CSV file",importDone:" hometown tax records imported",
+    importEcDone:" EC orders imported",importWsDone:" wholesale orders imported",
+    importSampleDl:"Sample CSV downloaded",importFormats:"💡 Supported CSV formats",
+    importRoadmapTitle:"📋 Automation Roadmap",
+    // Settings
+    setupStaff:"👤 Staff",setupProducts:"🐟 Products",setupClients:"🏢 Clients",
+    setupBackup:"💾 Backup",setupSystem:"🔧 Production",
+    setupStaffTitle:"Registered Staff",setupStaffNone:"No staff registered yet",
+    setupStaffPlaceholder:"Enter name...",setupStaffAddDone:"Staff added",
+    setupStaffExist:"Already registered",
+    setupProdTitle:"Add Product",setupProdName:"Product Name",setupProdPrice:"Price (¥)",
+    setupProdStock:"Initial Stock",setupProdCategory:"Category",setupProdAddBtn:"＋ Add Product",
+    setupProdAddDone:"Product added",setupProdErrInput:"Enter product name",
+    setupProdEdit:"Edit",setupProdDel:"Delete",setupProdDone:"✓ Done",
+    setupProdStockLbl:"Stock:",
+    setupClientTitle:"Add Client",setupClientName:"Company Name *",
+    setupClientTel:"Phone",setupClientAddr:"Address",setupClientMemo:"Memo",
+    setupClientAddBtn:"＋ Add Client",setupClientAddDone:"Client added",
+    setupClientErrInput:"Enter company name",
+    setupBackupTitle:"💾 Data Backup (CSV)",
+    setupBackupNote:"Download your data as CSV files. Can be opened in Excel. Weekly backup recommended.",
+    setupBackupAll:"📥 Download All Data",
+    setupBackupTip:"💡 Recommended: Download all data weekly for safe keeping.",
+    setupDemoMode:"🧪 Running in Demo mode. Configure settings below to go live.",setupLiveMode:"✅ Running in Production mode",
+    // Calendar
+    calEcLbl:"🛒 EC",calWsLbl:"📦 WS",calFnLbl:"🏠 FN",
+    calSchedule:"Schedule",calNoSchedule:"No events",
+    calLegendEc:"🛒 EC Orders",calLegendWs:"📦 Wholesale",calLegendFn:"🏠 Hometown Tax",
+    calDays:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
+    // Furusato
+    fnTotal:"Total",fnDone:"Shipped/Done",fnUnhandled:"Pending",
+    fnNoData:"No data",fnNoCsvHint:"Import CSV from the Import tab",
+    fnDetail:"Hometown Tax Detail",fnDonor:"Donor Name",fnProduct:"Return Gift",
+    fnProductCode:"Product Code",fnShipRequest:"Ship Request Date",fnShipSched:"Scheduled Ship Date",
+    fnDelivNo:"Delivery No.",fnDonationNo:"Donation Receipt No.",fnDelivStatus:"Delivery Status",
+    fnTracking:"Tracking No.",fnCarrier:"Carrier",fnPrefecture:"Prefecture",
+    fnAddress:"Address",fnPhone:"Phone",fnDonationAmt:"Donation Amount",fnProductPrice:"Gift Price",
+    fnDonationYear:"Donation Year",fnMemo:"Memo",fnStatusChange:"Change Status",
+    fnDelBtn:"🗑 Delete",fnDelMsg:"Delete this record?",fnNoName:"(No Name)",fnNoProduct:"No Product",
+    fnUpdated:"Status updated",fnUpdateErr:"Update error",
+    // Statuses
+    stUnhandled:"Pending",stPacking:"Packing",stShipped:"Shipped",stDone:"Done",stAll:"All",
+    stInStock:"Order Entered",stNoOrder:"Not Ordered",stOrdered:"Ordered",stUnconf:"Unconfirmed",stConfirmed:"Confirmed",stDelivering:"Delivering",
+    ecTypeEc:"EC",ecTypeFn:"Hometown Tax",
+  }
+};
+
+// 言語切り替え（グローバル）
+let currentLang = localStorage.getItem('hanatate_lang') || 'ja';
+function setLang(l){ currentLang=l; localStorage.setItem('hanatate_lang',l); }
+function t(key){ return (DICT[currentLang]||DICT.ja)[key] || key; }
+
+
 const FN_PRICE_MAP = {
   '国産鰻の蒲焼2尾': 3900,
   '国産鰻の蒲焼3尾': 5400,
@@ -171,16 +453,16 @@ const ST_WS_P=["未発注","発注済"];
 const ST_WS_D=["未確定","仕入確定"];
 const DIARY_TAGS=["池管理","出荷","仕入","清掃","会議","その他"];
 const TABS=[
-  {id:"ec",icon:"🛒",label:"EC注文"},
-  {id:"furusato",icon:"🏠",label:"ふるさと納税"},
-  {id:"diary",icon:"📝",label:"日報"},
-  {id:"alert",icon:"🔔",label:"アラート"},
-  {id:"calendar",icon:"📅",label:"カレンダー"},
-  {id:"inventory",icon:"📋",label:"在庫"},
-  {id:"wholesale",icon:"📦",label:"卸先"},
-  {id:"finance",icon:"📊",label:"財務"},
-  {id:"import",icon:"📥",label:"自動取込"},
-  {id:"setup",icon:"⚙️",label:"設定"},
+  {id:"ec",icon:"🛒",label:t("tabEc")},
+  {id:"furusato",icon:"🏠",label:t("tabFurusato")},
+  {id:"diary",icon:"📝",label:t("tabDiary")},
+  {id:"alert",icon:"🔔",label:t("tabAlert")},
+  {id:"calendar",icon:"📅",label:t("tabCalendar")},
+  {id:"inventory",icon:"📋",label:t("tabInventory")},
+  {id:"wholesale",icon:"📦",label:t("tabWholesale")},
+  {id:"finance",icon:"📊",label:t("tabFinance")},
+  {id:"import",icon:"📥",label:t("tabImport")},
+  {id:"setup",icon:"⚙️",label:t("tabSetup")},
 ];
 
 const sc=s=>["発送済み","完了","仕入確定","受注入力済","発注済","配送中"].includes(s)?C.green:["未対応","在庫なし","未確定","未発注","未入力"].includes(s)?C.red:C.orange;
@@ -200,7 +482,7 @@ const Toggle=({label,checked,onChange})=>(<button onClick={()=>onChange(!checked
 const PrimaryBtn=({onClick,label,color=C.navy,disabled})=>(<button onClick={onClick} disabled={disabled} style={{width:"100%",padding:"13px 0",borderRadius:8,background:disabled?C.border:color,color:"white",fontWeight:700,fontSize:14,border:"none",cursor:"pointer",marginTop:12}}>{label}</button>);
 const SmallBtn=({onClick,label,color=C.navy,bg})=>(<button onClick={onClick} style={{padding:"7px 12px",borderRadius:6,background:bg||color+"11",color,fontWeight:700,fontSize:12,border:`1px solid ${color}33`,cursor:"pointer",whiteSpace:"nowrap"}}>{label}</button>);
 const Toast=({msg,type})=>msg?(<div style={{position:"fixed",bottom:76,left:"50%",transform:"translateX(-50%)",background:type==="error"?C.red:C.navy,color:"white",padding:"10px 20px",borderRadius:24,fontSize:13,fontWeight:600,zIndex:400,whiteSpace:"nowrap",boxShadow:"0 4px 20px #0004"}}>{type==="error"?"⚠️":"✅"} {msg}</div>):null;
-const Confirm=({msg,onOk,onCancel})=>(<div style={{position:"fixed",inset:0,background:"#000a",zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}><div style={{background:"white",borderRadius:16,padding:24,width:"100%",maxWidth:320}}><div style={{fontSize:22,textAlign:"center",marginBottom:10}}>🗑️</div><div style={{fontSize:14,textAlign:"center",lineHeight:1.7,marginBottom:20,color:C.text}}>{msg}</div><div style={{display:"flex",gap:10}}><button onClick={onCancel} style={{flex:1,padding:"12px 0",borderRadius:8,border:`1px solid ${C.border}`,background:"white",fontSize:14,cursor:"pointer",fontWeight:600}}>キャンセル</button><button onClick={onOk} style={{flex:1,padding:"12px 0",borderRadius:8,border:"none",background:C.red,color:"white",fontSize:14,cursor:"pointer",fontWeight:700}}>削除する</button></div></div></div>);
+const Confirm=({msg,onOk,onCancel})=>(<div style={{position:"fixed",inset:0,background:"#000a",zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}><div style={{background:"white",borderRadius:16,padding:24,width:"100%",maxWidth:320}}><div style={{fontSize:22,textAlign:"center",marginBottom:10}}>🗑️</div><div style={{fontSize:14,textAlign:"center",lineHeight:1.7,marginBottom:20,color:C.text}}>{msg}</div><div style={{display:"flex",gap:10}}><button onClick={onCancel} style={{flex:1,padding:"12px 0",borderRadius:8,border:`1px solid ${C.border}`,background:"white",fontSize:14,cursor:"pointer",fontWeight:600}}>{t("cancel")}</button><button onClick={onOk} style={{flex:1,padding:"12px 0",borderRadius:8,border:"none",background:C.red,color:"white",fontSize:14,cursor:"pointer",fontWeight:700}}>{t("del")}</button></div></div></div>);
 const Modal=({onClose,title,children})=>(<div style={{position:"fixed",inset:0,background:"#000a",zIndex:300,display:"flex",alignItems:"flex-end"}} onClick={onClose}><div style={{background:"white",width:"100%",maxHeight:"92vh",borderRadius:"18px 18px 0 0",padding:20,overflowY:"auto"}} onClick={e=>e.stopPropagation()}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}><h3 style={{margin:0,fontSize:16,color:C.navy}}>{title}</h3><button onClick={onClose} style={{border:"none",background:"none",fontSize:22,cursor:"pointer",color:C.sub}}>✕</button></div>{children}</div></div>);
 const SummaryCard=({label,value,color})=>(<div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"12px 10px",borderLeft:`4px solid ${color}`}}><div style={{fontSize:22,fontWeight:800,color}}>{value}</div><div style={{fontSize:10,color:C.sub,marginTop:2,lineHeight:1.3}}>{label}</div></div>);
 
@@ -208,20 +490,22 @@ const SummaryCard=({label,value,color})=>(<div style={{background:C.card,border:
 function LoginScreen({onLogin}){
   const [pw,setPw]=useState("");
   const [err,setErr]=useState(false);
+  const [pwTick,setPwTick]=useState(0);
   const try_=()=>{if(pw===CONFIG.APP_PASSWORD){onLogin();}else{setErr(true);setTimeout(()=>setErr(false),2000);}};
   return(
     <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:C.bg,padding:20}}>
       <div style={{width:"100%",maxWidth:340}}>
         <div style={{background:C.navy,borderRadius:16,padding:"28px 24px",textAlign:"center",marginBottom:16}}>
-          <div style={{color:C.goldL,fontSize:24,fontWeight:800,marginBottom:4}}>花立山養鰻</div>
-          <div style={{color:"rgba(255,255,255,0.6)",fontSize:12}}>業務管理システム</div>
+          <div style={{color:C.goldL,fontSize:24,fontWeight:800,marginBottom:4}}>{t("appName")}</div>
+          <div style={{color:"rgba(255,255,255,0.6)",fontSize:12}}>{t("appSub")}</div>
+          <div style={{marginTop:10}}><button onClick={()=>{setLang(currentLang==="ja"?"en":"ja");setPwTick(p=>p+1);}} style={{background:"none",border:"1px solid rgba(255,255,255,0.4)",color:"rgba(255,255,255,0.8)",borderRadius:6,padding:"4px 12px",fontSize:11,cursor:"pointer",fontWeight:700}}>{currentLang==="ja"?"🇬🇧 English":"🇯🇵 日本語"}</button></div>
         </div>
         <div style={{background:"white",borderRadius:16,padding:24,boxShadow:"0 4px 20px #0001"}}>
-          <div style={{fontSize:13,color:C.sub,marginBottom:10}}>パスワードを入力してください</div>
-          <input type="password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&try_()} placeholder="パスワード" style={{width:"100%",padding:"12px 14px",borderRadius:8,border:`2px solid ${err?C.red:C.border}`,fontSize:15,marginBottom:8}}/>
-          {err&&<div style={{color:C.red,fontSize:12,marginBottom:8}}>パスワードが正しくありません</div>}
-          <button onClick={try_} style={{width:"100%",padding:"13px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:15,border:"none",cursor:"pointer"}}>ログイン</button>
-          {IS_DEMO&&<div style={{fontSize:11,color:C.sub,textAlign:"center",marginTop:10}}>デモ用PW: hanatate2026</div>}
+          <div style={{fontSize:13,color:C.sub,marginBottom:10}}>{t("loginPw")}</div>
+          <input type="password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&try_()} placeholder={t("loginPw")} style={{width:"100%",padding:"12px 14px",borderRadius:8,border:`2px solid ${err?C.red:C.border}`,fontSize:15,marginBottom:8}}/>
+          {err&&<div style={{color:C.red,fontSize:12,marginBottom:8}}>{t("loginErr")}</div>}
+          <button onClick={try_} style={{width:"100%",padding:"13px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:15,border:"none",cursor:"pointer"}}>{t("loginBtn")}</button>
+          {IS_DEMO&&<div style={{fontSize:11,color:C.sub,textAlign:"center",marginTop:10}}>{t("demoPw")}</div>}
         </div>
       </div>
     </div>
@@ -240,29 +524,29 @@ function EcTab({orders,setOrders,furusatoOrders=[],staff,products,showToast,onSa
   const filtered=filter==="全て"?orders:filter==="ふるさと納税"?allOrders:orders.filter(o=>o.type===filter||o.status===filter);
   const upd=(id,f,v)=>{setOrders(p=>p.map(o=>{if(o.id!==id)return o;const u={...o,[f]:v};u.alert=!u.stock||!u.payment||u.status==="未対応";return u;}));setDetail(p=>p&&p.id===id?{...p,[f]:v}:p);};
   const addOrder=()=>{
-    if(!form.customer||!form.product){showToast("顧客名と商品を入力してください","error");return;}
+    if(!form.customer||!form.product){showToast(t("ecErrInput"),"error");return;}
     const o={id:genId("EC"),customer:form.customer,type:form.type,product:form.product,qty:Number(form.qty),amount:Number(form.amount),status:"未対応",stock:form.stock,payment:form.payment,assigned:null,shipDate:form.shipDate,created:nowStr(),alert:true,memo:form.memo};
     setOrders(p=>[o,...p]);setShowNew(false);
     setForm({customer:"",type:"EC",product:"",qty:1,amount:0,shipDate:"",stock:true,payment:false,memo:""});
-    showToast("注文を追加しました");
+    showToast(t("ecAddDone"));
   };
   const selProd=name=>{const p=products.find(p=>p.name===name);if(p)setForm(f=>({...f,product:p.name,amount:p.price*Number(f.qty||1)}));else setForm(f=>({...f,product:name}));};
-  const doDelete=id=>{setConfirm({msg:"この注文を削除しますか？\n削除後は元に戻せません。",onOk:async()=>{setOrders(p=>p.filter(o=>o.id!==id));await onDel("ec_orders","id",id);setDetail(null);setConfirm(null);showToast("削除しました");}});};
+  const doDelete=id=>{setConfirm({msg:t("ecDelMsg"),onOk:async()=>{setOrders(p=>p.filter(o=>o.id!==id));await onDel("ec_orders","id",id);setDetail(null);setConfirm(null);showToast(t("deleted"));}});};
   return(
     <div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:14}}>
-        <SummaryCard label="本日の注文" value={orders.filter(o=>o.created.startsWith(today())).length} color={C.cyan}/>
-        <SummaryCard label="要対応" value={orders.filter(o=>o.alert).length} color={C.red}/>
-        <SummaryCard label="発送待ち" value={orders.filter(o=>o.status==="梱包中").length} color={C.orange}/>
+        <SummaryCard label={t("ecTitle")} value={orders.filter(o=>o.created.startsWith(today())).length} color={C.cyan}/>
+        <SummaryCard label={t("ecAlert")} value={orders.filter(o=>o.alert).length} color={C.red}/>
+        <SummaryCard label={t("ecShipping")} value={orders.filter(o=>o.status==="梱包中").length} color={C.orange}/>
       </div>
-      <button onClick={()=>setShowNew(true)} style={{width:"100%",padding:"12px 0",borderRadius:10,background:C.gold,color:"white",fontWeight:800,fontSize:14,border:"none",cursor:"pointer",marginBottom:12,boxShadow:"0 2px 8px #C8963E44"}}>＋ 新規注文を追加</button>
+      <button onClick={()=>setShowNew(true)} style={{width:"100%",padding:"12px 0",borderRadius:10,background:C.gold,color:"white",fontWeight:800,fontSize:14,border:"none",cursor:"pointer",marginBottom:12,boxShadow:"0 2px 8px #C8963E44"}}>{t("ecNewBtn")}</button>
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
-        {["全て","EC","ふるさと納税","未対応","梱包中","発送済み","完了"].map(f=>(
+        {[t("stAll"),t("ecTypeEc"),t("ecTypeFn"),t("stUnhandled"),t("stPacking"),t("stShipped"),t("stDone")].map(f=>(
           <button key={f} onClick={()=>setFilter(f)} style={{padding:"5px 11px",borderRadius:20,border:`1px solid ${filter===f?C.gold:C.border}`,background:filter===f?C.gold:"white",color:filter===f?"white":C.text,fontSize:12,cursor:"pointer",fontWeight:filter===f?700:400}}>{f}</button>
         ))}
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:8}}>
-        {filtered.length===0&&<div style={{textAlign:"center",padding:"30px 0",color:C.sub,fontSize:13}}>該当する注文がありません</div>}
+        {filtered.length===0&&<div style={{textAlign:"center",padding:"30px 0",color:C.sub,fontSize:13}}>{t("ecNoOrder")}</div>}
         {filtered.map(o=>(
           <div key={o.id} onClick={()=>{setDetail({...o});setEditMode(false);}} style={{background:C.card,border:`1px solid ${o.alert?C.red:C.border}`,borderLeft:`4px solid ${o.alert?C.red:sc(o.status)}`,borderRadius:8,padding:"12px 14px",cursor:"pointer"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
@@ -274,7 +558,7 @@ function EcTab({orders,setOrders,furusatoOrders=[],staff,products,showToast,onSa
                   <Badge label={o.status} color={sc(o.status)}/>
                 </div>
                 <div style={{fontSize:12,color:C.sub,marginTop:3}}>{o.product} × {o.qty}</div>
-                <div style={{fontSize:11,color:C.sub,marginTop:2}}>担当:{o.assigned||"未割当"}{o.shipDate&&` | 発送予定:${o.shipDate}`}</div>
+                <div style={{fontSize:11,color:C.sub,marginTop:2}}>{t("ecAssignedLbl")}{o.assigned||t("ecUnassigned")}{o.shipDate&&` | 発送予定:${o.shipDate}`}</div>
                 {o.memo&&<div style={{fontSize:11,color:C.orange,marginTop:2}}>📝 {o.memo}</div>}
               </div>
               <div style={{fontWeight:800,color:C.navy,fontSize:14,whiteSpace:"nowrap"}}>¥{fmt(o.amount)}</div>
@@ -283,49 +567,49 @@ function EcTab({orders,setOrders,furusatoOrders=[],staff,products,showToast,onSa
         ))}
       </div>
       {showNew&&(
-        <Modal onClose={()=>setShowNew(false)} title="＋ 新規注文">
-          <Lbl t="種別"/><Sel value={form.type} onChange={v=>setForm(f=>({...f,type:v}))}><option>EC</option><option>ふるさと納税</option></Sel>
-          <Lbl t="顧客名 *"/><Inp value={form.customer} onChange={v=>setForm(f=>({...f,customer:v}))} placeholder="例：田中 一郎"/>
-          <Lbl t="商品（登録商品から選ぶか直接入力）"/>
-          <Sel value="" onChange={e=>selProd(e.target.value)}><option value="">── 登録商品から選択 ──</option>{products.filter(p=>p.category!=="卸売").map(p=><option key={p.id} value={p.name}>{p.name}（¥{fmt(p.price)}）在庫:{p.stock}</option>)}</Sel>
-          <div style={{marginTop:6}}><Inp value={form.product} onChange={v=>setForm(f=>({...f,product:v}))} placeholder="または直接入力"/></div>
-          <Lbl t="数量"/><Inp type="number" value={form.qty} onChange={v=>{const q=Number(v);const pr=products.find(p=>p.name===form.product);setForm(f=>({...f,qty:q,amount:pr?pr.price*q:f.amount}));}} placeholder="1"/>
-          <Lbl t="金額（円）"/><Inp type="number" value={form.amount} onChange={v=>setForm(f=>({...f,amount:Number(v)}))} placeholder="0"/>
-          <Lbl t="発送予定日"/><Inp type="date" value={form.shipDate} onChange={v=>setForm(f=>({...f,shipDate:v}))}/>
-          <Lbl t="メモ"/><Inp value={form.memo} onChange={v=>setForm(f=>({...f,memo:v}))} placeholder="備考"/>
-          <div style={{display:"flex",gap:10,marginTop:10}}><Toggle label="在庫あり" checked={form.stock} onChange={v=>setForm(f=>({...f,stock:v}))}/><Toggle label="決済OK" checked={form.payment} onChange={v=>setForm(f=>({...f,payment:v}))}/></div>
-          <PrimaryBtn onClick={addOrder} label="＋ 注文を追加" color={C.gold}/>
+        <Modal onClose={()=>setShowNew(false)} title={t("ecNewModal")}>
+          <Lbl t={t("ecType")}/><Sel value={form.type} onChange={v=>setForm(f=>({...f,type:v}))}><option>EC</option><option>ふるさと納税</option></Sel>
+          <Lbl t={t("ecCustomer")}/><Inp value={form.customer} onChange={v=>setForm(f=>({...f,customer:v}))} placeholder="e.g. Tanaka Ichiro"/>
+          <Lbl t={t("ecProduct")}/>
+          <Sel value="" onChange={e=>selProd(e.target.value)}><option value="">{t("ecSelectProduct")}</option>{products.filter(p=>p.category!=="卸売").map(p=><option key={p.id} value={p.name}>{p.name}（¥{fmt(p.price)}）在庫:{p.stock}</option>)}</Sel>
+          <div style={{marginTop:6}}><Inp value={form.product} onChange={v=>setForm(f=>({...f,product:v}))} placeholder={t("ecDirectInput")}/></div>
+          <Lbl t={t("ecQty")}/><Inp type="number" value={form.qty} onChange={v=>{const q=Number(v);const pr=products.find(p=>p.name===form.product);setForm(f=>({...f,qty:q,amount:pr?pr.price*q:f.amount}));}} placeholder="1"/>
+          <Lbl t={t("ecAmount")}/><Inp type="number" value={form.amount} onChange={v=>setForm(f=>({...f,amount:Number(v)}))} placeholder="0"/>
+          <Lbl t={t("ecShipDate")}/><Inp type="date" value={form.shipDate} onChange={v=>setForm(f=>({...f,shipDate:v}))}/>
+          <Lbl t={t("ecMemo")}/><Inp value={form.memo} onChange={v=>setForm(f=>({...f,memo:v}))} placeholder={t("ecMemoPlaceholder")}/>
+          <div style={{display:"flex",gap:10,marginTop:10}}><Toggle label={t("ecStock")} checked={form.stock} onChange={v=>setForm(f=>({...f,stock:v}))}/><Toggle label={t("ecPayment")} checked={form.payment} onChange={v=>setForm(f=>({...f,payment:v}))}/></div>
+          <PrimaryBtn onClick={addOrder} label={t("ecAddBtn")} color={C.gold}/>
         </Modal>
       )}
       {detail&&(
-        <Modal onClose={()=>setDetail(null)} title={editMode?`✏️ 編集 ${detail.id}`:`注文詳細 ${detail.id}`}>
+        <Modal onClose={()=>setDetail(null)} title={editMode?`${t("ecEditTitle")} ${detail.id}`:`${t("ecDetail")} ${detail.id}`}>
           {!editMode?(
             <>
-              <Row label="顧客名" value={detail.customer}/><Row label="商品" value={`${detail.product} × ${detail.qty}`}/><Row label="金額" value={`¥${fmt(detail.amount)}`}/><Row label="種別" value={detail.type}/><Row label="注文日時" value={detail.created}/><Row label="発送予定日" value={detail.shipDate||"未設定"}/><Row label="担当者" value={detail.assigned||"未割当"}/><Row label="メモ" value={detail.memo||"—"}/>
-              <Lbl t="ステータス変更"/>
-              <Sel value={detail.status} onChange={v=>{upd(detail.id,"status",v);setDetail(p=>({...p,status:v}));}}>{ST_EC.map(s=><option key={s}>{s}</option>)}</Sel>
-              <Lbl t="発送予定日"/>
+              <Row label={t("ecCustomerLbl")} value={detail.customer}/><Row label={t("ecProductLbl")} value={`${detail.product} × ${detail.qty}`}/><Row label={t("ecAmountLbl")} value={`¥${fmt(detail.amount)}`}/><Row label={t("ecTypeLbl")} value={detail.type}/><Row label={t("ecCreated")} value={detail.created}/><Row label={t("ecShipDateLbl")} value={detail.shipDate||"-"}/><Row label={t("ecAssigned")} value={detail.assigned||t("ecUnassigned")}/><Row label={t("ecMemoLbl")} value={detail.memo||"—"}/>
+              <Lbl t={t("ecStatusChange")}/>
+              <Sel value={detail.status} onChange={v=>{upd(detail.id,"status",v);setDetail(p=>({...p,status:v}));}}>{[t("stUnhandled"),"注文確認","在庫なし",t("stPacking"),t("stShipped"),t("stDone")].map(s=><option key={s}>{s}</option>)}</Sel>
+              <Lbl t={t("ecSetShipDate")}/>
               <Inp type="date" value={detail.shipDate||""} onChange={v=>{upd(detail.id,"shipDate",v);setDetail(p=>({...p,shipDate:v}));}}/>
-              <Lbl t="担当者を割り当てる"/>
+              <Lbl t={t("ecAssignStaff")}/>
               <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                {staff.length===0&&<div style={{fontSize:12,color:C.sub}}>⚙️設定タブで担当者を追加してください</div>}
+                {staff.length===0&&<div style={{fontSize:12,color:C.sub}}>{t("ecNoStaff")}</div>}
                 {staff.map(s=>(<button key={s} onClick={()=>{upd(detail.id,"assigned",s);setDetail(p=>({...p,assigned:s}));}} style={{padding:"9px 14px",borderRadius:6,border:`1px solid ${detail.assigned===s?C.navy:C.border}`,background:detail.assigned===s?C.navy:"white",color:detail.assigned===s?"white":C.text,fontSize:13,cursor:"pointer",fontWeight:700}}>{s}</button>))}
               </div>
-              <div style={{display:"flex",gap:10,marginTop:10}}><Toggle label="在庫あり" checked={detail.stock} onChange={v=>{upd(detail.id,"stock",v);setDetail(p=>({...p,stock:v}));}}/><Toggle label="決済OK" checked={detail.payment} onChange={v=>{upd(detail.id,"payment",v);setDetail(p=>({...p,payment:v}));}}/></div>
-              <div style={{display:"flex",gap:8,marginTop:14}}><SmallBtn onClick={()=>setEditMode(true)} label="✏️ 内容を編集" color={C.gold} bg={C.goldBg}/><SmallBtn onClick={()=>doDelete(detail.id)} label="🗑️ 削除" color={C.red} bg={C.red+"11"}/></div>
-              <PrimaryBtn onClick={async()=>{await onSave("ec_orders",detail);showToast("保存しました");setDetail(null);}} label="💾 保存"/>
+              <div style={{display:"flex",gap:10,marginTop:10}}><Toggle label={t("ecStock")} checked={detail.stock} onChange={v=>{upd(detail.id,"stock",v);setDetail(p=>({...p,stock:v}));}}/><Toggle label={t("ecPayment")} checked={detail.payment} onChange={v=>{upd(detail.id,"payment",v);setDetail(p=>({...p,payment:v}));}}/></div>
+              <div style={{display:"flex",gap:8,marginTop:14}}><SmallBtn onClick={()=>setEditMode(true)} label={t("edit")} color={C.gold} bg={C.goldBg}/><SmallBtn onClick={()=>doDelete(detail.id)} label={t("del")} color={C.red} bg={C.red+"11"}/></div>
+              <PrimaryBtn onClick={async()=>{await onSave("ec_orders",detail);showToast(t("saved"));setDetail(null);}} label={t("save")}/>
             </>
           ):(
             <>
-              <Lbl t="顧客名"/><Inp value={detail.customer} onChange={v=>setDetail(p=>({...p,customer:v}))}/>
-              <Lbl t="商品名"/><Inp value={detail.product} onChange={v=>setDetail(p=>({...p,product:v}))}/>
-              <Lbl t="数量"/><Inp type="number" value={detail.qty} onChange={v=>setDetail(p=>({...p,qty:Number(v)}))}/>
-              <Lbl t="金額（円）"/><Inp type="number" value={detail.amount} onChange={v=>setDetail(p=>({...p,amount:Number(v)}))}/>
-              <Lbl t="発送予定日"/><Inp type="date" value={detail.shipDate||""} onChange={v=>setDetail(p=>({...p,shipDate:v}))}/>
-              <Lbl t="メモ"/><Inp value={detail.memo||""} onChange={v=>setDetail(p=>({...p,memo:v}))} placeholder="備考"/>
+              <Lbl t={t("ecCustomerLbl")}/><Inp value={detail.customer} onChange={v=>setDetail(p=>({...p,customer:v}))}/>
+              <Lbl t={t("ecProductLbl")}/><Inp value={detail.product} onChange={v=>setDetail(p=>({...p,product:v}))}/>
+              <Lbl t={t("ecQty")}/><Inp type="number" value={detail.qty} onChange={v=>setDetail(p=>({...p,qty:Number(v)}))}/>
+              <Lbl t={t("ecAmount")}/><Inp type="number" value={detail.amount} onChange={v=>setDetail(p=>({...p,amount:Number(v)}))}/>
+              <Lbl t={t("ecShipDate")}/><Inp type="date" value={detail.shipDate||""} onChange={v=>setDetail(p=>({...p,shipDate:v}))}/>
+              <Lbl t={t("ecMemo")}/><Inp value={detail.memo||""} onChange={v=>setDetail(p=>({...p,memo:v}))} placeholder={t("ecMemoPlaceholder")}/>
               <div style={{display:"flex",gap:8,marginTop:14}}>
-                <button onClick={()=>setEditMode(false)} style={{flex:1,padding:"12px 0",borderRadius:8,border:`1px solid ${C.border}`,background:"white",fontSize:13,cursor:"pointer",fontWeight:600}}>← 戻る</button>
-                <button onClick={()=>{setOrders(p=>p.map(o=>o.id===detail.id?{...detail,alert:!detail.stock||!detail.payment||detail.status==="未対応"}:o));setEditMode(false);showToast("編集しました");}} style={{flex:1,padding:"12px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer"}}>✓ 変更を保存</button>
+                <button onClick={()=>setEditMode(false)} style={{flex:1,padding:"12px 0",borderRadius:8,border:`1px solid ${C.border}`,background:"white",fontSize:13,cursor:"pointer",fontWeight:600}}>{t("back")}</button>
+                <button onClick={()=>{setOrders(p=>p.map(o=>o.id===detail.id?{...detail,alert:!detail.stock||!detail.payment||detail.status==="未対応"}:o));setEditMode(false);showToast(t("wsEditDone"));}} style={{flex:1,padding:"12px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer"}}>{t("saveDone")}</button>
               </div>
             </>
           )}
@@ -347,21 +631,21 @@ function WholesaleTab({wholesale,setWholesale,products,clients,showToast,onSave,
   const selClient=n=>{const c=clients.find(c=>c.name===n);if(c)setForm(f=>({...f,client:c.name,tel:c.tel}));else setForm(f=>({...f,client:n}));};
   const selProd=n=>{const p=products.find(p=>p.name===n);if(p)setForm(f=>({...f,product:p.name,unitPrice:p.price}));else setForm(f=>({...f,product:n}));};
   const addWS=()=>{
-    if(!form.client||!form.product){showToast("得意先と商品を入力してください","error");return;}
+    if(!form.client||!form.product){showToast(t("wsErrInput"),"error");return;}
     const w={id:genId("WS"),client:form.client,tel:form.tel,product:form.product,qty:Number(form.qty),unitPrice:Number(form.unitPrice),amount:Number(form.qty)*Number(form.unitPrice),orderStatus:"受注入力済",purchaseStatus:"未発注",deliveryStatus:"未確定",invoiceIssued:false,salesRecorded:false,shipDate:form.shipDate,created:today(),memo:form.memo};
     setWholesale(p=>[w,...p]);setShowNew(false);
     setForm({client:"",tel:"",product:"",qty:1,unitPrice:0,shipDate:"",memo:""});
-    showToast("卸先注文を追加しました");
+    showToast(t("wsAddDone"));
   };
-  const doDelete=id=>{setConfirm({msg:"この卸先注文を削除しますか？\n削除後は元に戻せません。",onOk:async()=>{setWholesale(p=>p.filter(w=>w.id!==id));await onDel("ws_orders","id",id);setDetail(null);setConfirm(null);showToast("削除しました");}});};
+  const doDelete=id=>{setConfirm({msg:t("wsDelMsg"),onOk:async()=>{setWholesale(p=>p.filter(w=>w.id!==id));await onDel("ws_orders","id",id);setDetail(null);setConfirm(null);showToast("削除しました");}});};
   const FS=({label,opts,value,onChange})=>(<div style={{marginTop:10}}><div style={{fontSize:11,color:C.sub,marginBottom:5}}>{label}</div><div style={{display:"flex",gap:6}}>{opts.map(o=><button key={o} onClick={()=>onChange(o)} style={{flex:1,padding:"9px 0",borderRadius:6,border:`1px solid ${value===o?sc(o):C.border}`,background:value===o?sc(o):"white",color:value===o?"white":C.text,fontSize:12,cursor:"pointer",fontWeight:700}}>{o}</button>)}</div></div>);
   return(
     <div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,marginBottom:14}}>
-        <SummaryCard label="計上済み売上" value={`¥${fmt(wholesale.reduce((s,w)=>w.salesRecorded?s+w.amount:s,0))}`} color={C.green}/>
-        <SummaryCard label="未計上件数" value={wholesale.filter(w=>!w.salesRecorded).length} color={C.orange}/>
+        <SummaryCard label={t("wsRecorded")} value={`¥${fmt(wholesale.reduce((s,w)=>w.salesRecorded?s+w.amount:s,0))}`} color={C.green}/>
+        <SummaryCard label={t("wsUnrecorded")} value={wholesale.filter(w=>!w.salesRecorded).length} color={C.orange}/>
       </div>
-      <button onClick={()=>setShowNew(true)} style={{width:"100%",padding:"12px 0",borderRadius:10,background:C.gold,color:"white",fontWeight:800,fontSize:14,border:"none",cursor:"pointer",marginBottom:12,boxShadow:"0 2px 8px #C8963E44"}}>＋ 新規卸注文を追加</button>
+      <button onClick={()=>setShowNew(true)} style={{width:"100%",padding:"12px 0",borderRadius:10,background:C.gold,color:"white",fontWeight:800,fontSize:14,border:"none",cursor:"pointer",marginBottom:12,boxShadow:"0 2px 8px #C8963E44"}}>{t("wsNewBtn")}</button>
       <div style={{display:"flex",flexDirection:"column",gap:8}}>
         {wholesale.map(w=>(
           <div key={w.id} onClick={()=>{setDetail({...w});setEditMode(false);}} style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${w.salesRecorded?C.green:C.orange}`,borderRadius:8,padding:"12px 14px",cursor:"pointer"}}>
@@ -370,58 +654,58 @@ function WholesaleTab({wholesale,setWholesale,products,clients,showToast,onSave,
                 <div style={{fontWeight:700,fontSize:13}}>{w.client}</div>
                 <div style={{fontSize:12,color:C.sub,marginTop:3}}>{w.product} × {w.qty}</div>
                 <div style={{display:"flex",gap:5,marginTop:6,flexWrap:"wrap"}}>
-                  <Badge label={`受注:${w.orderStatus}`} color={sc(w.orderStatus)}/><Badge label={`発注:${w.purchaseStatus}`} color={sc(w.purchaseStatus)}/><Badge label={`仕入:${w.deliveryStatus}`} color={sc(w.deliveryStatus)}/>
+                  <Badge label={`${t("wsOrderPfx")}${w.orderStatus}`} color={sc(w.orderStatus)}/><Badge label={`${t("wsPurchasePfx")}${w.purchaseStatus}`} color={sc(w.purchaseStatus)}/><Badge label={`${t("wsDeliveryPfx2")}${w.deliveryStatus}`} color={sc(w.deliveryStatus)}/>
                 </div>
-                {w.shipDate&&<div style={{fontSize:11,color:C.sub,marginTop:4}}>納品予定:{w.shipDate}</div>}
+                {w.shipDate&&<div style={{fontSize:11,color:C.sub,marginTop:4}}>{t("wsShipDateLbl")}:{w.shipDate}</div>}
                 {w.memo&&<div style={{fontSize:11,color:C.orange,marginTop:2}}>📝 {w.memo}</div>}
               </div>
               <div style={{textAlign:"right"}}><div style={{fontWeight:800,color:C.navy,fontSize:14}}>¥{fmt(w.amount)}</div><div style={{fontSize:11,color:C.sub}}>{w.created}</div></div>
             </div>
-            <div style={{display:"flex",gap:6,marginTop:8}}><Badge label={w.invoiceIssued?"✓ 納品書":"納品書未発行"} color={w.invoiceIssued?C.green:C.red}/><Badge label={w.salesRecorded?"✓ 売上計上":"売上未計上"} color={w.salesRecorded?C.green:C.orange}/></div>
+            <div style={{display:"flex",gap:6,marginTop:8}}><Badge label={w.invoiceIssued?t("wsInvoiceIssued"):t("wsInvoiceNone")} color={w.invoiceIssued?C.green:C.red}/><Badge label={w.salesRecorded?t("wsSalesOk"):t("wsSalesNone")} color={w.salesRecorded?C.green:C.orange}/></div>
           </div>
         ))}
       </div>
       {showNew&&(
-        <Modal onClose={()=>setShowNew(false)} title="＋ 新規卸注文">
-          <Lbl t="得意先"/>
-          <Sel value="" onChange={e=>selClient(e.target.value)}><option value="">── 登録得意先から選択 ──</option>{clients.map(c=><option key={c.id} value={c.name}>{c.name}</option>)}</Sel>
-          <div style={{marginTop:6}}><Inp value={form.client} onChange={v=>setForm(f=>({...f,client:v}))} placeholder="または直接入力"/></div>
-          <Lbl t="電話番号"/><Inp value={form.tel} onChange={v=>setForm(f=>({...f,tel:v}))} placeholder="例：092-123-4567"/>
-          <Lbl t="商品"/>
-          <Sel value="" onChange={e=>selProd(e.target.value)}><option value="">── 登録商品から選択 ──</option>{products.filter(p=>p.category==="卸売").map(p=><option key={p.id} value={p.name}>{p.name}（¥{fmt(p.price)}）</option>)}</Sel>
+        <Modal onClose={()=>setShowNew(false)} title={t("wsNewModal")}>
+          <Lbl t={t("wsClient")}/>
+          <Sel value="" onChange={e=>selClient(e.target.value)}><option value="">{t("wsSelectClient")}</option>{clients.map(c=><option key={c.id} value={c.name}>{c.name}</option>)}</Sel>
+          <div style={{marginTop:6}}><Inp value={form.client} onChange={v=>setForm(f=>({...f,client:v}))} placeholder={t("ecDirectInput")}/></div>
+          <Lbl t={t("wsTel")}/><Inp value={form.tel} onChange={v=>setForm(f=>({...f,tel:v}))} placeholder={t("wsTelPlaceholder")}/>
+          <Lbl t={t("wsProduct")}/>
+          <Sel value="" onChange={e=>selProd(e.target.value)}><option value="">{t("wsSelectProduct")}</option>{products.filter(p=>p.category==="卸売").map(p=><option key={p.id} value={p.name}>{p.name}（¥{fmt(p.price)}）</option>)}</Sel>
           <div style={{marginTop:6}}><Inp value={form.product} onChange={v=>setForm(f=>({...f,product:v}))} placeholder="または直接入力"/></div>
-          <Lbl t="数量"/><Inp type="number" value={form.qty} onChange={v=>setForm(f=>({...f,qty:v}))} placeholder="1"/>
-          <Lbl t="単価（円）"/><Inp type="number" value={form.unitPrice} onChange={v=>setForm(f=>({...f,unitPrice:v}))} placeholder="0"/>
-          <div style={{padding:"8px 12px",background:C.gold+"11",borderRadius:6,marginTop:6,fontWeight:700,color:C.navy}}>合計：¥{fmt(Number(form.qty)*Number(form.unitPrice))}</div>
-          <Lbl t="納品予定日"/><Inp type="date" value={form.shipDate} onChange={v=>setForm(f=>({...f,shipDate:v}))}/>
-          <Lbl t="メモ"/><Inp value={form.memo} onChange={v=>setForm(f=>({...f,memo:v}))} placeholder="備考"/>
-          <PrimaryBtn onClick={addWS} label="＋ 卸注文を追加" color={C.gold}/>
+          <Lbl t={t("wsQty")}/><Inp type="number" value={form.qty} onChange={v=>setForm(f=>({...f,qty:v}))} placeholder="1"/>
+          <Lbl t={t("wsUnitPrice")}/><Inp type="number" value={form.unitPrice} onChange={v=>setForm(f=>({...f,unitPrice:v}))} placeholder="0"/>
+          <div style={{padding:"8px 12px",background:C.gold+"11",borderRadius:6,marginTop:6,fontWeight:700,color:C.navy}}>{t("wsTotal")}¥{fmt(Number(form.qty)*Number(form.unitPrice))}</div>
+          <Lbl t={t("wsShipDate")}/><Inp type="date" value={form.shipDate} onChange={v=>setForm(f=>({...f,shipDate:v}))}/>
+          <Lbl t={t("wsMemo")}/><Inp value={form.memo} onChange={v=>setForm(f=>({...f,memo:v}))} placeholder="備考"/>
+          <PrimaryBtn onClick={addWS} label={t("wsAddBtn")} color={C.gold}/>
         </Modal>
       )}
       {detail&&(
-        <Modal onClose={()=>setDetail(null)} title={editMode?`✏️ 編集 ${detail.id}`:`卸先詳細 ${detail.id}`}>
+        <Modal onClose={()=>setDetail(null)} title={editMode?`${t("ecEditTitle")} ${detail.id}`:`${t("wsDetail")} ${detail.id}`}>
           {!editMode?(
             <>
-              <Row label="得意先" value={detail.client}/><Row label="電話" value={detail.tel||"—"}/><Row label="商品" value={detail.product}/><Row label="数量" value={`${detail.qty}個`}/><Row label="単価" value={`¥${fmt(detail.unitPrice)}`}/><Row label="合計" value={`¥${fmt(detail.amount)}`}/><Row label="受注日" value={detail.created}/><Row label="メモ" value={detail.memo||"—"}/>
-              <Lbl t="納品予定日"/><Inp type="date" value={detail.shipDate||""} onChange={v=>{upd(detail.id,"shipDate",v);setDetail(p=>({...p,shipDate:v}));}}/>
-              <FS label="受注管理" opts={ST_WS_O} value={detail.orderStatus} onChange={v=>upd(detail.id,"orderStatus",v)}/>
-              <FS label="発注管理" opts={ST_WS_P} value={detail.purchaseStatus} onChange={v=>upd(detail.id,"purchaseStatus",v)}/>
-              <FS label="仕入管理" opts={ST_WS_D} value={detail.deliveryStatus} onChange={v=>upd(detail.id,"deliveryStatus",v)}/>
-              <div style={{display:"flex",gap:10,marginTop:10}}><Toggle label="納品書発行" checked={detail.invoiceIssued} onChange={v=>upd(detail.id,"invoiceIssued",v)}/><Toggle label="売上計上" checked={detail.salesRecorded} onChange={v=>upd(detail.id,"salesRecorded",v)}/></div>
-              <div style={{display:"flex",gap:8,marginTop:14}}><SmallBtn onClick={()=>setEditMode(true)} label="✏️ 内容を編集" color={C.gold} bg={C.goldBg}/><SmallBtn onClick={()=>doDelete(detail.id)} label="🗑️ 削除" color={C.red} bg={C.red+"11"}/></div>
-              <PrimaryBtn onClick={async()=>{await onSave("ws_orders",detail);showToast("保存しました");setDetail(null);}} label="💾 保存"/>
+              <Row label={t("wsClientLbl")} value={detail.client}/><Row label={t("wsTelLbl")} value={detail.tel||"—"}/><Row label={t("wsProductLbl")} value={detail.product}/><Row label={t("wsQtyLbl")} value={`${detail.qty}`}/><Row label={t("wsUnitPriceLbl")} value={`¥${fmt(detail.unitPrice)}`}/><Row label={t("wsTotalLbl")} value={`¥${fmt(detail.amount)}`}/><Row label={t("wsCreated")} value={detail.created}/><Row label={t("wsMemoLbl")} value={detail.memo||"—"}/>
+              <Lbl t={t("wsShipDateLbl")}/><Inp type="date" value={detail.shipDate||""} onChange={v=>{upd(detail.id,"shipDate",v);setDetail(p=>({...p,shipDate:v}));}}/>
+              <FS label={t("wsOrderMgmt")} opts={[t("stInStock"),"受注入力済"].filter((v,i,a)=>a.indexOf(v)===0?true:false)} value={detail.orderStatus} onChange={v=>upd(detail.id,"orderStatus",v)}/>
+              <FS label={t("wsPurchaseMgmt")} opts={ST_WS_P} value={detail.purchaseStatus} onChange={v=>upd(detail.id,"purchaseStatus",v)}/>
+              <FS label={t("wsDeliveryMgmt")} opts={ST_WS_D} value={detail.deliveryStatus} onChange={v=>upd(detail.id,"deliveryStatus",v)}/>
+              <div style={{display:"flex",gap:10,marginTop:10}}><Toggle label={t("wsInvoice")} checked={detail.invoiceIssued} onChange={v=>upd(detail.id,"invoiceIssued",v)}/><Toggle label={t("wsSalesRecord")} checked={detail.salesRecorded} onChange={v=>upd(detail.id,"salesRecorded",v)}/></div>
+              <div style={{display:"flex",gap:8,marginTop:14}}><SmallBtn onClick={()=>setEditMode(true)} label={t("edit")} color={C.gold} bg={C.goldBg}/><SmallBtn onClick={()=>doDelete(detail.id)} label={t("del")} color={C.red} bg={C.red+"11"}/></div>
+              <PrimaryBtn onClick={async()=>{await onSave("ws_orders",detail);showToast("保存しました");setDetail(null);}} label={t("save")}/>
             </>
           ):(
             <>
-              <Lbl t="得意先名"/><Inp value={detail.client} onChange={v=>setDetail(p=>({...p,client:v}))}/>
-              <Lbl t="電話番号"/><Inp value={detail.tel||""} onChange={v=>setDetail(p=>({...p,tel:v}))}/>
-              <Lbl t="商品名"/><Inp value={detail.product} onChange={v=>setDetail(p=>({...p,product:v}))}/>
-              <Lbl t="数量"/><Inp type="number" value={detail.qty} onChange={v=>setDetail(p=>({...p,qty:Number(v),amount:Number(v)*p.unitPrice}))}/>
-              <Lbl t="単価（円）"/><Inp type="number" value={detail.unitPrice} onChange={v=>setDetail(p=>({...p,unitPrice:Number(v),amount:p.qty*Number(v)}))}/>
-              <Lbl t="メモ"/><Inp value={detail.memo||""} onChange={v=>setDetail(p=>({...p,memo:v}))} placeholder="備考"/>
+              <Lbl t={t("wsClientLbl")}/><Inp value={detail.client} onChange={v=>setDetail(p=>({...p,client:v}))}/>
+              <Lbl t={t("wsTel")}/><Inp value={detail.tel||""} onChange={v=>setDetail(p=>({...p,tel:v}))}/>
+              <Lbl t={t("wsProductLbl")}/><Inp value={detail.product} onChange={v=>setDetail(p=>({...p,product:v}))}/>
+              <Lbl t={t("wsQty")}/><Inp type="number" value={detail.qty} onChange={v=>setDetail(p=>({...p,qty:Number(v),amount:Number(v)*p.unitPrice}))}/>
+              <Lbl t={t("wsUnitPrice")}/><Inp type="number" value={detail.unitPrice} onChange={v=>setDetail(p=>({...p,unitPrice:Number(v),amount:p.qty*Number(v)}))}/>
+              <Lbl t={t("ecMemo")}/><Inp value={detail.memo||""} onChange={v=>setDetail(p=>({...p,memo:v}))} placeholder="備考"/>
               <div style={{display:"flex",gap:8,marginTop:14}}>
-                <button onClick={()=>setEditMode(false)} style={{flex:1,padding:"12px 0",borderRadius:8,border:`1px solid ${C.border}`,background:"white",fontSize:13,cursor:"pointer",fontWeight:600}}>← 戻る</button>
-                <button onClick={()=>{setWholesale(p=>p.map(w=>w.id===detail.id?{...detail}:w));setEditMode(false);showToast("編集しました");}} style={{flex:1,padding:"12px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer"}}>✓ 変更を保存</button>
+                <button onClick={()=>setEditMode(false)} style={{flex:1,padding:"12px 0",borderRadius:8,border:`1px solid ${C.border}`,background:"white",fontSize:13,cursor:"pointer",fontWeight:600}}>{t("back")}</button>
+                <button onClick={()=>{setWholesale(p=>p.map(w=>w.id===detail.id?{...detail}:w));setEditMode(false);showToast(t("wsEditDone"));}} style={{flex:1,padding:"12px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer"}}>{t("saveDone")}</button>
               </div>
             </>
           )}
@@ -437,8 +721,8 @@ function AlertTab({orders,wholesale,onLine,lineSending,autoNotifyEnabled,setAuto
   const ecA=orders.filter(o=>o.alert);
   const wsA=wholesale.filter(w=>!w.salesRecorded||!w.invoiceIssued||w.purchaseStatus==="未発注");
   const shipA=[
-    ...orders.filter(o=>o.shipDate===today()&&!["発送済み","完了"].includes(o.status)).map(o=>({label:`EC: ${o.customer}`,sub:"発送予定日が本日です",color:C.cyan})),
-    ...wholesale.filter(w=>w.shipDate===today()&&w.deliveryStatus!=="仕入確定").map(w=>({label:`卸: ${w.client}`,sub:"納品予定日が本日です",color:C.gold})),
+    ...orders.filter(o=>o.shipDate===today()&&!["発送済み","完了"].includes(o.status)).map(o=>({label:`EC: ${o.customer}`,sub:t("alertShipSub"),color:C.cyan})),
+    ...wholesale.filter(w=>w.shipDate===today()&&w.deliveryStatus!=="仕入確定").map(w=>({label:`卸: ${w.client}`,sub:t("alertDelivSub"),color:C.gold})),
   ];
   const total=ecA.length+wsA.length+shipA.length;
   const Card=({title,sub,issues,color=C.red})=>(<div style={{background:C.card,border:`1px solid ${color}44`,borderLeft:`4px solid ${color}`,borderRadius:8,padding:"10px 14px",marginBottom:8}}><div style={{fontWeight:700,fontSize:13}}>{title}</div>{sub&&<div style={{fontSize:11,color:C.sub,marginBottom:5}}>{sub}</div>}{issues&&issues.map((i,idx)=><div key={idx} style={{fontSize:12,color}}>{i}</div>)}</div>);
@@ -446,36 +730,36 @@ function AlertTab({orders,wholesale,onLine,lineSending,autoNotifyEnabled,setAuto
     <div>
       <div style={{background:total>0?C.red+"11":C.green+"11",border:`1px solid ${total>0?C.red:C.green}44`,borderRadius:10,padding:"14px 16px",marginBottom:12,display:"flex",alignItems:"center",gap:10}}>
         <span style={{fontSize:24}}>{total>0?"⚠️":"✅"}</span>
-        <div style={{flex:1}}><div style={{fontWeight:700,color:total>0?C.red:C.green,fontSize:15}}>{total>0?`要対応 ${total}件`:"全て対応済みです"}</div><div style={{fontSize:12,color:C.sub}}>複数名で確認してください</div></div>
-        <button onClick={onLine} disabled={lineSending} style={{padding:"9px 14px",borderRadius:8,background:lineSending?C.border:C.lineGreen,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>{lineSending?"送信中...":"📲 LINE通知"}</button>}
+        <div style={{flex:1}}><div style={{fontWeight:700,color:total>0?C.red:C.green,fontSize:15}}>{total>0?`${t("alertNeeded")} ${total}`:"全て対応済みです"}</div><div style={{fontSize:12,color:C.sub}}>{t("alertCheck")}</div></div>
+        <button onClick={onLine} disabled={lineSending} style={{padding:"9px 14px",borderRadius:8,background:lineSending?C.border:C.lineGreen,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>{lineSending?t("alertSending"):t("alertSendLine")}</button>}
       </div>
-      {IS_DEMO&&<div style={{background:C.gold+"22",border:`1px solid ${C.gold}55`,borderRadius:8,padding:"10px 14px",marginBottom:12,fontSize:12}}>🧪 デモモード：LINE通知はコンソールに出力されます（LINE Messaging API未設定）</div>}
-      {shipA.length>0&&(<div style={{marginBottom:14}}><div style={{fontWeight:700,fontSize:13,color:C.orange,marginBottom:8,paddingBottom:6,borderBottom:`2px solid ${C.orange}33`}}>📅 本日の発送・納品予定</div>{shipA.map((s,i)=><Card key={i} title={s.label} sub={s.sub} color={s.color}/>)}</div>)}
-      <div style={{fontWeight:700,fontSize:13,color:C.cyan,marginBottom:8,paddingBottom:6,borderBottom:`2px solid ${C.cyan}33`}}>🛒 EC・ふるさと納税</div>
-      {ecA.length===0?<div style={{fontSize:13,color:C.green,padding:"8px 0 14px"}}>✅ アラートなし</div>:ecA.map(o=>(<Card key={o.id} title={`${o.id} — ${o.customer}`} sub={o.product} issues={[!o.stock&&"⛔ 在庫なし",!o.payment&&"⛔ 決済未確認",o.status==="未対応"&&"⚡ 未対応",!o.assigned&&"👤 担当未割当"].filter(Boolean)}/>))}
-      <div style={{fontWeight:700,fontSize:13,color:C.gold,marginBottom:8,marginTop:6,paddingBottom:6,borderBottom:`2px solid ${C.gold}33`}}>📦 卸先管理</div>
-      {wsA.length===0?<div style={{fontSize:13,color:C.green,padding:"8px 0 14px"}}>✅ アラートなし</div>:wsA.map(w=>(<Card key={w.id} title={`${w.id} — ${w.client}`} sub={w.product} issues={[w.purchaseStatus==="未発注"&&"⚡ 発注未完了",!w.invoiceIssued&&"📄 納品書未発行",!w.salesRecorded&&"💴 売上未計上"].filter(Boolean)}/>))}
+      {IS_DEMO&&<div style={{background:C.gold+"22",border:`1px solid ${C.gold}55`,borderRadius:8,padding:"10px 14px",marginBottom:12,fontSize:12}}>{t("alertDemo")}</div>}
+      {shipA.length>0&&(<div style={{marginBottom:14}}><div style={{fontWeight:700,fontSize:13,color:C.orange,marginBottom:8,paddingBottom:6,borderBottom:`2px solid ${C.orange}33`}}>{t("alertTodayShip")}</div>{shipA.map((s,i)=><Card key={i} title={s.label} sub={s.sub} color={s.color}/>)}</div>)}
+      <div style={{fontWeight:700,fontSize:13,color:C.cyan,marginBottom:8,paddingBottom:6,borderBottom:`2px solid ${C.cyan}33`}}>{t("alertEcSection")}</div>
+      {ecA.length===0?<div style={{fontSize:13,color:C.green,padding:"8px 0 14px"}}>✅ アラートなし</div>:ecA.map(o=>(<Card key={o.id} title={`${o.id} — ${o.customer}`} sub={o.product} issues={[!o.stock&&t("alertNoStock"),!o.payment&&t("alertNoPayment"),o.status==="未対応"&&t("alertUnhandled"),!o.assigned&&t("alertUnassigned")].filter(Boolean)}/>))}
+      <div style={{fontWeight:700,fontSize:13,color:C.gold,marginBottom:8,marginTop:6,paddingBottom:6,borderBottom:`2px solid ${C.gold}33`}}>{t("alertWsSection")}</div>
+      {wsA.length===0?<div style={{fontSize:13,color:C.green,padding:"8px 0 14px"}}>✅ アラートなし</div>:wsA.map(w=>(<Card key={w.id} title={`${w.id} — ${w.client}`} sub={w.product} issues={[w.purchaseStatus==="未発注"&&t("alertNoOrder"),!w.invoiceIssued&&t("alertNoInvoice"),!w.salesRecorded&&t("alertNoSales")].filter(Boolean)}/>))}
       <div style={{background:C.navy+"0A",border:`1px solid ${C.navy}22`,borderRadius:8,padding:14,marginTop:6}}>
-        <div style={{fontWeight:700,fontSize:13,marginBottom:8,color:C.navy}}>📋 確認ルール</div>
+        <div style={{fontWeight:700,fontSize:13,marginBottom:8,color:C.navy}}>{t("alertRuleTitle")}</div>
         {["主担当が対応後、副担当が内容を確認してください","24時間以上未対応の案件は全員にLINE通知で共有","在庫なし・決済NGは即時「📲 LINE通知」で全員に共有"].map((r,i)=>(<div key={i} style={{fontSize:12,color:C.sub,padding:"5px 0",borderBottom:`1px solid ${C.border}`}}>・{r}</div>))}
       </div>
       {/* 自動通知設定 */}
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.lineGreen}`,borderRadius:8,padding:14,marginTop:12}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <div style={{fontWeight:700,fontSize:13,color:C.lineGreen}}>🤖 自動通知（LINE Messaging API）</div>
-          <button onClick={()=>setAutoNotifyEnabled(p=>!p)} style={{padding:"6px 16px",borderRadius:20,background:autoNotifyEnabled?C.lineGreen:C.border,color:"white",fontWeight:700,fontSize:12,border:"none",cursor:"pointer"}}>{autoNotifyEnabled?"ON ✓":"OFF"}</button>
+          <div style={{fontWeight:700,fontSize:13,color:C.lineGreen}}>{t("alertAutoTitle")}</div>
+          <button onClick={()=>setAutoNotifyEnabled(p=>!p)} style={{padding:"6px 16px",borderRadius:20,background:autoNotifyEnabled?C.lineGreen:C.border,color:"white",fontWeight:700,fontSize:12,border:"none",cursor:"pointer"}}>{autoNotifyEnabled?t("alertAutoOn"):t("alertAutoOff")}</button>
         </div>
         {[{icon:"🌅",label:"毎朝8時",desc:"日次レポート（発送予定・要対応・在庫状況）"},
           {icon:"⏰",label:"60分ごと",desc:"未対応アラートの定期チェック・通知"},
           {icon:"🔴",label:"在庫3個以下",desc:"欠品・残りわずかをリアルタイム通知"},
           {icon:"📥",label:"CSV取込完了時",desc:"一括取込完了後に件数を通知"},
         ].map((n,i)=>(<div key={i} style={{display:"flex",gap:10,padding:"7px 0",borderBottom:`1px solid ${C.border}`}}><span style={{fontSize:16}}>{n.icon}</span><div><div style={{fontWeight:700,fontSize:12,color:C.navy}}>{n.label}</div><div style={{fontSize:11,color:C.sub}}>{n.desc}</div></div></div>))}
-        <button onClick={onMorning} style={{width:"100%",padding:"10px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:12,border:"none",cursor:"pointer",marginTop:10}}>📲 今すぐ日次レポートを送信</button>
-        {IS_DEMO&&<div style={{fontSize:11,color:C.sub,textAlign:"center",marginTop:6}}>デモ時はコンソールに出力されます</div>}
+        <button onClick={onMorning} style={{width:"100%",padding:"10px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:12,border:"none",cursor:"pointer",marginTop:10}}>{t("alertSendNow")}</button>
+        {IS_DEMO&&<div style={{fontSize:11,color:C.sub,textAlign:"center",marginTop:6}}>{t("alertDemoConsole")}</div>}
       </div>
       {notifyLog.length>0&&(
         <div style={{marginTop:12}}>
-          <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:8,paddingBottom:6,borderBottom:`2px solid ${C.navy}22`}}>📋 通知履歴</div>
+          <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:8,paddingBottom:6,borderBottom:`2px solid ${C.navy}22`}}>{t("alertLogTitle")}</div>
           <div style={{display:"flex",flexDirection:"column",gap:6}}>
             {notifyLog.map(l=>(<div key={l.id} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"8px 12px",display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,fontSize:12,color:C.navy}}>{l.type}</div><div style={{fontSize:11,color:C.sub}}>{l.msg}</div></div><div style={{fontSize:10,color:C.sub,whiteSpace:"nowrap"}}>{l.time}</div></div>))}
           </div>
@@ -496,45 +780,45 @@ function InventoryTab({products,setProducts,inventory,setInventory,showToast}){
     setProducts(p=>p.map(x=>x.id===prod.id?{...x,stock:newQty}:x));
     setInventory(p=>[{id:genId("I"),product:prod.name,qty:newQty,type:type==="add"?"入庫":"出庫",date:today(),memo:adjMemo},...p]);
     setShowAdj(null);setAdjQty(0);setAdjMemo("");
-    showToast(`在庫を更新しました（${newQty}個）`);
+    showToast(`${t("invUpdated")}（${newQty}）`);
   };
   return(
     <div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,marginBottom:14}}>
-        <SummaryCard label="在庫あり商品" value={products.filter(p=>p.stock>0).length} color={C.green}/>
-        <SummaryCard label="欠品中" value={products.filter(p=>p.stock===0).length} color={C.red}/>
+        <SummaryCard label={t("invInStock")} value={products.filter(p=>p.stock>0).length} color={C.green}/>
+        <SummaryCard label={t("invOutOfStock")} value={products.filter(p=>p.stock===0).length} color={C.red}/>
       </div>
-      <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:8,paddingBottom:6,borderBottom:`2px solid ${C.navy}22`}}>📦 商品在庫一覧</div>
+      <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:8,paddingBottom:6,borderBottom:`2px solid ${C.navy}22`}}>{t("invTitle")}</div>
       <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:18}}>
         {products.map(p=>(
           <div key={p.id} style={{background:C.card,border:`1px solid ${p.stock===0?C.red:C.border}`,borderLeft:`4px solid ${p.stock===0?C.red:p.stock<5?C.orange:C.green}`,borderRadius:8,padding:"12px 14px"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <div style={{flex:1}}>
                 <div style={{fontWeight:700,fontSize:13}}>{p.name}</div>
-                <div style={{fontSize:11,color:C.sub,marginTop:2}}><Badge label={p.category} color={p.category==="EC"?C.cyan:p.category==="卸売"?C.green:C.gold}/>{p.stock===0&&<span style={{color:C.red,fontSize:11,marginLeft:6}}>⛔ 欠品中</span>}{p.stock>0&&p.stock<5&&<span style={{color:C.orange,fontSize:11,marginLeft:6}}>⚠️ 残りわずか</span>}</div>
+                <div style={{fontSize:11,color:C.sub,marginTop:2}}><Badge label={p.category} color={p.category==="EC"?C.cyan:p.category==="卸売"?C.green:C.gold}/>{p.stock===0&&<span style={{color:C.red,fontSize:11,marginLeft:6}}>⛔ {t("invOutBadge")}</span>}{p.stock>0&&p.stock<5&&<span style={{color:C.orange,fontSize:11,marginLeft:6}}>⚠️ {t("invLowBadge")}</span>}</div>
               </div>
               <div style={{textAlign:"right"}}><div style={{fontSize:22,fontWeight:800,color:p.stock===0?C.red:p.stock<5?C.orange:C.green}}>{p.stock}</div><div style={{fontSize:10,color:C.sub}}>個</div></div>
             </div>
             <div style={{display:"flex",gap:8,marginTop:10}}>
-              <button onClick={()=>{setShowAdj({...p,adjType:"add"});setAdjQty(0);setAdjMemo("");}} style={{flex:1,padding:"8px 0",borderRadius:6,background:C.green+"11",color:C.green,border:`1px solid ${C.green}33`,fontWeight:700,fontSize:12,cursor:"pointer"}}>＋ 入庫</button>
-              <button onClick={()=>{setShowAdj({...p,adjType:"sub"});setAdjQty(0);setAdjMemo("");}} style={{flex:1,padding:"8px 0",borderRadius:6,background:C.orange+"11",color:C.orange,border:`1px solid ${C.orange}33`,fontWeight:700,fontSize:12,cursor:"pointer"}}>－ 出庫</button>
+              <button onClick={()=>{setShowAdj({...p,adjType:"add"});setAdjQty(0);setAdjMemo("");}} style={{flex:1,padding:"8px 0",borderRadius:6,background:C.green+"11",color:C.green,border:`1px solid ${C.green}33`,fontWeight:700,fontSize:12,cursor:"pointer"}}>{t("invIn")}</button>
+              <button onClick={()=>{setShowAdj({...p,adjType:"sub"});setAdjQty(0);setAdjMemo("");}} style={{flex:1,padding:"8px 0",borderRadius:6,background:C.orange+"11",color:C.orange,border:`1px solid ${C.orange}33`,fontWeight:700,fontSize:12,cursor:"pointer"}}>{t("invOut")}</button>
             </div>
           </div>
         ))}
       </div>
-      <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:8,paddingBottom:6,borderBottom:`2px solid ${C.navy}22`}}>📋 入出庫履歴</div>
+      <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:8,paddingBottom:6,borderBottom:`2px solid ${C.navy}22`}}>{t("invHistoryTitle")}</div>
       <div style={{display:"flex",flexDirection:"column",gap:6}}>
-        {inventory.length===0&&<div style={{fontSize:13,color:C.sub,padding:"10px 0"}}>履歴がありません</div>}
-        {inventory.map(i=>(<div key={i.id} style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${i.type==="入庫"?C.green:C.orange}`,borderRadius:8,padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,fontSize:12}}>{i.product}</div><div style={{fontSize:11,color:C.sub}}>{i.date}{i.memo&&` | ${i.memo}`}</div></div><div style={{textAlign:"right"}}><Badge label={i.type} color={i.type==="入庫"?C.green:C.orange}/><div style={{fontSize:14,fontWeight:800,color:C.navy,marginTop:2}}>{i.qty}個</div></div></div>))}
+        {inventory.length===0&&<div style={{fontSize:13,color:C.sub,padding:"10px 0"}}>{t("invNoHistory")}</div>}
+        {inventory.map(i=>(<div key={i.id} style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${i.type==="入庫"?C.green:C.orange}`,borderRadius:8,padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,fontSize:12}}>{i.product}</div><div style={{fontSize:11,color:C.sub}}>{i.date}{i.memo&&` | ${i.memo}`}</div></div><div style={{textAlign:"right"}}><Badge label={i.type} color={i.type==="入庫"?C.green:C.orange}/><div style={{fontSize:14,fontWeight:800,color:C.navy,marginTop:2}}>{i.qty}{t("invUnit")}</div></div></div>))}
       </div>
       {showAdj&&(
-        <Modal onClose={()=>setShowAdj(null)} title={`${showAdj.adjType==="add"?"＋ 入庫":"－ 出庫"}：${showAdj.name}`}>
-          <Row label="現在の在庫" value={`${showAdj.stock}個`}/>
-          <Lbl t={showAdj.adjType==="add"?"入庫数量":"出庫数量"}/>
+        <Modal onClose={()=>setShowAdj(null)} title={`${showAdj.adjType==="add"?t("invAdjIn"):t("invAdjOut")}：${showAdj.name}`}>
+          <Row label={t("invCurrentStock")} value={`${showAdj.stock}`}/>
+          <Lbl t={showAdj.adjType==="add"?t("invQtyIn"):t("invQtyOut")}/>
           <Inp type="number" value={adjQty} onChange={v=>setAdjQty(v)} placeholder="0"/>
-          <div style={{padding:"8px 12px",background:C.navy+"0A",borderRadius:6,marginTop:6,fontWeight:700,color:C.navy,fontSize:13}}>更新後の在庫：{showAdj.adjType==="add"?showAdj.stock+Number(adjQty):Math.max(0,showAdj.stock-Number(adjQty))}個</div>
-          <Lbl t="メモ（任意）"/><Inp value={adjMemo} onChange={v=>setAdjMemo(v)} placeholder="備考"/>
-          <PrimaryBtn onClick={()=>doAdj(showAdj,showAdj.adjType)} label={showAdj.adjType==="add"?"＋ 入庫を記録":"－ 出庫を記録"} color={showAdj.adjType==="add"?C.green:C.orange}/>
+          <div style={{padding:"8px 12px",background:C.navy+"0A",borderRadius:6,marginTop:6,fontWeight:700,color:C.navy,fontSize:13}}>{t("invNewStock")}{showAdj.adjType==="add"?showAdj.stock+Number(adjQty):Math.max(0,showAdj.stock-Number(adjQty))}</div>
+          <Lbl t={t("invMemo")}/><Inp value={adjMemo} onChange={v=>setAdjMemo(v)} placeholder="備考"/>
+          <PrimaryBtn onClick={()=>doAdj(showAdj,showAdj.adjType)} label={showAdj.adjType==="add"?t("invRecordIn"):t("invRecordOut")} color={showAdj.adjType==="add"?C.green:C.orange}/>
         </Modal>
       )}
     </div>
@@ -575,24 +859,24 @@ function FinanceTab({orders,wholesale,furusatoOrders=[],reports,onExport}){
   return(
     <div>
       <div style={{background:C.navy,borderRadius:10,padding:"18px 20px",marginBottom:14,color:"white"}}>
-        <div style={{fontSize:11,opacity:0.7,marginBottom:4}}>今月の確定売上</div>
+        <div style={{fontSize:11,opacity:0.7,marginBottom:4}}>{t("finMonthSales")}</div>
         <div style={{fontSize:28,fontWeight:800,color:C.goldL}}>¥{fmt(total)}</div>
-        <div style={{fontSize:11,opacity:0.6,marginTop:4}}>未計上: ¥{fmt(pending)}</div>
+        <div style={{fontSize:11,opacity:0.6,marginTop:4}}>{t("finPending")} ¥{fmt(pending)}</div>
       </div>
       <div style={{display:"flex",gap:8,marginBottom:14}}>
-        <button onClick={()=>onExport("ec")} style={{flex:1,padding:"10px 0",borderRadius:8,background:"white",border:`1px solid ${C.border}`,color:C.navy,fontWeight:700,fontSize:12,cursor:"pointer"}}>📥 EC注文</button>
-        <button onClick={()=>onExport("ws")} style={{flex:1,padding:"10px 0",borderRadius:8,background:"white",border:`1px solid ${C.border}`,color:C.navy,fontWeight:700,fontSize:12,cursor:"pointer"}}>📥 卸先</button>
-        <button onClick={()=>onExport("all")} style={{flex:1,padding:"10px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:12,cursor:"pointer",border:"none"}}>📥 全データ</button>
+        <button onClick={()=>onExport("ec")} style={{flex:1,padding:"10px 0",borderRadius:8,background:"white",border:`1px solid ${C.border}`,color:C.navy,fontWeight:700,fontSize:12,cursor:"pointer"}}>{t("finExportEc")}</button>
+        <button onClick={()=>onExport("ws")} style={{flex:1,padding:"10px 0",borderRadius:8,background:"white",border:`1px solid ${C.border}`,color:C.navy,fontWeight:700,fontSize:12,cursor:"pointer"}}>{t("finExportWs")}</button>
+        <button onClick={()=>onExport("all")} style={{flex:1,padding:"10px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:12,cursor:"pointer",border:"none"}}>{t("finExportAll")}</button>
       </div>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:16,marginBottom:14}}>
-        <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:12}}>📈 月次売上推移</div>
+        <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:12}}>{t("finChartTitle")}</div>
         {activeReports.map(r=>{const tot=r.ec+r.furusato+r.wholesale;return(<div key={r.month} style={{marginBottom:10}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12,fontWeight:600}}>{r.month}</span><span style={{fontSize:12,fontWeight:700,color:C.navy}}>¥{fmt(tot)}</span></div><div style={{display:"flex",borderRadius:4,overflow:"hidden",height:16,background:"#eee"}}><div style={{width:`${r.ec/maxBar*100}%`,background:C.cyan}}/><div style={{width:`${r.furusato/maxBar*100}%`,background:C.gold}}/><div style={{width:`${r.wholesale/maxBar*100}%`,background:C.green}}/></div></div>);})}
-        <div style={{display:"flex",gap:12,marginTop:8,flexWrap:"wrap"}}>{[{l:"EC直販",c:C.cyan},{l:"ふるさと納税",c:C.gold},{l:"卸売",c:C.green}].map(x=>(<div key={x.l} style={{display:"flex",alignItems:"center",gap:5,fontSize:11}}><div style={{width:10,height:10,borderRadius:2,background:x.c}}/><span style={{color:C.sub}}>{x.l}</span></div>))}</div>
+        <div style={{display:"flex",gap:12,marginTop:8,flexWrap:"wrap"}}>{[{l:t("finEc"),c:C.cyan},{l:t("finFurusato"),c:C.gold},{l:t("finWs"),c:C.green}].map(x=>(<div key={x.l} style={{display:"flex",alignItems:"center",gap:5,fontSize:11}}><div style={{width:10,height:10,borderRadius:2,background:x.c}}/><span style={{color:C.sub}}>{x.l}</span></div>))}</div>
       </div>
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:16,marginBottom:14}}>
-        <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:10}}>📊 今月の内訳</div>
-        {[{l:"EC直販",v:bd["EC"]||0,c:C.cyan},{l:"ふるさと納税",v:fnSales,c:C.gold},{l:"卸売（計上済）",v:wsSales,c:C.green},{l:"卸売（未計上）",v:pending,c:C.orange}].map(x=>(<div key={x.l} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:`1px solid ${C.border}`}}><div style={{width:10,height:10,borderRadius:"50%",background:x.c}}/><div style={{flex:1,fontSize:13}}>{x.l}</div><div style={{fontWeight:700,fontSize:14,color:x.c}}>¥{fmt(x.v)}</div></div>))}
-        <div style={{display:"flex",justifyContent:"space-between",padding:"12px 0 0",fontWeight:800,fontSize:15}}><span>合計（確定）</span><span style={{color:C.navy}}>¥{fmt(total)}</span></div>
+        <div style={{fontWeight:700,fontSize:13,color:C.navy,marginBottom:10}}>{t("finBreakTitle")}</div>
+        {[{l:t("finEc"),v:bd["EC"]||0,c:C.cyan},{l:t("finFurusato"),v:fnSales,c:C.gold},{l:t("finWsRecorded"),v:wsSales,c:C.green},{l:t("finWsPending"),v:pending,c:C.orange}].map(x=>(<div key={x.l} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:`1px solid ${C.border}`}}><div style={{width:10,height:10,borderRadius:"50%",background:x.c}}/><div style={{flex:1,fontSize:13}}>{x.l}</div><div style={{fontWeight:700,fontSize:14,color:x.c}}>¥{fmt(x.v)}</div></div>))}
+        <div style={{display:"flex",justifyContent:"space-between",padding:"12px 0 0",fontWeight:800,fontSize:15}}><span>{t("finTotalConfirmed")}</span><span style={{color:C.navy}}>¥{fmt(total)}</span></div>
       </div>
     </div>
   );
@@ -605,23 +889,23 @@ function DiaryTab({diary,setDiary,staff,showToast,onDel,onSave}){
   const [filterTag,setFilterTag]=useState("全て");
   const [form,setForm]=useState({date:today(),author:"",content:"",tag:"池管理"});
   const filtered=filterTag==="全て"?diary:diary.filter(d=>d.tag===filterTag);
-  const add=async()=>{if(!form.content){showToast("内容を入力してください","error");return;}const newEntry={id:genId("D"),date:form.date,author:form.author,content:form.content,tag:form.tag};setDiary(p=>[newEntry,...p]);setShowNew(false);setForm({date:today(),author:"",content:"",tag:"池管理"});showToast("日報を追加しました");if(onSave){try{await onSave("diary",[newEntry]);}catch(e){console.log("日報保存エラー",e);}}try{await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`📝【日報】${form.date}\n記録者：${form.author||"不明"}\nカテゴリ：${form.tag}\n\n${form.content}`})});}catch(e){console.log("LINE通知エラー",e);}};
+  const add=async()=>{if(!form.content){showToast(t("diaryErrInput"),"error");return;}const newEntry={id:genId("D"),date:form.date,author:form.author,content:form.content,tag:form.tag};setDiary(p=>[newEntry,...p]);setShowNew(false);setForm({date:today(),author:"",content:"",tag:"池管理"});showToast(t("diaryAddDone"));if(onSave){try{await onSave("diary",[newEntry]);}catch(e){console.log("日報保存エラー",e);}}try{await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`📝【日報】${form.date}\n記録者：${form.author||"不明"}\nカテゴリ：${form.tag}\n\n${form.content}`})});}catch(e){console.log("LINE通知エラー",e);}};
   const doDelete=id=>{setConfirm({msg:"この日報を削除しますか？",onOk:async()=>{setDiary(p=>p.filter(d=>d.id!==id));await onDel("diary","id",id);setConfirm(null);showToast("削除しました");}});};
   const tc=t=>({池管理:C.cyan,出荷:C.green,仕入:C.gold,清掃:C.orange,会議:C.navy,その他:C.sub}[t]||C.sub);
   return(
     <div>
-      <button onClick={()=>setShowNew(true)} style={{width:"100%",padding:"12px 0",borderRadius:10,background:C.gold,color:"white",fontWeight:800,fontSize:14,border:"none",cursor:"pointer",marginBottom:12,boxShadow:"0 2px 8px #C8963E44"}}>＋ 日報・作業メモを追加</button>
+      <button onClick={()=>setShowNew(true)} style={{width:"100%",padding:"12px 0",borderRadius:10,background:C.gold,color:"white",fontWeight:800,fontSize:14,border:"none",cursor:"pointer",marginBottom:12,boxShadow:"0 2px 8px #C8963E44"}}>{t("diaryNewBtn")}</button>
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>{["全て",...DIARY_TAGS].map(t=>(<button key={t} onClick={()=>setFilterTag(t)} style={{padding:"5px 10px",borderRadius:20,border:`1px solid ${filterTag===t?C.gold:C.border}`,background:filterTag===t?C.gold:"white",color:filterTag===t?"white":C.text,fontSize:11,cursor:"pointer",fontWeight:filterTag===t?700:400}}>{t}</button>))}</div>
       <div style={{display:"flex",flexDirection:"column",gap:10}}>
-        {filtered.length===0&&<div style={{textAlign:"center",padding:"30px 0",color:C.sub,fontSize:13}}>日報がありません</div>}
-        {filtered.map(d=>(<div key={d.id} style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${tc(d.tag)}`,borderRadius:8,padding:"12px 14px"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}><div style={{display:"flex",gap:8,alignItems:"center"}}><span style={{fontWeight:700,fontSize:13}}>{d.date}</span><Badge label={d.tag} color={tc(d.tag)}/></div><div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:12,color:C.sub}}>{d.author||"—"}</span><button onClick={()=>doDelete(d.id)} style={{border:"none",background:C.red+"11",color:C.red,borderRadius:6,padding:"4px 8px",cursor:"pointer",fontSize:11,fontWeight:700}}>削除</button></div></div><div style={{fontSize:13,color:C.text,lineHeight:1.7,whiteSpace:"pre-wrap"}}>{d.content}</div></div>))}
+        {filtered.length===0&&<div style={{textAlign:"center",padding:"30px 0",color:C.sub,fontSize:13}}>{t("diaryNoData")}</div>}
+        {filtered.map(d=>(<div key={d.id} style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${tc(d.tag)}`,borderRadius:8,padding:"12px 14px"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}><div style={{display:"flex",gap:8,alignItems:"center"}}><span style={{fontWeight:700,fontSize:13}}>{d.date}</span><Badge label={d.tag} color={tc(d.tag)}/></div><div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:12,color:C.sub}}>{d.author||"—"}</span><button onClick={()=>doDelete(d.id)} style={{border:"none",background:C.red+"11",color:C.red,borderRadius:6,padding:"4px 8px",cursor:"pointer",fontSize:11,fontWeight:700}}>{t("diaryDelBtn")}</button></div></div><div style={{fontSize:13,color:C.text,lineHeight:1.7,whiteSpace:"pre-wrap"}}>{d.content}</div></div>))}
       </div>
-      {showNew&&(<Modal onClose={()=>setShowNew(false)} title="＋ 日報・作業メモ">
-        <Lbl t="日付"/><Inp type="date" value={form.date} onChange={v=>setForm(f=>({...f,date:v}))}/>
-        <Lbl t="記録者"/><select value={form.author} onChange={e=>setForm(f=>({...f,author:e.target.value}))} style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,fontSize:14,background:"white"}}><option value="">── 選択 ──</option>{staff.map(s=><option key={s}>{s}</option>)}</select>
-        <Lbl t="カテゴリ"/><div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{DIARY_TAGS.map(t=>(<button key={t} onClick={()=>setForm(f=>({...f,tag:t}))} style={{padding:"6px 12px",borderRadius:20,border:`1px solid ${form.tag===t?tc(t):C.border}`,background:form.tag===t?tc(t)+"22":"white",color:form.tag===t?tc(t):C.text,fontSize:12,cursor:"pointer",fontWeight:700}}>{t}</button>))}</div>
-        <Lbl t="作業内容"/><textarea value={form.content} onChange={e=>setForm(f=>({...f,content:e.target.value}))} placeholder="今日の作業内容を入力..." style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,fontSize:14,minHeight:120,resize:"vertical",background:"white"}}/>
-        <PrimaryBtn onClick={add} label="＋ 日報を追加" color={C.gold}/>
+      {showNew&&(<Modal onClose={()=>setShowNew(false)} title={t("diaryNewModal")}>
+        <Lbl t={t("diaryDate")}/><Inp type="date" value={form.date} onChange={v=>setForm(f=>({...f,date:v}))}/>
+        <Lbl t={t("diaryAuthor")}/><select value={form.author} onChange={e=>setForm(f=>({...f,author:e.target.value}))} style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,fontSize:14,background:"white"}}><option value="">{t("diarySelectAuthor")}</option>{staff.map(s=><option key={s}>{s}</option>)}</select>
+        <Lbl t={t("diaryCategory")}/><div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{DIARY_TAGS.map(t=>(<button key={t} onClick={()=>setForm(f=>({...f,tag:t}))} style={{padding:"6px 12px",borderRadius:20,border:`1px solid ${form.tag===t?tc(t):C.border}`,background:form.tag===t?tc(t)+"22":"white",color:form.tag===t?tc(t):C.text,fontSize:12,cursor:"pointer",fontWeight:700}}>{t}</button>))}</div>
+        <Lbl t={t("diaryContent")}/><textarea value={form.content} onChange={e=>setForm(f=>({...f,content:e.target.value}))} placeholder={t("diaryPlaceholder")} style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,fontSize:14,minHeight:120,resize:"vertical",background:"white"}}/>
+        <PrimaryBtn onClick={add} label={t("diaryAddBtn")} color={C.gold}/>
       </Modal>)}
       {confirm&&<Confirm msg={confirm.msg} onOk={confirm.onOk} onCancel={()=>setConfirm(null)}/>}
     </div>
@@ -654,7 +938,7 @@ function ImportTab({orders,setOrders,wholesale,setWholesale,furusatoOrders,setFu
     reader.readAsText(file,'Shift_JIS');
   };
   const handleImport=async()=>{
-    if(!csvText){showToast("CSVファイルを選択してください","error");return;}
+    if(!csvText){showToast(t("importErrSelect"),"error");return;}
     setImporting(true);
     try{
       const rows=parseCSV(csvText);
@@ -690,30 +974,30 @@ function ImportTab({orders,setOrders,wholesale,setWholesale,furusatoOrders,setFu
     const s={ec:"氏名,商品名,数量,金額,発送予定日,備考\n田中 一郎,うなぎ蒲焼き 2尾セット,1,4800,2026-06-20,\n鈴木 花子,うなぎ白焼き 1尾,2,4800,2026-06-21,急ぎ",furusato:"寄付者名,返礼品名,数量,寄付金額,発送予定日,備考\n山田 太郎,特選うなぎ詰め合わせ,1,12000,2026-06-25,\n佐藤 美咲,うなぎ蒲焼き 4尾セット,1,8500,2026-06-26,",wholesale:"得意先名,電話番号,商品名,数量,単価,金額,納品予定日,備考\n博多うなぎ料理店,092-111-2222,活鰻 5kg,5,8000,40000,2026-06-20,"};
     const blob=new Blob(["\uFEFF"+s[type]],{type:"text/csv;charset=utf-8"});
     const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`サンプル_${type}.csv`;a.click();
-    showToast("サンプルCSVをダウンロードしました");
+    showToast(t("importSampleDl"));
   };
-  const SECS=[{id:"csv",l:"📂 CSV取込"},{id:"roadmap",l:"📋 ロードマップ"}];
+  const SECS=[{id:"csv",l:t("importCsv")},{id:"roadmap",l:t("importRoadmap")}];
   return(
     <div>
       <div style={{display:"flex",gap:6,marginBottom:14}}>{SECS.map(s=>(<button key={s.id} onClick={()=>setSec(s.id)} style={{flex:1,padding:"9px 4px",borderRadius:8,border:`1px solid ${sec===s.id?C.navy:C.border}`,background:sec===s.id?C.navy:"white",color:sec===s.id?"white":C.text,fontSize:11,cursor:"pointer",fontWeight:700}}>{s.l}</button>))}</div>
       {sec==="csv"&&(
         <div>
           <div style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.gold}`,borderRadius:8,padding:"14px 16px",marginBottom:14}}>
-            <div style={{fontWeight:800,fontSize:14,color:C.gold,marginBottom:12}}>📂 CSVファイルから一括取込</div>
-            <Lbl t="取込種別"/>
-            <Sel value={csvType} onChange={v=>setCsvType(v)}><option value="ec">🛒 EC注文（Shopify等）</option><option value="furusato">🏠 ふるさと納税</option><option value="wholesale">📦 卸売注文</option></Sel>
+            <div style={{fontWeight:800,fontSize:14,color:C.gold,marginBottom:12}}>{t("importCsvTitle")}</div>
+            <Lbl t={t("importType")}/>
+            <Sel value={csvType} onChange={v=>setCsvType(v)}><option value="ec">{t("importEcOpt")}</option><option value="furusato">{t("importFnOpt")}</option><option value="wholesale">{t("importWsOpt")}</option></Sel>
             <div style={{marginTop:10,marginBottom:6}}>
-              <div style={{fontSize:11,color:C.sub,marginBottom:6}}>サンプルCSVをダウンロードして形式を確認できます</div>
+              <div style={{fontSize:11,color:C.sub,marginBottom:6}}>{t("importSampleNote")}</div>
               <div style={{display:"flex",gap:6}}>
-                <button onClick={()=>downloadSample("ec")} style={{flex:1,padding:"7px 0",borderRadius:6,background:"white",border:`1px solid ${C.border}`,color:C.cyan,fontSize:11,fontWeight:700,cursor:"pointer"}}>花立山EC</button>
-                <button onClick={()=>downloadSample("furusato")} style={{flex:1,padding:"7px 0",borderRadius:6,background:"white",border:`1px solid ${C.border}`,color:C.gold,fontSize:11,fontWeight:700,cursor:"pointer"}}>ふるさと納税</button>
-                <button onClick={()=>downloadSample("wholesale")} style={{flex:1,padding:"7px 0",borderRadius:6,background:"white",border:`1px solid ${C.border}`,color:C.green,fontSize:11,fontWeight:700,cursor:"pointer"}}>卸売</button>
+                <button onClick={()=>downloadSample("ec")} style={{flex:1,padding:"7px 0",borderRadius:6,background:"white",border:`1px solid ${C.border}`,color:C.cyan,fontSize:11,fontWeight:700,cursor:"pointer"}}>{t("importSampleEc")}</button>
+                <button onClick={()=>downloadSample("furusato")} style={{flex:1,padding:"7px 0",borderRadius:6,background:"white",border:`1px solid ${C.border}`,color:C.gold,fontSize:11,fontWeight:700,cursor:"pointer"}}>{t("importSampleFn")}</button>
+                <button onClick={()=>downloadSample("wholesale")} style={{flex:1,padding:"7px 0",borderRadius:6,background:"white",border:`1px solid ${C.border}`,color:C.green,fontSize:11,fontWeight:700,cursor:"pointer"}}>{t("importSampleWs")}</button>
               </div>
             </div>
-            <Lbl t="CSVファイルを選択"/>
+            <Lbl t={t("importSelectFile")}/>
             <input ref={fileRef} type="file" accept=".csv,.txt" onChange={handleFile} style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,fontSize:13,background:"white"}}/>
-            {preview.length>0&&(<div style={{marginTop:12}}><div style={{fontSize:11,color:C.sub,marginBottom:6}}>プレビュー（最初の5件）</div><div style={{overflowX:"auto",background:"#f8f8f8",borderRadius:6,padding:8}}>{preview.map((row,i)=>(<div key={i} style={{fontSize:11,padding:"4px 0",borderBottom:`1px solid ${C.border}`,display:"flex",gap:8,flexWrap:"wrap"}}>{Object.entries(row).slice(0,4).map(([k,v])=>(<span key={k} style={{color:C.sub}}><strong>{k}:</strong> {v}</span>))}</div>))}</div><div style={{fontSize:11,color:C.sub,marginTop:4}}>合計 {csvType==="furusato" ? parseCSV(csvText).filter(r=>r["寄附受付No"]&&/^\d+$/.test(String(r["寄附受付No"]).trim())).length : parseCSV(csvText).length}件を取り込みます</div></div>)}
-            <button onClick={handleImport} disabled={!csvText||importing} style={{width:"100%",padding:"13px 0",borderRadius:8,background:!csvText||importing?C.border:C.navy,color:"white",fontWeight:700,fontSize:14,border:"none",cursor:"pointer",marginTop:12}}>{importing?"取込中...":"📥 一括取込を実行"}</button>
+            {preview.length>0&&(<div style={{marginTop:12}}><div style={{fontSize:11,color:C.sub,marginBottom:6}}>{t("importPreview")}</div><div style={{overflowX:"auto",background:"#f8f8f8",borderRadius:6,padding:8}}>{preview.map((row,i)=>(<div key={i} style={{fontSize:11,padding:"4px 0",borderBottom:`1px solid ${C.border}`,display:"flex",gap:8,flexWrap:"wrap"}}>{Object.entries(row).slice(0,4).map(([k,v])=>(<span key={k} style={{color:C.sub}}><strong>{k}:</strong> {v}</span>))}</div>))}</div><div style={{fontSize:11,color:C.sub,marginTop:4}}>合計 {csvType==="furusato" ? parseCSV(csvText).filter(r=>r["寄附受付No"]&&/^\d+$/.test(String(r["寄附受付No"]).trim())).length : parseCSV(csvText).length}}{t("importPreviewCount")}</div></div>)}
+            <button onClick={handleImport} disabled={!csvText||importing} style={{width:"100%",padding:"13px 0",borderRadius:8,background:!csvText||importing?C.border:C.navy,color:"white",fontWeight:700,fontSize:14,border:"none",cursor:"pointer",marginTop:12}}>{importing?t("importingBtn"):t("importBtn")}</button>
           </div>
           <div style={{background:C.gold+"11",border:`1px solid ${C.gold}44`,borderRadius:8,padding:14,fontSize:12,lineHeight:1.7}}><strong>💡 対応しているCSV形式</strong><br/>・さとふる、楽天ふるさと納税のダウンロードCSV<br/>・Shopify注文エクスポートCSV<br/>・自社Excelからの変換CSV</div>
         </div>
@@ -848,15 +1132,15 @@ function CalendarTab({orders,wholesale,furusatoOrders}){
       {/* 月次サマリー */}
       <div style={{display:"flex",gap:6,marginBottom:12}}>
         <div style={{background:C.card,border:`1px solid ${C.cyan}44`,borderRadius:8,padding:"8px 10px",flex:1,textAlign:"center"}}>
-          <div style={{fontSize:10,color:C.sub}}>🛒 EC</div>
+          <div style={{fontSize:10,color:C.sub}}>{t("calEcLbl")}</div>
           <div style={{fontSize:20,fontWeight:800,color:C.cyan}}>{monthEC}</div>
         </div>
         <div style={{background:C.card,border:`1px solid ${C.gold}44`,borderRadius:8,padding:"8px 10px",flex:1,textAlign:"center"}}>
-          <div style={{fontSize:10,color:C.sub}}>📦 卸先</div>
+          <div style={{fontSize:10,color:C.sub}}>{t("calWsLbl")}</div>
           <div style={{fontSize:20,fontWeight:800,color:C.gold}}>{monthWS}</div>
         </div>
         <div style={{background:C.card,border:`1px solid #9C6FD644`,borderRadius:8,padding:"8px 10px",flex:1,textAlign:"center"}}>
-          <div style={{fontSize:10,color:C.sub}}>🏠 ふるさと</div>
+          <div style={{fontSize:10,color:C.sub}}>{t("calFnLbl")}</div>
           <div style={{fontSize:20,fontWeight:800,color:"#9C6FD6"}}>{monthFN}</div>
         </div>
       </div>
@@ -871,7 +1155,7 @@ function CalendarTab({orders,wholesale,furusatoOrders}){
 
         {/* 曜日ヘッダー */}
         <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",background:C.navy+"22"}}>
-          {["日","月","火","水","木","金","土"].map((d,i)=>(
+          {(t("calDays")||["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]).map((d,i)=>(
             <div key={d} style={{textAlign:"center",padding:"6px 0",fontSize:11,fontWeight:700,color:i===0?C.red:i===6?"#4488FF":C.sub}}>{d}</div>
           ))}
         </div>
@@ -901,7 +1185,7 @@ function CalendarTab({orders,wholesale,furusatoOrders}){
 
       {/* 凡例 */}
       <div style={{display:"flex",gap:12,marginTop:10,flexWrap:"wrap"}}>
-        {[{color:C.cyan,label:"🛒 EC注文"},{color:C.gold,label:"📦 卸先"},{color:"#9C6FD6",label:"🏠 ふるさと納税"}].map((l,i)=>(
+        {[{color:C.cyan,label:t("calLegendEc")},{color:C.gold,label:t("calLegendWs")},{color:"#9C6FD6",label:t("calLegendFn")}].map((l,i)=>(
           <div key={i} style={{display:"flex",alignItems:"center",gap:4,fontSize:11,color:C.sub}}>
             <div style={{width:10,height:10,borderRadius:2,background:l.color}}/>
             {l.label}
@@ -916,7 +1200,7 @@ function CalendarTab({orders,wholesale,furusatoOrders}){
             📅 {new Date(selectedDay+"T00:00:00").toLocaleDateString("ja-JP",{month:"long",day:"numeric",weekday:"short"})}の予定
           </div>
           {selectedEvents.length===0?(
-            <div style={{fontSize:13,color:C.sub,textAlign:"center",padding:"12px 0"}}>予定なし</div>
+            <div style={{fontSize:13,color:C.sub,textAlign:"center",padding:"12px 0"}}>{t("calNoSchedule")}</div>
           ):(
             selectedEvents.map((e,i)=>(
               <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:`1px solid ${C.border}`}}>
@@ -948,15 +1232,15 @@ function FurusatoTab({furusatoOrders,setFurusatoOrders,showToast,onDel}){
     <div>
       <div style={{display:"flex",gap:8,marginBottom:12}}>
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 16px",flex:1,textAlign:"center"}}>
-          <div style={{fontSize:11,color:C.sub}}>総件数</div>
+          <div style={{fontSize:11,color:C.sub}}>{t("fnTotal")}</div>
           <div style={{fontSize:22,fontWeight:800,color:C.gold}}>{total}</div>
         </div>
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 16px",flex:1,textAlign:"center"}}>
-          <div style={{fontSize:11,color:C.sub}}>発送済/完了</div>
+          <div style={{fontSize:11,color:C.sub}}>{t("fnDone")}</div>
           <div style={{fontSize:22,fontWeight:800,color:C.green}}>{done}</div>
         </div>
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 16px",flex:1,textAlign:"center"}}>
-          <div style={{fontSize:11,color:C.sub}}>未対応</div>
+          <div style={{fontSize:11,color:C.sub}}>{t("fnUnhandled")}</div>
           <div style={{fontSize:22,fontWeight:800,color:C.red}}>{unhandled}</div>
         </div>
       </div>
@@ -965,17 +1249,17 @@ function FurusatoTab({furusatoOrders,setFurusatoOrders,showToast,onDel}){
       </div>
       {filtered.length===0?(
         <div style={{textAlign:"center",color:C.sub,padding:40,fontSize:14}}>
-          データがありません<br/>
-          <span style={{fontSize:12}}>「自動取込」タブからCSVを読み込んでください</span>
+          {t("fnNoData")}<br/>
+          <span style={{fontSize:12}}>{t("fnNoCsvHint")}</span>
         </div>
       ):(
         filtered.map(o=>(
           <div key={o.id} onClick={()=>setDetail(o)} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:"12px 14px",marginBottom:8,cursor:"pointer"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:4}}>
-              <div style={{fontWeight:700,fontSize:14,color:C.text}}>{(o.lastName||o.last_name)?`${o.lastName||o.last_name} ${o.firstName||o.first_name||""}`.trim():o.donorName||"（氏名なし）"}</div>
+              <div style={{fontWeight:700,fontSize:14,color:C.text}}>{(o.lastName||o.last_name)?`${o.lastName||o.last_name} ${o.firstName||o.first_name||""}`.trim():o.donorName||t("fnNoName")}</div>
               <Badge label={o.delivery_status||o.status||"未対応"} color={sc(o.delivery_status||o.status||"未対応")}/>
             </div>
-            <div style={{fontSize:12,color:C.sub,marginBottom:4}}>{o.product_name||o.productName||"商品未設定"}</div>
+            <div style={{fontSize:12,color:C.sub,marginBottom:4}}>{o.product_name||o.productName||t("fnNoProduct")}</div>
             <div style={{display:"flex",gap:12,fontSize:11,color:C.sub,flexWrap:"wrap"}}>
               {(o.shipment_request_date||o.donationDate)&&<span>📅 {o.shipment_request_date||o.donationDate}</span>}
               {(o.delivery_no||o.deliveryNo)&&<span>📦 {o.delivery_no||o.deliveryNo}</span>}
@@ -987,39 +1271,39 @@ function FurusatoTab({furusatoOrders,setFurusatoOrders,showToast,onDel}){
         ))
       )}
       {detail&&(
-        <Modal onClose={()=>setDetail(null)} title="ふるさと納税 詳細">
-          <Row label="寄附者名" value={(detail.lastName||detail.last_name)?`${detail.lastName||detail.last_name} ${detail.firstName||detail.first_name||""}`:detail.donorName||"-"}/>
-          <Row label="返礼品" value={detail.product_name||detail.productName||"-"}/>
-          <Row label="商品コード" value={detail.product_code||"-"}/>
-          <Row label="出荷依頼日" value={detail.shipment_request_date||detail.donationDate||"-"}/>
-          <Row label="発送予定日" value={detail.scheduled_shipment_date||detail.scheduledShipDate||"-"}/>
-          <Row label="配送No." value={detail.delivery_no||detail.deliveryNo||"-"}/>
-          <Row label="寄附受付No." value={detail.donation_receipt_no||detail.donationReceiptNo||"-"}/>
-          <Row label="配送ステータス" value={detail.delivery_status||detail.status||"未対応"}/>
-          <Row label="伝票番号" value={detail.tracking_number||"-"}/>
-          <Row label="配送業者" value={detail.carrier||"-"}/>
-          <Row label="都道府県" value={detail.prefecture||"-"}/>
-          <Row label="住所" value={detail.address1?`${detail.address1} ${detail.address2||""}`:"-"}/>
-          <Row label="電話番号" value={detail.phone||"-"}/>
-          <Row label="寄附金額" value={detail.donation_amount?`¥${Number(detail.donation_amount).toLocaleString()}`:"-"}/>
-          <Row label="謝礼品価格" value={detail.product_price?`¥${Number(detail.product_price).toLocaleString()}`:"-"}/>
-          <Row label="寄附年度" value={detail.donation_year||"-"}/>
-          <Row label="備考" value={detail.memo||"-"}/>
+        <Modal onClose={()=>setDetail(null)} title={t("fnDetail")}>
+          <Row label={t("fnDonor")} value={(detail.lastName||detail.last_name)?`${detail.lastName||detail.last_name} ${detail.firstName||detail.first_name||""}`:detail.donorName||"-"}/>
+          <Row label={t("fnProduct")} value={detail.product_name||detail.productName||"-"}/>
+          <Row label={t("fnProductCode")} value={detail.product_code||"-"}/>
+          <Row label={t("fnShipRequest")} value={detail.shipment_request_date||detail.donationDate||"-"}/>
+          <Row label={t("fnShipSched")} value={detail.scheduled_shipment_date||detail.scheduledShipDate||"-"}/>
+          <Row label={t("fnDelivNo")} value={detail.delivery_no||detail.deliveryNo||"-"}/>
+          <Row label={t("fnDonationNo")} value={detail.donation_receipt_no||detail.donationReceiptNo||"-"}/>
+          <Row label={t("fnDelivStatus")} value={detail.delivery_status||detail.status||"未対応"}/>
+          <Row label={t("fnTracking")} value={detail.tracking_number||"-"}/>
+          <Row label={t("fnCarrier")} value={detail.carrier||"-"}/>
+          <Row label={t("fnPrefecture")} value={detail.prefecture||"-"}/>
+          <Row label={t("fnAddress")} value={detail.address1?`${detail.address1} ${detail.address2||""}`:"-"}/>
+          <Row label={t("fnPhone")} value={detail.phone||"-"}/>
+          <Row label={t("fnDonationAmt")} value={detail.donation_amount?`¥${Number(detail.donation_amount).toLocaleString()}`:"-"}/>
+          <Row label={t("fnProductPrice")} value={detail.product_price?`¥${Number(detail.product_price).toLocaleString()}`:"-"}/>
+          <Row label={t("fnDonationYear")} value={detail.donation_year||"-"}/>
+          <Row label={t("fnMemo")} value={detail.memo||"-"}/>
           <div style={{marginTop:16}}>
-            <Lbl t="ステータス変更"/>
+            <Lbl t={t("fnStatusChange")}/>
             <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
               {["未対応","梱包中","発送済み","完了"].map(s=>(
                 <button key={s} onClick={async()=>{
                   const updated={...detail,status:s};
                   setFurusatoOrders(p=>p.map(o=>o.id===detail.id?updated:o));
                   setDetail(updated);
-                  try{await db.upsert("furusato_orders",[updated]);showToast("ステータスを更新しました");}catch(e){showToast("更新エラー","error");}
+                  try{await db.upsert("furusato_orders",[updated]);showToast(t("fnUpdated"));}catch(e){showToast(t("fnUpdateErr"),"error");}
                 }} style={{padding:"8px 14px",borderRadius:6,border:"none",background:detail.status===s?C.gold:C.bg,color:detail.status===s?"white":C.text,fontSize:13,cursor:"pointer",fontWeight:detail.status===s?700:400}}>{s}</button>
               ))}
             </div>
           </div>
           <div style={{marginTop:12}}>
-            <button onClick={async()=>{if(window.confirm("削除しますか？")){await onDel("furusato_orders","id",detail.id);setFurusatoOrders(p=>p.filter(o=>o.id!==detail.id));setDetail(null);showToast("削除しました");}}} style={{width:"100%",padding:"10px 0",borderRadius:8,border:"none",background:C.red+"22",color:C.red,fontSize:13,cursor:"pointer",fontWeight:700}}>🗑 削除</button>
+            <button onClick={async()=>{if(window.confirm(t("fnDelMsg"))){await onDel("furusato_orders","id",detail.id);setFurusatoOrders(p=>p.filter(o=>o.id!==detail.id));setDetail(null);showToast("削除しました");}}} style={{width:"100%",padding:"10px 0",borderRadius:8,border:"none",background:C.red+"22",color:C.red,fontSize:13,cursor:"pointer",fontWeight:700}}>{t("fnDelBtn")}</button>
           </div>
         </Modal>
       )}
@@ -1036,61 +1320,61 @@ function SetupTab({staff,setStaff,products,setProducts,clients,setClients,showTo
   const [epId,setEpId]=useState(null);
   const [ecId,setEcId]=useState(null);
   const [confirm,setConfirm]=useState(null);
-  const addStaff=async()=>{const n=ns.trim();if(!n)return;if(staff.includes(n)){showToast("すでに登録されています","error");return;}setStaff(p=>[...p,n]);setNs("");showToast("担当者を追加しました");try{await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`👤【担当者登録】\n「${n}」さんが担当者に追加されました`})});}catch(e){console.log("LINE通知エラー",e);}};
-  const addProd=()=>{if(!np.name){showToast("商品名を入力してください","error");return;}setProducts(p=>[...p,{id:genId("P"),name:np.name,price:Number(np.price)||0,category:np.category,stock:Number(np.stock)||0}]);setNp({name:"",price:"",category:"EC",stock:0});showToast("商品を追加しました");};
-  const addClient=()=>{if(!nc.name){showToast("会社名を入力してください","error");return;}setClients(p=>[...p,{id:genId("C"),name:nc.name,tel:nc.tel,address:nc.address,memo:nc.memo}]);setNc({name:"",tel:"",address:"",memo:""});showToast("得意先を追加しました");};
-  const SECS=[{id:"staff",l:"👤 担当者"},{id:"products",l:"🐟 商品"},{id:"clients",l:"🏢 得意先"},{id:"backup",l:"💾 バックアップ"},{id:"system",l:"🔧 本番設定"}];
+  const addStaff=async()=>{const n=ns.trim();if(!n)return;if(staff.includes(n)){showToast(t("setupStaffExist"),"error");return;}setStaff(p=>[...p,n]);setNs("");showToast(t("setupStaffAddDone"));try{await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`👤【担当者登録】\n「${n}」さんが担当者に追加されました`})});}catch(e){console.log("LINE通知エラー",e);}};
+  const addProd=()=>{if(!np.name){showToast(t("setupProdErrInput"),"error");return;}setProducts(p=>[...p,{id:genId("P"),name:np.name,price:Number(np.price)||0,category:np.category,stock:Number(np.stock)||0}]);setNp({name:"",price:"",category:"EC",stock:0});showToast(t("setupProdAddDone"));};
+  const addClient=()=>{if(!nc.name){showToast(t("setupClientErrInput"),"error");return;}setClients(p=>[...p,{id:genId("C"),name:nc.name,tel:nc.tel,address:nc.address,memo:nc.memo}]);setNc({name:"",tel:"",address:"",memo:""});showToast(t("setupClientAddDone"));};
+  const SECS=[{id:"staff",l:t("setupStaff")},{id:"products",l:t("setupProducts")},{id:"clients",l:t("setupClients")},{id:"backup",l:t("setupBackup")},{id:"system",l:t("setupSystem")}];
   return(
     <div>
       <div style={{display:"flex",gap:5,marginBottom:14,flexWrap:"wrap"}}>{SECS.map(s=>(<button key={s.id} onClick={()=>setSec(s.id)} style={{flex:1,minWidth:"28%",padding:"8px 4px",borderRadius:8,border:`1px solid ${sec===s.id?C.navy:C.border}`,background:sec===s.id?C.navy:"white",color:sec===s.id?"white":C.text,fontSize:11,cursor:"pointer",fontWeight:700}}>{s.l}</button>))}</div>
       {sec==="staff"&&(
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.gold}`,borderRadius:8,padding:"14px 16px"}}>
-          <div style={{fontWeight:800,fontSize:14,color:C.gold,marginBottom:12}}>登録済み担当者</div>
-          {staff.length===0&&<div style={{fontSize:13,color:C.sub,marginBottom:10}}>まだ登録されていません</div>}
+          <div style={{fontWeight:800,fontSize:14,color:C.gold,marginBottom:12}}>{t("setupStaffTitle")}</div>
+          {staff.length===0&&<div style={{fontSize:13,color:C.sub,marginBottom:10}}>{t("setupStaffNone")}</div>}
           <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:12}}>{staff.map(s=>(<div key={s} style={{display:"flex",alignItems:"center",gap:5,background:C.navy+"11",border:`1px solid ${C.navy}33`,borderRadius:20,padding:"6px 12px"}}><span style={{fontSize:13,fontWeight:700,color:C.navy}}>{s}</span><button onClick={()=>setConfirm({msg:`「${s}」を削除しますか？`,onOk:()=>{setStaff(p=>p.filter(x=>x!==s));setConfirm(null);showToast("削除しました");}})} style={{border:"none",background:"none",color:C.red,fontSize:16,cursor:"pointer",lineHeight:1,padding:"0 2px"}}>×</button></div>))}</div>
-          <div style={{display:"flex",gap:8}}><input value={ns} onChange={e=>setNs(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addStaff()} placeholder="名前を入力..." style={{flex:1,padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,fontSize:14}}/><button onClick={addStaff} style={{padding:"10px 18px",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer"}}>＋追加</button></div>
+          <div style={{display:"flex",gap:8}}><input value={ns} onChange={e=>setNs(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addStaff()} placeholder={t("setupStaffPlaceholder")} style={{flex:1,padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,fontSize:14}}/><button onClick={addStaff} style={{padding:"10px 18px",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer"}}>{t("add")}</button></div>
         </div>
       )}
       {sec==="products"&&(
         <div>
           <div style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.cyan}`,borderRadius:8,padding:"14px 16px",marginBottom:12}}>
-            <div style={{fontWeight:800,fontSize:14,color:C.cyan,marginBottom:10}}>商品を追加</div>
-            <Lbl t="商品名"/><Inp value={np.name} onChange={v=>setNp(f=>({...f,name:v}))} placeholder="例：うなぎ蒲焼き 2尾セット"/>
-            <Lbl t="価格（円）"/><Inp type="number" value={np.price} onChange={v=>setNp(f=>({...f,price:v}))} placeholder="0"/>
-            <Lbl t="初期在庫数"/><Inp type="number" value={np.stock} onChange={v=>setNp(f=>({...f,stock:v}))} placeholder="0"/>
-            <Lbl t="カテゴリ"/><select value={np.category} onChange={e=>setNp(f=>({...f,category:e.target.value}))} style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,fontSize:14,background:"white"}}><option>EC</option><option>ふるさと納税</option><option>卸売</option></select>
-            <button onClick={addProd} style={{width:"100%",padding:"11px 0",borderRadius:8,background:C.cyan,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer",marginTop:12}}>＋ 商品を追加</button>
+            <div style={{fontWeight:800,fontSize:14,color:C.cyan,marginBottom:10}}>{t("setupProdTitle")}</div>
+            <Lbl t={t("setupProdName")}/><Inp value={np.name} onChange={v=>setNp(f=>({...f,name:v}))} placeholder="例：うなぎ蒲焼き 2尾セット"/>
+            <Lbl t={t("setupProdPrice")}/><Inp type="number" value={np.price} onChange={v=>setNp(f=>({...f,price:v}))} placeholder="0"/>
+            <Lbl t={t("setupProdStock")}/><Inp type="number" value={np.stock} onChange={v=>setNp(f=>({...f,stock:v}))} placeholder="0"/>
+            <Lbl t={t("setupProdCategory")}/><select value={np.category} onChange={e=>setNp(f=>({...f,category:e.target.value}))} style={{width:"100%",padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,fontSize:14,background:"white"}}><option>EC</option><option>ふるさと納税</option><option>卸売</option></select>
+            <button onClick={addProd} style={{width:"100%",padding:"11px 0",borderRadius:8,background:C.cyan,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer",marginTop:12}}>{t("setupProdAddBtn")}</button>
           </div>
-          <div style={{display:"flex",flexDirection:"column",gap:8}}>{products.map(p=>(<div key={p.id} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 14px"}}>{epId===p.id?(<div><Lbl t="商品名"/><Inp value={p.name} onChange={v=>setProducts(prev=>prev.map(x=>x.id===p.id?{...x,name:v}:x))}/><Lbl t="価格（円）"/><Inp type="number" value={p.price} onChange={v=>setProducts(prev=>prev.map(x=>x.id===p.id?{...x,price:Number(v)}:x))}/><Lbl t="在庫数"/><Inp type="number" value={p.stock||0} onChange={v=>setProducts(prev=>prev.map(x=>x.id===p.id?{...x,stock:Number(v)}:x))}/><button onClick={()=>setEpId(null)} style={{width:"100%",padding:"9px 0",borderRadius:6,border:`1px solid ${C.border}`,background:"white",fontSize:12,cursor:"pointer",marginTop:10}}>✓ 完了</button></div>):(<div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,fontSize:13}}>{p.name}</div><div style={{fontSize:12,color:C.sub}}>¥{fmt(p.price)} | 在庫:{p.stock||0} | <Badge label={p.category} color={p.category==="EC"?C.cyan:p.category==="卸売"?C.green:C.gold}/></div></div><div style={{display:"flex",gap:6}}><SmallBtn onClick={()=>setEpId(p.id)} label="編集" color={C.gold} bg={C.goldBg}/><SmallBtn onClick={()=>setConfirm({msg:`「${p.name}」を削除しますか？`,onOk:()=>{setProducts(prev=>prev.filter(x=>x.id!==p.id));setConfirm(null);showToast("削除しました");}})} label="削除" color={C.red} bg={C.red+"11"}/></div></div>)}</div>))}</div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>{products.map(p=>(<div key={p.id} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 14px"}}>{epId===p.id?(<div><Lbl t={t("setupProdName")}/><Inp value={p.name} onChange={v=>setProducts(prev=>prev.map(x=>x.id===p.id?{...x,name:v}:x))}/><Lbl t="価格（円）"/><Inp type="number" value={p.price} onChange={v=>setProducts(prev=>prev.map(x=>x.id===p.id?{...x,price:Number(v)}:x))}/><Lbl t={t("setupProdStock")}/><Inp type="number" value={p.stock||0} onChange={v=>setProducts(prev=>prev.map(x=>x.id===p.id?{...x,stock:Number(v)}:x))}/><button onClick={()=>setEpId(null)} style={{width:"100%",padding:"9px 0",borderRadius:6,border:`1px solid ${C.border}`,background:"white",fontSize:12,cursor:"pointer",marginTop:10}}>{t("setupProdDone")}</button></div>):(<div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,fontSize:13}}>{p.name}</div><div style={{fontSize:12,color:C.sub}}>¥{fmt(p.price)} | {t("setupProdStockLbl")}{p.stock||0} | <Badge label={p.category} color={p.category==="EC"?C.cyan:p.category==="卸売"?C.green:C.gold}/></div></div><div style={{display:"flex",gap:6}}><SmallBtn onClick={()=>setEpId(p.id)} label={t("setupProdEdit")} color={C.gold} bg={C.goldBg}/><SmallBtn onClick={()=>setConfirm({msg:`${p.name}?`,onOk:()=>{setProducts(prev=>prev.filter(x=>x.id!==p.id));setConfirm(null);showToast("削除しました");}})} label="削除" color={C.red} bg={C.red+"11"}/></div></div>)}</div>))}</div>
         </div>
       )}
       {sec==="clients"&&(
         <div>
           <div style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.green}`,borderRadius:8,padding:"14px 16px",marginBottom:12}}>
-            <div style={{fontWeight:800,fontSize:14,color:C.green,marginBottom:10}}>得意先を追加</div>
-            <Lbl t="会社名 *"/><Inp value={nc.name} onChange={v=>setNc(f=>({...f,name:v}))} placeholder="例：博多うなぎ料理店"/>
-            <Lbl t="電話番号"/><Inp value={nc.tel} onChange={v=>setNc(f=>({...f,tel:v}))} placeholder="例：092-123-4567"/>
-            <Lbl t="住所"/><Inp value={nc.address} onChange={v=>setNc(f=>({...f,address:v}))} placeholder="例：福岡市博多区"/>
-            <Lbl t="メモ"/><Inp value={nc.memo} onChange={v=>setNc(f=>({...f,memo:v}))} placeholder="備考"/>
-            <button onClick={addClient} style={{width:"100%",padding:"11px 0",borderRadius:8,background:C.green,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer",marginTop:12}}>＋ 得意先を追加</button>
+            <div style={{fontWeight:800,fontSize:14,color:C.green,marginBottom:10}}>{t("setupClientTitle")}</div>
+            <Lbl t={t("setupClientName")}/><Inp value={nc.name} onChange={v=>setNc(f=>({...f,name:v}))} placeholder="例：博多うなぎ料理店"/>
+            <Lbl t={t("setupClientTel")}/><Inp value={nc.tel} onChange={v=>setNc(f=>({...f,tel:v}))} placeholder={t("wsTelPlaceholder")}/>
+            <Lbl t={t("setupClientAddr")}/><Inp value={nc.address} onChange={v=>setNc(f=>({...f,address:v}))} placeholder="例：福岡市博多区"/>
+            <Lbl t={t("setupClientMemo")}/><Inp value={nc.memo} onChange={v=>setNc(f=>({...f,memo:v}))} placeholder="備考"/>
+            <button onClick={addClient} style={{width:"100%",padding:"11px 0",borderRadius:8,background:C.green,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer",marginTop:12}}>{t("setupClientAddBtn")}</button>
           </div>
-          <div style={{display:"flex",flexDirection:"column",gap:8}}>{clients.map(c=>(<div key={c.id} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 14px"}}>{ecId===c.id?(<div><Lbl t="会社名"/><Inp value={c.name} onChange={v=>setClients(prev=>prev.map(x=>x.id===c.id?{...x,name:v}:x))}/><Lbl t="電話番号"/><Inp value={c.tel||""} onChange={v=>setClients(prev=>prev.map(x=>x.id===c.id?{...x,tel:v}:x))}/><Lbl t="住所"/><Inp value={c.address||""} onChange={v=>setClients(prev=>prev.map(x=>x.id===c.id?{...x,address:v}:x))}/><Lbl t="メモ"/><Inp value={c.memo||""} onChange={v=>setClients(prev=>prev.map(x=>x.id===c.id?{...x,memo:v}:x))}/><button onClick={()=>setEcId(null)} style={{width:"100%",padding:"9px 0",borderRadius:6,border:`1px solid ${C.border}`,background:"white",fontSize:12,cursor:"pointer",marginTop:10}}>✓ 完了</button></div>):(<div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,fontSize:13}}>{c.name}</div><div style={{fontSize:12,color:C.sub}}>{c.tel||"—"} {c.address&&`| ${c.address}`}</div>{c.memo&&<div style={{fontSize:11,color:C.orange}}>📝 {c.memo}</div>}</div><div style={{display:"flex",gap:6}}><SmallBtn onClick={()=>setEcId(c.id)} label="編集" color={C.gold} bg={C.goldBg}/><SmallBtn onClick={()=>setConfirm({msg:`「${c.name}」を削除しますか？`,onOk:()=>{setClients(prev=>prev.filter(x=>x.id!==c.id));setConfirm(null);showToast("削除しました");}})} label="削除" color={C.red} bg={C.red+"11"}/></div></div>)}</div>))}</div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>{clients.map(c=>(<div key={c.id} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"10px 14px"}}>{ecId===c.id?(<div><Lbl t={t("setupClientName")}/><Inp value={c.name} onChange={v=>setClients(prev=>prev.map(x=>x.id===c.id?{...x,name:v}:x))}/><Lbl t={t("setupClientTel")}/><Inp value={c.tel||""} onChange={v=>setClients(prev=>prev.map(x=>x.id===c.id?{...x,tel:v}:x))}/><Lbl t={t("setupClientAddr")}/><Inp value={c.address||""} onChange={v=>setClients(prev=>prev.map(x=>x.id===c.id?{...x,address:v}:x))}/><Lbl t={t("setupClientMemo")}/><Inp value={c.memo||""} onChange={v=>setClients(prev=>prev.map(x=>x.id===c.id?{...x,memo:v}:x))}/><button onClick={()=>setEcId(null)} style={{width:"100%",padding:"9px 0",borderRadius:6,border:`1px solid ${C.border}`,background:"white",fontSize:12,cursor:"pointer",marginTop:10}}>✓ 完了</button></div>):(<div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,fontSize:13}}>{c.name}</div><div style={{fontSize:12,color:C.sub}}>{c.tel||"—"} {c.address&&`| ${c.address}`}</div>{c.memo&&<div style={{fontSize:11,color:C.orange}}>📝 {c.memo}</div>}</div><div style={{display:"flex",gap:6}}><SmallBtn onClick={()=>setEcId(c.id)} label={t("setupProdEdit")} color={C.gold} bg={C.goldBg}/><SmallBtn onClick={()=>setConfirm({msg:`「${c.name}」を削除しますか？`,onOk:()=>{setClients(prev=>prev.filter(x=>x.id!==c.id));setConfirm(null);showToast("削除しました");}})} label="削除" color={C.red} bg={C.red+"11"}/></div></div>)}</div>))}</div>
         </div>
       )}
       {sec==="backup"&&(
         <div>
           <div style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${C.navy}`,borderRadius:8,padding:"14px 16px",marginBottom:12}}>
-            <div style={{fontWeight:800,fontSize:14,color:C.navy,marginBottom:6}}>💾 データバックアップ（CSV）</div>
+            <div style={{fontWeight:800,fontSize:14,color:C.navy,marginBottom:6}}>{t("setupBackupTitle")}</div>
             <div style={{fontSize:12,color:C.sub,marginBottom:14}}>データをCSVファイルとしてダウンロードできます。Excelで開くことができます。週1回の定期バックアップを推奨します。</div>
             {[{l:"📥 EC注文データ",k:"ec"},{l:"📥 卸先注文データ",k:"ws"},{l:"📥 商品マスタ",k:"products"},{l:"📥 得意先マスタ",k:"clients"},{l:"📥 日報データ",k:"diary"},{l:"📥 在庫履歴",k:"inventory"}].map(b=>(<button key={b.k} onClick={()=>onExportAll(b.k)} style={{width:"100%",padding:"11px 0",borderRadius:8,background:"white",border:`1px solid ${C.border}`,color:C.navy,fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:8}}>{b.l}</button>))}
-            <button onClick={()=>onExportAll("all")} style={{width:"100%",padding:"12px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:13,cursor:"pointer",border:"none",marginTop:4}}>📥 全データをまとめてダウンロード</button>
+            <button onClick={()=>onExportAll("all")} style={{width:"100%",padding:"12px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:13,cursor:"pointer",border:"none",marginTop:4}}>{t("setupBackupAll")}</button>
           </div>
-          <div style={{background:C.gold+"11",border:`1px solid ${C.gold}44`,borderRadius:8,padding:14,fontSize:12,color:C.text,lineHeight:1.7}}>💡 <strong>推奨：</strong>週1回、全データをダウンロードして保管してください。</div>
+          <div style={{background:C.gold+"11",border:`1px solid ${C.gold}44`,borderRadius:8,padding:14,fontSize:12,color:C.text,lineHeight:1.7}}>{t("setupBackupTip")}</div>
         </div>
       )}
       {sec==="system"&&(
         <div>
-          <div style={{background:IS_DEMO?C.gold+"11":"#E8F5E9",border:`1px solid ${IS_DEMO?C.gold:C.green}44`,borderRadius:8,padding:"12px 14px",marginBottom:14,fontSize:13,lineHeight:1.6}}>{IS_DEMO?"🧪 現在デモモードで動作中です。下記を設定すると本番稼働できます。":"✅ 本番モードで稼働中"}</div>
+          <div style={{background:IS_DEMO?C.gold+"11":"#E8F5E9",border:`1px solid ${IS_DEMO?C.gold:C.green}44`,borderRadius:8,padding:"12px 14px",marginBottom:14,fontSize:13,lineHeight:1.6}}>{IS_DEMO?t("setupDemoMode"):t("setupLiveMode")}</div>
           {[
             {title:"① Supabase（データ永続化）",color:C.cyan,steps:["app.supabase.com でプロジェクト作成","Settings → API から URL と anon key をコピー","CONFIG.SUPABASE_URL と CONFIG.SUPABASE_ANON_KEY に貼り付け"],
              sql:`CREATE TABLE ec_orders (id TEXT PRIMARY KEY, customer TEXT, type TEXT, product TEXT, qty INT, amount INT, status TEXT, stock BOOL, payment BOOL, assigned TEXT, ship_date TEXT, created TEXT, alert BOOL, memo TEXT);
@@ -1156,6 +1440,8 @@ function App(){
   const [lineSending,setLineSending]=useState(false);
   const [notifyLog,setNotifyLog]=useState([]);
   const [autoNotifyEnabled,setAutoNotifyEnabled]=useState(true);
+  const [langTick,setLangTick]=useState(0);
+  const [langTick,setLangTick]=useState(0);
   const ordersRef=useRef(orders);
   const wholesaleRef=useRef(wholesale);
   const productsRef=useRef(products);
@@ -1239,8 +1525,8 @@ function App(){
         if(ec?.length)setOrders(ec);if(ws?.length)setWholesale(ws);if(pr?.length)setProducts(pr);
         if(cl?.length)setClients(cl);if(st?.length)setStaff(st.map(s=>s.name));if(di?.length)setDiary(di);if(inv?.length)setInventory(inv);
         if(fn?.length)setFurusatoOrders(fn);
-        showToast("データを読み込みました");
-      }catch(e){showToast("データ取得エラー","error");}
+        showToast(t("saved"));
+      }catch(e){showToast(t("errInput"),"error");}
     })();
   },[loggedIn]);
 
@@ -1256,7 +1542,7 @@ function App(){
     if(wsA.length){lines.push("\n📦 卸先管理");wsA.forEach(w=>lines.push(`　${w.id} ${w.client}`));}
     await lineMessage(lines.join("\n"));
     addLog("手動通知",`EC${ecA.length}件・卸先${wsA.length}件`);
-    showToast(IS_DEMO?"LINE通知（デモ）コンソールを確認":"LINE通知を送信しました");
+    showToast(t("alertSendLine"));
     setLineSending(false);
   },[orders,wholesale,showToast,addLog]);
 
@@ -1275,10 +1561,11 @@ function App(){
     <div style={{fontFamily:"'Helvetica Neue',Arial,'Hiragino Sans',sans-serif",background:C.bg,minHeight:"100vh",maxWidth:600,margin:"0 auto"}}>
       <div style={{background:C.navy,padding:"14px 18px 0",position:"sticky",top:0,zIndex:50}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-          <div><div style={{color:"white",fontWeight:800,fontSize:15}}>花立山養鰻</div><div style={{color:C.goldL,fontSize:10,opacity:0.85}}>業務管理システム {IS_DEMO?"🧪 デモ":"🟢 本番"}</div></div>
+          <div><div style={{color:"white",fontWeight:800,fontSize:15}}>{t("appName")}</div><div style={{color:C.goldL,fontSize:10,opacity:0.85}}>業務管理システム {IS_DEMO?t("demoMode"):t("liveMode")}</div></div>
           <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:8}}>
             {alertCount>0&&<div style={{background:C.red,color:"white",borderRadius:20,padding:"4px 10px",fontSize:12,fontWeight:800}}>⚠️ {alertCount}件</div>}
-            <button onClick={()=>setLoggedIn(false)} style={{background:"none",border:`1px solid rgba(255,255,255,0.3)`,color:"rgba(255,255,255,0.7)",borderRadius:6,padding:"4px 8px",fontSize:11,cursor:"pointer"}}>ログアウト</button>
+            <button onClick={()=>{setLang(currentLang==="ja"?"en":"ja");setLangTick(p=>p+1);}} style={{background:"none",border:`1px solid rgba(255,255,255,0.3)`,color:"rgba(255,255,255,0.9)",borderRadius:6,padding:"4px 8px",fontSize:11,cursor:"pointer",fontWeight:700}}>{currentLang==="ja"?"🇬🇧 EN":"🇯🇵 JA"}</button>
+            <button onClick={()=>setLoggedIn(false)} style={{background:"none",border:`1px solid rgba(255,255,255,0.3)`,color:"rgba(255,255,255,0.7)",borderRadius:6,padding:"4px 8px",fontSize:11,cursor:"pointer"}}>{t("logout")}</button>
           </div>
         </div>
         <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch"}}>
