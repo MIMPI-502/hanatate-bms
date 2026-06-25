@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram投稿サンプル｜花立山養鰻</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f0ece4;font-family:'Hiragino Sans','Noto Sans JP',sans-serif;color:#1a1208;min-height:100vh;padding:20px 16px;}
+
+h1{font-size:16px;font-weight:700;text-align:center;margin-bottom:6px;color:#1a1208;}
+.sub{font-size:12px;color:#888;text-align:center;margin-bottom:20px;}
+
+.gen-btn{width:100%;max-width:500px;display:block;margin:0 auto 24px;padding:14px;background:#c8963e;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.2s;}
+.gen-btn:hover{background:#b8862e;}
+.gen-btn:disabled{background:#ccc;cursor:not-allowed;}
+
+.theme-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;max-width:500px;margin-left:auto;margin-right:auto;}
+.theme-btn{padding:8px 14px;border:1.5px solid #ddd;background:#fff;border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit;transition:all 0.2s;}
+.theme-btn.active{border-color:#c8963e;background:#fff8ee;color:#c8963e;font-weight:700;}
+
+.posts{display:flex;flex-direction:column;gap:20px;max-width:500px;margin:0 auto;}
+
+.post-card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);}
+.post-img{width:100%;aspect-ratio:1/1;background:#1a1208;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.post-img-inner{text-align:center;padding:30px 20px;z-index:1;}
+.post-img-bg{position:absolute;inset:0;opacity:0.15;font-size:120px;display:flex;align-items:center;justify-content:center;}
+.post-img h2{color:#faf6ef;font-size:22px;font-weight:700;line-height:1.4;margin-bottom:10px;text-shadow:0 2px 8px rgba(0,0,0,0.5);}
+.post-img .img-sub{color:#c8963e;font-size:12px;letter-spacing:0.2em;}
+.post-img .img-price{color:#fff;font-size:28px;font-weight:700;margin-top:10px;text-shadow:0 2px 8px rgba(0,0,0,0.5);}
+
+.post-body{padding:16px;}
+.post-caption{font-size:13px;line-height:1.9;white-space:pre-wrap;color:#1a1208;}
+.post-tags{margin-top:10px;font-size:12px;color:#3897f0;line-height:1.8;}
+.copy-btn{width:100%;margin-top:12px;padding:10px;background:#f5f0e8;border:1px solid #e0d8cc;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;color:#666;transition:all 0.2s;}
+.copy-btn:hover{background:#e8e0d0;}
+.copy-btn.copied{background:#27ae6020;border-color:#27ae60;color:#27ae60;}
+
+.loading-msg{text-align:center;padding:40px;color:#888;font-size:14px;}
+.spinner{display:inline-block;width:20px;height:20px;border:3px solid #eee;border-top-color:#c8963e;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<h1>🐟 Instagram投稿 AIサンプル</h1>
+<p class="sub">花立山養鰻｜AIが自動生成する投稿文・画像イメージ</p>
+
+<div class="theme-row">
+  <button class="theme-btn active" onclick="setTheme(this,'季節')">🌿 季節</button>
+  <button class="theme-btn" onclick="setTheme(this,'こだわり')">✨ こだわり</button>
+  <button class="theme-btn" onclick="setTheme(this,'サブスク')">♻️ サブスク</button>
+  <button class="theme-btn" onclick="setTheme(this,'朝ごはん')">🌅 朝ごはん</button>
+</div>
+
+<button class="gen-btn" id="genBtn" onclick="generate()">
+  ✨ AIで投稿を自動生成する
+</button>
+
+<div class="posts" id="posts"></div>
+
+<script>
+let currentTheme = '季節';
+
+function setTheme(el, theme) {
+  currentTheme = theme;
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+const BG_COLORS = {
+  '季節': 'linear-gradient(135deg,#1a3a1a,#2d5a1b)',
+  'こだわり': 'linear-gradient(135deg,#1a1208,#3d2b0e)',
+  'サブスク': 'linear-gradient(135deg,#1e3d5a,#0d2035)',
+  '朝ごはん': 'linear-gradient(135deg,#3d1a00,#7a3a00)',
+};
+const BG_EMOJI = { '季節':'🌿', 'こだわり':'🐟', 'サブスク':'♻️', '朝ごはん':'🌅' };
+
+async function generate() {
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>AIが生成中…';
+
+  const postsEl = document.getElementById('posts');
+  postsEl.innerHTML = '<div class="loading-msg"><span class="spinner"></span>投稿文を考えています…</div>';
+
+  const prompts = [
+    `花立山養鰻（福岡県筑前町）のInstagram投稿文を1つ作成してください。
+テーマ：${currentTheme}
+条件：
+・1投稿分の本文（200字程度）
+・絵文字を自然に使う
+・最後に改行して関連ハッシュタグを10個
+・読んだ人がサブスクに興味を持つような内容
+・鰻の美味しさ・産地・こだわりを伝える
+JSONで返す: {"title":"画像に入れる短いキャッチコピー（20字以内）","caption":"本文","tags":"ハッシュタグ（スペース区切り）","price":"梅プラン¥4,500〜"}`,
+
+    `花立山養鰻（福岡県筑前町）のInstagram投稿文をもう1パターン作成してください。
+テーマ：${currentTheme}
+先ほどとは違うアプローチで。
+JSONで返す: {"title":"画像に入れる短いキャッチコピー（20字以内）","caption":"本文","tags":"ハッシュタグ（スペース区切り）","price":"梅プラン¥4,500〜"}`
+  ];
+
+  const results = [];
+  for (const prompt of prompts) {
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content?.map(c => c.text || '').join('') || '';
+      const clean = text.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+      results.push(parsed);
+    } catch(e) {
+      results.push({
+        title: '福岡から届く本物の鰻',
+        caption: '花立山養鰻の国産鰻をお届けします。\n\n筑前町の清らかな水で育てた鰻は\n臭みがなく、ふっくらとした身が特徴。\n\n毎月の食卓に特別な一品を。\n定期便で継続的にお楽しみいただけます。',
+        tags: '#国産うなぎ #福岡グルメ #鰻 #うなぎ #蒲焼き #産地直送 #定期便 #お取り寄せ #筑前町 #花立山養鰻',
+        price: '梅プラン¥4,500〜'
+      });
+    }
+  }
+
+  postsEl.innerHTML = '';
+  const bgColor = BG_COLORS[currentTheme] || BG_COLORS['季節'];
+  const bgEmoji = BG_EMOJI[currentTheme] || '🐟';
+
+  results.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'post-card';
+    card.innerHTML = `
+      <div class="post-img" style="background:${bgColor}">
+        <div class="post-img-bg">${bgEmoji}</div>
+        <div class="post-img-inner">
+          <div class="img-sub">HANATATE EEL FARM</div>
+          <h2>${r.title || '福岡から届く本物の鰻'}</h2>
+          <div class="img-price">${r.price || '梅プラン¥4,500〜'}</div>
+        </div>
+      </div>
+      <div class="post-body">
+        <div class="post-caption">${(r.caption||'').replace(/\\n/g,'\n')}</div>
+        <div class="post-tags">${r.tags||''}</div>
+        <button class="copy-btn" id="copy${i}" onclick="copyPost(${i},'${encodeURIComponent((r.caption||'')+(r.tags||''))}')">📋 投稿文をコピー</button>
+      </div>
+    `;
+    postsEl.appendChild(card);
+  });
+
+  btn.disabled = false;
+  btn.innerHTML = '✨ もう一度生成する';
+}
+
+function copyPost(i, encoded) {
+  const text = decodeURIComponent(encoded);
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy' + i);
+    btn.textContent = '✅ コピーしました';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 投稿文をコピー'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// 初回自動生成
+window.addEventListener('load', () => setTimeout(generate, 500));
+</script>
+</body>
+</html>
