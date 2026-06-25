@@ -118,11 +118,14 @@ const db=new SB(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
 async function lineMessage(msg){
   if(IS_DEMO){console.log("[LINE Messaging API デモ]\n"+msg);return;}
   try{
-    await fetch("/api/line-message",{
+    const res=await fetch("/api/line-message",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({message:msg}),
     });
+    const data=await res.json();
+    if(!res.ok||!data.ok){console.error("LINE通知失敗:",data);}
+    else{console.log("LINE通知成功:",data);}
   }catch(e){console.error("LINE通知エラー:",e);}
 }
 
