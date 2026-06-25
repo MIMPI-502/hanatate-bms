@@ -1185,6 +1185,32 @@ function App(){
     showToast(IS_DEMO?"📲 朝の日次レポート（デモ・コンソール確認）":"📲 朝の日次レポートを送信しました");
   },[addLog,showToast]);
 
+  // 24時間以上未対応チェック
+  const check24h=useCallback(async()=>{
+    const ords=ordersRef.current;
+    const now=new Date();
+    const overdue=ords.filter(o=>{
+      if(o.status!=="未対応")return false;
+      if(!o.created_at&&!o.order_date)return false;
+      const created=new Date(o.created_at||o.order_date);
+      const diffH=(now-created)/(1000*60*60);
+      return diffH>=24;
+    });
+    if(overdue.length===0)return;
+    const lines=[
+      "🚨【花立山養鰻】24時間以上未対応の注文があります",
+      ,
+      "",
+      ,
+      ...overdue.slice(0,5).map(o=>)
+      ,"",
+      "早急に対応をお願いします"
+    ];
+    await lineMessage(lines.join("
+"));
+    addLog("24h未対応アラート",);
+  },[addLog]);
+
   const sendAlertNotify=useCallback(async(reason)=>{
     const ords=ordersRef.current,ws=wholesaleRef.current;
     const ecA=ords.filter(o=>o.alert);
@@ -1214,6 +1240,7 @@ function App(){
       if(!lastAlertRef.current||nowMs-lastAlertRef.current>CONFIG.ALERT_INTERVAL_MIN*60*1000){
         lastAlertRef.current=nowMs;
         await sendAlertNotify("定期アラートチェック");
+        await check24h();
         const lowProds=productsRef.current.filter(p=>p.stock<=CONFIG.LOW_STOCK_THRESHOLD);
         if(lowProds.length>0)await sendStockAlert(lowProds);
       }
