@@ -130,29 +130,16 @@ async function lineMessage(msg){
 }
 
 // ── CSV出力 ──
-function dlFile(csv,filename){
-  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
-  const a=document.createElement("a");
-  if(isIOS){
-    a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);
-  } else {
-    const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
-    a.href=URL.createObjectURL(blob);
-    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
-  }
-  a.download=filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
 function exportCSV(data,name){
   if(!data||!data.length)return;
   const keys=Object.keys(data[0]);
   const rows=[keys.join(","),...data.map(r=>keys.map(k=>`"${String(r[k]??'').replace(/"/g,'""')}"`).join(","))];
-  const csv="\uFEFF"+rows.join("\n");
-  dlFile(csv,`花立山養鬼_${name}_${new Date().toISOString().slice(0,10)}.csv`);
+  const blob=new Blob(["\uFEFF"+rows.join("\n")],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`花立山養鰻_${name}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
 }
-
 
 // ── カラー ──
 const C={
@@ -702,7 +689,8 @@ function ImportTab({orders,setOrders,wholesale,setWholesale,furusatoOrders,setFu
   };
   const downloadSample=(type)=>{
     const s={ec:"氏名,商品名,数量,金額,発送予定日,備考\n田中 一郎,うなぎ蒲焼き 2尾セット,1,4800,2026-06-20,\n鈴木 花子,うなぎ白焼き 1尾,2,4800,2026-06-21,急ぎ",furusato:"寄付者名,返礼品名,数量,寄付金額,発送予定日,備考\n山田 太郎,特選うなぎ詰め合わせ,1,12000,2026-06-25,\n佐藤 美咲,うなぎ蒲焼き 4尾セット,1,8500,2026-06-26,",wholesale:"得意先名,電話番号,商品名,数量,単価,金額,納品予定日,備考\n博多うなぎ料理店,092-111-2222,活鰻 5kg,5,8000,40000,2026-06-20,"};
-    dlFile("\uFEFF"+s[type],`サンプル_${type}.csv`);
+    const blob=new Blob(["\uFEFF"+s[type]],{type:"text/csv;charset=utf-8"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`サンプル_${type}.csv`;a.click();
     showToast("サンプルCSVをダウンロードしました");
   };
   const SECS=[{id:"csv",l:"📂 CSV取込"},{id:"roadmap",l:"📋 ロードマップ"}];
