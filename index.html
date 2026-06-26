@@ -148,10 +148,11 @@ function dlFile(csv,filename){
 function exportCSV(data,name){
   if(!data||!data.length)return;
   const keys=Object.keys(data[0]);
-  const rows=[keys.join(","),...data.map(r=>keys.map(k=>`"${String(r[k]??'').replace(/"/g,'""')}"`)].join(","))];
+  const rows=[keys.join(","),...data.map(r=>keys.map(k=>`"${String(r[k]??'').replace(/"/g,'""')}"`).join(","))];
   const csv="\uFEFF"+rows.join("\n");
-  dlFile(csv,`花立山養鰻_${name}_${new Date().toISOString().slice(0,10)}.csv`);
+  dlFile(csv,`花立山養鬼_${name}_${new Date().toISOString().slice(0,10)}.csv`);
 }
+
 
 // ── カラー ──
 const C={
