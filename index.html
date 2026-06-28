@@ -715,7 +715,7 @@ function ImportTab({orders,setOrders,wholesale,setWholesale,furusatoOrders,setFu
             <Lbl t="取込種別"/>
             <Sel value={csvType} onChange={v=>setCsvType(v)}><option value="ec">🛒 EC注文（Shopify等）</option><option value="furusato">🏠 ふるさと納税</option><option value="wholesale">📦 卸売注文</option></Sel>
             <div style={{marginTop:10,marginBottom:6}}>
-              <div style={{fontSize:11,color:C.sub,marginBottom:6}}>サンプルCSVをダウンロードして形式を確認できます</div>
+              <div style={{fontSize:11,color:C.sub,marginBottom:6}}>CSVをダウンロードして形式を確認できます</div>
               <div style={{display:"flex",gap:6}}>
                 <button onClick={()=>downloadSample("ec")} style={{flex:1,padding:"7px 0",borderRadius:6,background:"white",border:`1px solid ${C.border}`,color:C.cyan,fontSize:11,fontWeight:700,cursor:"pointer"}}>花立山EC</button>
                 <button onClick={()=>downloadSample("furusato")} style={{flex:1,padding:"7px 0",borderRadius:6,background:"white",border:`1px solid ${C.border}`,color:C.gold,fontSize:11,fontWeight:700,cursor:"pointer"}}>ふるさと納税</button>
