@@ -1256,7 +1256,7 @@ function SetupTab({staff,setStaff,products,setProducts,clients,setClients,showTo
   const addStaff=async()=>{const n=ns.trim();if(!n)return;if(staff.includes(n)){showToast("すでに登録されています","error");return;}setStaff(p=>[...p,n]);setNs("");showToast("担当者を追加しました");try{await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`👤【担当者登録】\n「${n}」さんが担当者に追加されました`})});}catch(e){console.log("LINE通知エラー",e);}};
   const addProd=()=>{if(!np.name){showToast("商品名を入力してください","error");return;}setProducts(p=>[...p,{id:genId("P"),name:np.name,price:Number(np.price)||0,category:np.category,stock:Number(np.stock)||0}]);setNp({name:"",price:"",category:"EC",stock:0});showToast("商品を追加しました");};
   const addClient=()=>{if(!nc.name){showToast("会社名を入力してください","error");return;}setClients(p=>[...p,{id:genId("C"),name:nc.name,tel:nc.tel,address:nc.address,memo:nc.memo}]);setNc({name:"",tel:"",address:"",memo:""});showToast("得意先を追加しました");};
-  const SECS=[{id:"staff",l:"👤 担当者"},{id:"products",l:" 商品"},{id:"clients",l:"🏢 得意先"},{id:"backup",l:"💾 バックアップ"},{id:"system",l:"🔧 本番設定"}];
+  const SECS=[{id:"staff",l:"👤 担当者"},{id:"products",l:" 商品"},{id:"clients",l:"🏢 得意先"},{id:"backup",l:"💾 バックアップ"}];
   return(
     <div>
       <div style={{display:"flex",gap:5,marginBottom:14,flexWrap:"wrap"}}>{SECS.map(s=>(<button key={s.id} onClick={()=>setSec(s.id)} style={{flex:1,minWidth:"28%",padding:"8px 4px",borderRadius:8,border:`1px solid ${sec===s.id?C.navy:C.border}`,background:sec===s.id?C.navy:"white",color:sec===s.id?"white":C.text,fontSize:11,cursor:"pointer",fontWeight:700}}>{s.l}</button>))}</div>
