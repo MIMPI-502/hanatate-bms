@@ -1305,3 +1305,126 @@ function SetupTab({staff,setStaff,products,setProducts,clients,setClients,showTo
           <div style={{background:C.gold+"11",border:`1px solid ${C.gold}44`,borderRadius:8,padding:14,fontSize:12,color:C.text,lineHeight:1.7}}>💡 <strong>推奨：</strong>週1回、全データをダウンロードして保管してください。</div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── メインアプリ ──
+function App(){
+  const [loggedIn,setLoggedIn]=React.useState(false);
+  const [tab,setTab]=React.useState("ec");
+  const [orders,setOrders]=React.useState([]);
+  const [wholesale,setWholesale]=React.useState([]);
+  const [furusatoOrders,setFurusatoOrders]=React.useState([]);
+  const [products,setProducts]=React.useState([]);
+  const [clients,setClients]=React.useState([]);
+  const [staff,setStaff]=React.useState([]);
+  const [diary,setDiary]=React.useState([]);
+  const [inventory,setInventory]=React.useState([]);
+  const [reports,setReports]=React.useState([]);
+  const [toast,setToast]=React.useState({msg:"",type:""});
+  const [lineSending,setLineSending]=React.useState(false);
+  const [autoNotifyEnabled,setAutoNotifyEnabled]=React.useState(true);
+  const [notifyLog,setNotifyLog]=React.useState([]);
+
+  React.useEffect(()=>{
+    if(!loggedIn||IS_DEMO)return;
+    (async()=>{
+      try{
+        const [ec,ws,fn,pr,cl,st,dr,inv]=await Promise.all([
+          db.select("ec_orders"),db.select("ws_orders"),db.select("furusato_orders"),
+          db.select("products"),db.select("clients"),db.select("staff"),
+          db.select("diary"),db.select("inventory"),
+        ]);
+        setOrders(ec||[]);setWholesale(ws||[]);setFurusatoOrders(fn||[]);
+        setProducts(pr||[]);setClients(cl||[]);
+        setStaff((st||[]).map(s=>s.name||s));
+        setDiary(dr||[]);setInventory(inv||[]);
+      }catch(e){console.log("DB読込エラー",e);}
+    })();
+  },[loggedIn]);
+
+  const showToast=(msg,type="success")=>{setToast({msg,type});setTimeout(()=>setToast({msg:"",type:""}),3000);};
+
+  const onSave=async(table,data)=>{
+    if(IS_DEMO)return;
+    try{await db.upsert(table,data);}catch(e){showToast("保存エラー: "+e.message,"error");}
+  };
+  const onDel=async(table,col,val)=>{
+    if(IS_DEMO)return;
+    try{await db.del(table,col,val);}catch(e){showToast("削除エラー","error");}
+  };
+
+  const sendLineAlert=async()=>{
+    setLineSending(true);
+    const alertOrders=orders.filter(o=>o.alert);
+    const msg=`⚠️【花立山養鰻】要対応アラート
+📅 ${new Date().toLocaleString("ja-JP")}
+
+EC未対応: ${alertOrders.length}件
+${alertOrders.slice(0,3).map(o=>`・${o.customer}（${o.product}）`).join("
+")}`;
+    await lineMessage(msg);
+    setNotifyLog(p=>[{id:genId("L"),type:"手動LINE通知",msg:`要対応${alertOrders.length}件を通知`,time:nowStr()},...p.slice(0,9)]);
+    setLineSending(false);
+    showToast("LINE通知を送信しました");
+  };
+
+  const sendMorningReport=async()=>{
+    const todayShip=orders.filter(o=>o.shipDate===today()&&!["発送済み","完了"].includes(o.status));
+    const msg=`🌅【花立山養鰻】おはようございます
+📅 ${new Date().toLocaleDateString("ja-JP")}
+
+📦 本日の発送予定：${todayShip.length}件
+⚠️ 要対応：${orders.filter(o=>o.alert).length}件
+
+✅ 自動日次レポート`;
+    await lineMessage(msg);
+    showToast("日次レポートを送信しました");
+  };
+
+  const onExport=(type)=>{
+    if(type==="ec")exportCSV(orders,"EC注文");
+    else if(type==="ws")exportCSV(wholesale,"卸先注文");
+    else if(type==="all"){exportCSV(orders,"EC注文");exportCSV(wholesale,"卸先注文");}
+  };
+  const onExportAll=(key)=>{
+    const map={ec:orders,ws:wholesale,products,clients,diary,inventory};
+    if(key==="all"){Object.entries(map).forEach(([k,v])=>exportCSV(v,k));}
+    else exportCSV(map[key]||[],key);
+  };
+
+  if(!loggedIn)return <LoginScreen onLogin={()=>setLoggedIn(true)}/>;
+
+  return(
+    <div style={{maxWidth:480,margin:"0 auto",minHeight:"100vh",background:C.bg,paddingBottom:80}}>
+      <div style={{background:C.navy,padding:"14px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:100}}>
+        <div style={{color:C.goldL,fontWeight:800,fontSize:16}}>花立山養鰻</div>
+        <div style={{color:"rgba(255,255,255,0.6)",fontSize:11}}>{TABS.find(t=>t.id===tab)?.label}</div>
+      </div>
+      <div style={{padding:"14px 16px"}}>
+        {tab==="ec"&&<EcTab orders={orders} setOrders={setOrders} furusatoOrders={furusatoOrders} staff={staff} products={products} showToast={showToast} onSave={onSave} onDel={onDel}/>}
+        {tab==="furusato"&&<FurusatoTab furusatoOrders={furusatoOrders} setFurusatoOrders={setFurusatoOrders} showToast={showToast} onDel={onDel}/>}
+        {tab==="diary"&&<DiaryTab diary={diary} setDiary={setDiary} staff={staff} showToast={showToast} onDel={onDel} onSave={onSave}/>}
+        {tab==="alert"&&<AlertTab orders={orders} wholesale={wholesale} onLine={sendLineAlert} lineSending={lineSending} autoNotifyEnabled={autoNotifyEnabled} setAutoNotifyEnabled={setAutoNotifyEnabled} notifyLog={notifyLog} onMorning={sendMorningReport}/>}
+        {tab==="calendar"&&<CalendarTab orders={orders} wholesale={wholesale} furusatoOrders={furusatoOrders}/>}
+        {tab==="inventory"&&<InventoryTab products={products} setProducts={setProducts} inventory={inventory} setInventory={setInventory} showToast={showToast}/>}
+        {tab==="wholesale"&&<WholesaleTab wholesale={wholesale} setWholesale={setWholesale} products={products} clients={clients} showToast={showToast} onSave={onSave} onDel={onDel}/>}
+        {tab==="finance"&&<FinanceTab orders={orders} wholesale={wholesale} furusatoOrders={furusatoOrders} reports={reports} onExport={onExport}/>}
+        {tab==="import"&&<ImportTab orders={orders} setOrders={setOrders} wholesale={wholesale} setWholesale={setWholesale} furusatoOrders={furusatoOrders} setFurusatoOrders={setFurusatoOrders} showToast={showToast}/>}
+        {tab==="setup"&&<SetupTab staff={staff} setStaff={setStaff} products={products} setProducts={setProducts} clients={clients} setClients={setClients} showToast={showToast} onExportAll={onExportAll}/>}
+        {tab==="subscrip"&&<SubscripTab showToast={showToast}/>}
+      </div>
+      <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:"white",borderTop:`1px solid ${C.border}`,display:"flex",overflowX:"auto",zIndex:200}}>
+        {TABS.map(t=>(<button key={t.id} onClick={()=>setTab(t.id)} style={{flex:"0 0 auto",padding:"8px 10px",border:"none",background:tab===t.id?C.goldBg:"white",color:tab===t.id?C.gold:C.sub,fontSize:9,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2,minWidth:52,fontWeight:tab===t.id?700:400}}><span style={{fontSize:16}}>{t.icon}</span>{t.label}</button>))}
+      </div>
+      <Toast msg={toast.msg} type={toast.type}/>
+    </div>
+  );
+}
+
+const root=ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App/>);
+</script>
+</body>
+</html>
