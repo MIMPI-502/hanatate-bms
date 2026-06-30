@@ -1,9 +1,24 @@
 {
   "crons": [
-    {"path": "/api/daily-report", "schedule": "0 23 * * *"},
-    {"path": "/api/alert-check", "schedule": "0 * * * *"},
-    {"path": "/api/stock-alert", "schedule": "30 * * * *"},
-    {"path": "/api/subscrip-monthly", "schedule": "0 15 1 * *"},
-    {"path": "/api/subscrip-retention", "schedule": "0 15 15 * *"}
+    {
+      "path": "/api/daily-report",
+      "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/alert-check",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/stock-alert",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/subscrip-monthly",
+      "schedule": "0 15 1 * *"
+    },
+    {
+      "path": "/api/subscrip-retention",
+      "schedule": "0 15 15 * *"
+    }
   ]
 }
