@@ -1256,7 +1256,7 @@ function SetupTab({staff,setStaff,products,setProducts,clients,setClients,showTo
   const addStaff=async()=>{const n=ns.trim();if(!n)return;if(staff.includes(n)){showToast("すでに登録されています","error");return;}setStaff(p=>[...p,n]);setNs("");showToast("担当者を追加しました");try{await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`👤【担当者登録】\n「${n}」さんが担当者に追加されました`})});}catch(e){console.log("LINE通知エラー",e);}};
   const addProd=()=>{if(!np.name){showToast("商品名を入力してください","error");return;}setProducts(p=>[...p,{id:genId("P"),name:np.name,price:Number(np.price)||0,category:np.category,stock:Number(np.stock)||0}]);setNp({name:"",price:"",category:"EC",stock:0});showToast("商品を追加しました");};
   const addClient=()=>{if(!nc.name){showToast("会社名を入力してください","error");return;}setClients(p=>[...p,{id:genId("C"),name:nc.name,tel:nc.tel,address:nc.address,memo:nc.memo}]);setNc({name:"",tel:"",address:"",memo:""});showToast("得意先を追加しました");};
-  const SECS=[{id:"staff",l:"👤 担当者"},{id:"products",l:" 商品"},{id:"clients",l:"🏢 得意先"},{id:"backup",l:"💾 バックアップ"},{id:"system",l:"🔧 本番設定"}];
+  const SECS=[{id:"staff",l:"👤 担当者"},{id:"products",l:" 商品"},{id:"clients",l:"🏢 得意先"},{id:"backup",l:"💾 バックアップ"}];
   return(
     <div>
       <div style={{display:"flex",gap:5,marginBottom:14,flexWrap:"wrap"}}>{SECS.map(s=>(<button key={s.id} onClick={()=>setSec(s.id)} style={{flex:1,minWidth:"28%",padding:"8px 4px",borderRadius:8,border:`1px solid ${sec===s.id?C.navy:C.border}`,background:sec===s.id?C.navy:"white",color:sec===s.id?"white":C.text,fontSize:11,cursor:"pointer",fontWeight:700}}>{s.l}</button>))}</div>
@@ -1305,49 +1305,7 @@ function SetupTab({staff,setStaff,products,setProducts,clients,setClients,showTo
           <div style={{background:C.gold+"11",border:`1px solid ${C.gold}44`,borderRadius:8,padding:14,fontSize:12,color:C.text,lineHeight:1.7}}>💡 <strong>推奨：</strong>週1回、全データをダウンロードして保管してください。</div>
         </div>
       )}
-      {sec==="system"&&(
-        <div>
-          <div style={{background:IS_DEMO?C.gold+"11":"#E8F5E9",border:`1px solid ${IS_DEMO?C.gold:C.green}44`,borderRadius:8,padding:"12px 14px",marginBottom:14,fontSize:13,lineHeight:1.6}}>{IS_DEMO?"🧪 現在デモモードで動作中です。下記を設定すると本番稼働できます。":"✅ 本番モードで稼働中"}</div>
-          {[
-            {title:"① Supabase（データ永続化）",color:C.cyan,steps:["app.supabase.com でプロジェクト作成","Settings → API から URL と anon key をコピー","CONFIG.SUPABASE_URL と CONFIG.SUPABASE_ANON_KEY に貼り付け"],
-             sql:`CREATE TABLE ec_orders (id TEXT PRIMARY KEY, customer TEXT, type TEXT, product TEXT, qty INT, amount INT, status TEXT, stock BOOL, payment BOOL, assigned TEXT, ship_date TEXT, created TEXT, alert BOOL, memo TEXT);
-CREATE TABLE ws_orders (id TEXT PRIMARY KEY, client TEXT, tel TEXT, product TEXT, qty INT, unit_price INT, amount INT, order_status TEXT, purchase_status TEXT, delivery_status TEXT, invoice_issued BOOL, sales_recorded BOOL, ship_date TEXT, created TEXT, memo TEXT);
-CREATE TABLE products (id TEXT PRIMARY KEY, name TEXT, price INT, category TEXT, stock INT);
-CREATE TABLE clients (id TEXT PRIMARY KEY, name TEXT, tel TEXT, address TEXT, memo TEXT);
-CREATE TABLE staff (id TEXT PRIMARY KEY, name TEXT);
-CREATE TABLE diary (id TEXT PRIMARY KEY, date TEXT, author TEXT, content TEXT, tag TEXT);
-CREATE TABLE inventory (id TEXT PRIMARY KEY, product TEXT, qty INT, type TEXT, date TEXT, memo TEXT);
-CREATE TABLE furusato_orders (id TEXT PRIMARY KEY, delivery_no TEXT, donation_receipt_no TEXT, product_name TEXT, operator_name TEXT, donor_no TEXT, last_name TEXT, first_name TEXT, last_name_kana TEXT, first_name_kana TEXT, prefecture TEXT, postal_code TEXT, address1 TEXT, address2 TEXT, phone TEXT, delivery_status TEXT, tracking_number TEXT, carrier TEXT, memo TEXT, donation_status TEXT, donation_year TEXT, product_price INT, product_code TEXT, gift_type TEXT, donation_amount INT, donation_set_amount INT, shipment_request_date TEXT, scheduled_shipment_date TEXT, created TEXT);`},
-            {title:"② LINE Messaging API（自動通知）",color:C.lineGreen,steps:["developers.line.me でプロバイダー・チャンネル作成","Messaging API チャンネルアクセストークンを発行","スタッフグループにBotを追加してグループIDを取得","CONFIG.LINE_CHANNEL_ACCESS_TOKEN にトークンを設定","CONFIG.LINE_GROUP_ID にグループIDを設定","Vercel環境変数に LINE_TOKEN と LINE_GROUP_ID を追加"],
-             sql:`// api/line-message.js (Vercel API Route)
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end();
-  const { message } = req.body;
-  const response = await fetch('https://api.line.me/v2/bot/message/push', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + process.env.LINE_TOKEN,
-    },
-    body: JSON.stringify({
-      to: process.env.LINE_GROUP_ID,
-      messages: [{ type: 'text', text: message }],
-    }),
-  });
-  const data = await response.json();
-  res.json({ ok: response.ok, data });
-}`},
-            {title:"③ パスワード変更",color:C.navy,steps:["CONFIG.APP_PASSWORD を任意のパスワードに変更","GitHubにアップロードしてVercelにデプロイ","新しいパスワードでログインできることを確認"]}
-          ].map((s,si)=>(<div key={si} style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`4px solid ${s.color}`,borderRadius:8,padding:"14px 16px",marginBottom:12}}>
-            <div style={{fontWeight:800,fontSize:13,color:s.color,marginBottom:10}}>{s.title}</div>
-            {s.steps.map((step,i)=>(<div key={i} style={{display:"flex",gap:8,padding:"4px 0",fontSize:12}}><span style={{color:s.color,fontWeight:700,minWidth:18}}>{i+1}.</span><span style={{color:C.text,lineHeight:1.6}}>{step}</span></div>))}
-            {s.sql&&(<div style={{marginTop:10,background:"#0F1923",borderRadius:6,padding:"10px 12px",overflowX:"auto"}}><pre style={{margin:0,fontSize:10,color:"#A8E6CF",fontFamily:"monospace",whiteSpace:"pre",lineHeight:1.6}}>{s.sql}</pre></div>)}
-          </div>))}
-        </div>
-      )}
-      {confirm&&<Confirm msg={confirm.msg} onOk={confirm.onOk} onCancel={()=>setConfirm(null)}/>}
-    </div>
-  );
+      {);
 }
 
 // ══════════════════════════════
