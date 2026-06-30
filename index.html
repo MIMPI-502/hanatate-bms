@@ -191,7 +191,6 @@ const TABS=[
   {id:"wholesale",icon:"📦",label:"卸先"},
   {id:"finance",icon:"📊",label:"財務"},
   {id:"import",icon:"📥",label:"自動取込"},
-  {id:"setup",icon:"⚙️",label:"設定"},
   {id:"subscrip",icon:"♻️",label:"サブスク"},
 ];
 
@@ -1315,7 +1314,7 @@ function SetupTab({staff,setStaff,products,setProducts,clients,setClients,showTo
 const AUTO_NOTIFY={MORNING_HOUR:8,ALERT_INTERVAL_MS:60*60*1000,LOW_STOCK:3};
 
 // ══════════════════════════════
-// updated: 2026-06-30T06:57
+// updated: 2026-06-30T07:14
 //  メインアプリ
 // ══════════════════════════════
 function App(){
@@ -1473,7 +1472,7 @@ function App(){
         {activeTab==="furusato"&&<FurusatoTab furusatoOrders={furusatoOrders} setFurusatoOrders={setFurusatoOrders} showToast={showToast} onDel={handleDel}/>}
         {activeTab==="subscrip"&&<SubscripTab showToast={showToast}/>}
         {activeTab==="import"&&<ImportTab orders={orders} setOrders={setOrders} wholesale={wholesale} setWholesale={setWholesale} furusatoOrders={furusatoOrders} setFurusatoOrders={setFurusatoOrders} showToast={showToast}/>}
-        {activeTab==="setup"&&<SetupTab staff={staff} setStaff={setStaff} products={products} setProducts={setProducts} clients={clients} setClients={setClients} showToast={showToast} onExportAll={handleExport}/>}
+        
       </div>
       <Toast msg={toast?.msg} type={toast?.type}/>
     </div>
