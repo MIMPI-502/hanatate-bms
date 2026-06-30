@@ -5,6 +5,5 @@
     {"path": "/api/stock-alert", "schedule": "30 * * * *"},
     {"path": "/api/subscrip-monthly", "schedule": "0 15 1 * *"},
     {"path": "/api/subscrip-retention", "schedule": "0 15 15 * *"}
-  ],
-  "buildCommand": "echo 'build 2026-06-30T07:38'"
+  ]
 }
