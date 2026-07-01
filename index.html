@@ -30,16 +30,19 @@ const CONFIG={
   // Supabase
   SUPABASE_URL:"https://xmzsszuteyuumspyzsaq.supabase.co",
   SUPABASE_ANON_KEY:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtenNzenV0ZXl1dW1zcHl6c2FxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3NDY0NjEsImV4cCI6MjA5NzMyMjQ2MX0.48SaeSrIiVElH-RUTXEgjBga07WACtazXqT8_qvdztA",
-  // LINE Messaging API
-  LINE_CHANNEL_ACCESS_TOKEN:"bAF7QCTUvQL9ZTfjfjScOUaGFbDgBU9aLTqo1DLGnnSUTa7Ls5CxKCumCmAiNbLWAFXAZlOw2RDZ7GGLLaMOvLDX4AAmT4xRtWL3GYbopS1WNKP6X7f3ILW4nOfDuHNXB",
+  // LINE Messaging API（グループID。トークン自体はサーバー側/api/line-message.jsが環境変数から使用するため、クライアント側には持たせない）
   LINE_GROUP_ID:"C0f63a7aae27293a3238a1ce22d7a8d50",
-  // アプリパスワード
-  APP_PASSWORD:"hanatate2026",
+  // アプリパスワード（平文はコードに含めない。SHA-256ハッシュのみ保持）
+  APP_PASSWORD_HASH:"827625c6bf7c4336d5b3fb787117e392443c49ae7c8618a6bf68bead3443722f",
   // 自動通知設定
   MORNING_HOUR:8,
   ALERT_INTERVAL_MIN:60,
   LOW_STOCK_THRESHOLD:3,
 };
+async function sha256(text){
+  const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
 const IS_DEMO=CONFIG.SUPABASE_URL.includes("YOUR_PROJECT");
 
 // Vercel環境変数からSupabase設定を動的取得
@@ -220,7 +223,14 @@ const SummaryCard=({label,value,color})=>(<div style={{background:C.card,border:
 function LoginScreen({onLogin}){
   const [pw,setPw]=useState("");
   const [err,setErr]=useState(false);
-  const try_=()=>{if(pw===CONFIG.APP_PASSWORD){onLogin();}else{setErr(true);setTimeout(()=>setErr(false),2000);}};
+  const [checking,setChecking]=useState(false);
+  const try_=async()=>{
+    if(checking)return;
+    setChecking(true);
+    const h=await sha256(pw);
+    if(h===CONFIG.APP_PASSWORD_HASH){onLogin();}else{setErr(true);setTimeout(()=>setErr(false),2000);}
+    setChecking(false);
+  };
   return(
     <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:C.bg,padding:20}}>
       <div style={{width:"100%",maxWidth:340}}>
@@ -232,8 +242,7 @@ function LoginScreen({onLogin}){
           <div style={{fontSize:13,color:C.sub,marginBottom:10}}>パスワードを入力してください</div>
           <input type="password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&try_()} placeholder="パスワード" style={{width:"100%",padding:"12px 14px",borderRadius:8,border:`2px solid ${err?C.red:C.border}`,fontSize:15,marginBottom:8}}/>
           {err&&<div style={{color:C.red,fontSize:12,marginBottom:8}}>パスワードが正しくありません</div>}
-          <button onClick={try_} style={{width:"100%",padding:"13px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:15,border:"none",cursor:"pointer"}}>ログイン</button>
-          {IS_DEMO&&<div style={{fontSize:11,color:C.sub,textAlign:"center",marginTop:10}}>デモ用PW: hanatate2026</div>}
+          <button onClick={try_} disabled={checking} style={{width:"100%",padding:"13px 0",borderRadius:8,background:C.navy,color:"white",fontWeight:700,fontSize:15,border:"none",cursor:"pointer"}}>{checking?"確認中...":"ログイン"}</button>
         </div>
       </div>
     </div>
@@ -459,7 +468,7 @@ function AlertTab({orders,wholesale,onLine,lineSending,autoNotifyEnabled,setAuto
       <div style={{background:total>0?C.red+"11":C.green+"11",border:`1px solid ${total>0?C.red:C.green}44`,borderRadius:10,padding:"14px 16px",marginBottom:12,display:"flex",alignItems:"center",gap:10}}>
         <span style={{fontSize:24}}>{total>0?"⚠️":"✅"}</span>
         <div style={{flex:1}}><div style={{fontWeight:700,color:total>0?C.red:C.green,fontSize:15}}>{total>0?`要対応 ${total}件`:"全て対応済みです"}</div><div style={{fontSize:12,color:C.sub}}>複数名で確認してください</div></div>
-        <button onClick={onLine} disabled={lineSending} style={{padding:"9px 14px",borderRadius:8,background:lineSending?C.border:C.lineGreen,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>{lineSending?"送信中...":"📲 LINE通知"}</button>}
+        <button onClick={onLine} disabled={lineSending} style={{padding:"9px 14px",borderRadius:8,background:lineSending?C.border:C.lineGreen,color:"white",fontWeight:700,fontSize:13,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>{lineSending?"送信中...":"📲 LINE通知"}</button>
       </div>
       {IS_DEMO&&<div style={{background:C.gold+"22",border:`1px solid ${C.gold}55`,borderRadius:8,padding:"10px 14px",marginBottom:12,fontSize:12}}>🧪 デモモード：LINE通知はコンソールに出力されます（LINE Messaging API未設定）</div>}
       {shipA.length>0&&(<div style={{marginBottom:14}}><div style={{fontWeight:700,fontSize:13,color:C.orange,marginBottom:8,paddingBottom:6,borderBottom:`2px solid ${C.orange}33`}}>📅 本日の発送・納品予定</div>{shipA.map((s,i)=><Card key={i} title={s.label} sub={s.sub} color={s.color}/>)}</div>)}
@@ -1254,7 +1263,7 @@ function SetupTab({staff,setStaff,products,setProducts,clients,setClients,showTo
   const [ecId,setEcId]=useState(null);
   const [confirm,setConfirm]=useState(null);
   const addStaff=async()=>{const n=ns.trim();if(!n)return;if(staff.includes(n)){showToast("すでに登録されています","error");return;}setStaff(p=>[...p,n]);setNs("");showToast("担当者を追加しました");try{await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`👤【担当者登録】\n「${n}」さんが担当者に追加されました`})});}catch(e){console.log("LINE通知エラー",e);}};
-  const addProd=()=>{if(!np.name){showToast("商品名を入力してください","error");return;}setProducts(p=>[...p,{id:genId("P"),name:np.name,price:Number(np.price)||0,category:np.category,stock:Number(np.stock)||0}]);setNp({name:"",price:"",category:"EC",stock:0});showToast("商品を追加しました");try{await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`📦【商品登録】\n「${np.name}」が商品マスタに追加されました\nカテゴリ：${np.category}\n価格：¥${Number(np.price).toLocaleString()}`})});}catch(e){console.log("LINE通知エラー",e);}};
+  const addProd=async()=>{if(!np.name){showToast("商品名を入力してください","error");return;}setProducts(p=>[...p,{id:genId("P"),name:np.name,price:Number(np.price)||0,category:np.category,stock:Number(np.stock)||0}]);setNp({name:"",price:"",category:"EC",stock:0});showToast("商品を追加しました");try{await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`📦【商品登録】\n「${np.name}」が商品マスタに追加されました\nカテゴリ：${np.category}\n価格：¥${Number(np.price).toLocaleString()}`})});}catch(e){console.log("LINE通知エラー",e);}};
   const addClient=async()=>{if(!nc.name){showToast("会社名を入力してください","error");return;}setClients(p=>[...p,{id:genId("C"),name:nc.name,tel:nc.tel,address:nc.address,memo:nc.memo}]);setNc({name:"",tel:"",address:"",memo:""});showToast("得意先を追加しました");try{await fetch("/api/line-message",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`🏢【得意先登録】\n「${nc.name}」が得意先マスタに追加されました\nTEL：${nc.tel||"未登録"}`})});}catch(e){console.log("LINE通知エラー",e);}};
   const SECS=[{id:"staff",l:"👤 担当者"},{id:"products",l:" 商品"},{id:"clients",l:"🏢 得意先"},{id:"backup",l:"💾 バックアップ"}];
   return(
