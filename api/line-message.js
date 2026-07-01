@@ -6,6 +6,7 @@ export default async function handler(req, res) {
 
   if (!token) return res.status(400).json({ ok: false, error: 'LINE_TOKEN未設定' });
   if (!groupId) return res.status(400).json({ ok: false, error: 'LINE_GROUP_ID未設定' });
+  if (!message) return res.status(400).json({ ok: false, error: 'メッセージが空です' });
 
   try {
     const response = await fetch('https://api.line.me/v2/bot/message/push', {
@@ -16,7 +17,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         to: groupId,
-        messages: [{ type: 'text', text: message || 'テスト通知' }],
+        messages: [{ type: 'text', text: message }],
       }),
     });
     const data = await response.json();
