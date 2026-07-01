@@ -1,4 +1,10 @@
 export default async function handler(req, res) {
+  // 日本時間8時のみ実行（手動実行は除く）
+  const now = new Date();
+  const jstHour = new Date(now.getTime() + 9 * 60 * 60 * 1000).getUTCHours();
+  if (req.query.force !== '1' && jstHour !== 8) {
+    return res.status(200).json({ ok: true, skipped: true, jstHour, message: '実行時間外' });
+  }
   try {
     const SUPABASE_URL = process.env.SUPABASE_URL;
     const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
